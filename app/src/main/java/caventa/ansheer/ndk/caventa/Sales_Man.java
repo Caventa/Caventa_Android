@@ -2,6 +2,7 @@ package caventa.ansheer.ndk.caventa;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -137,6 +138,9 @@ public class Sales_Man extends AppCompatActivity {
                 public void onClick(View view, int position) {
                     Movie movie = movieList.get(position);
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent(getContext(),Work.class);
+                    i.putExtra("work",movie.getTitle());
+                    startActivity(i);
                 }
 
                 @Override

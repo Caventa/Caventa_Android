@@ -1,5 +1,7 @@
 package caventa.ansheer.ndk.caventa;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -79,6 +82,15 @@ public class Home extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
+
+//        // Associate searchable configuration with the SearchView
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -95,6 +107,8 @@ public class Home extends AppCompatActivity {
             startActivity(i);
             return true;
         }
+
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -138,6 +152,10 @@ public class Home extends AppCompatActivity {
                 public void onClick(View view, int position) {
                     Movie movie = movieList.get(position);
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent(getContext(),Work.class);
+                    i.putExtra("work",movie.getTitle());
+                    startActivity(i);
                 }
 
                 @Override

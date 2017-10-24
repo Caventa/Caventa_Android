@@ -3,8 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/search_100"
+        android:title="Search Work"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/menu_item_bank"
         android:icon="@drawable/bank_100"
         android:title="Item"
         app:showAsAction="always" />
+
+
 </menu>
