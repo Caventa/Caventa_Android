@@ -19,7 +19,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:label="Sales Persons" />
+        <activity
+            android:name=".Sales_Man"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Accounts"
+            android:label="Accounts" />
+        <activity android:name=".Add_Work"></activity>
     </application>
 
 </manifest>

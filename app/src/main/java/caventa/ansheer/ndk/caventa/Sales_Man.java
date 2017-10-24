@@ -1,20 +1,18 @@
 package caventa.ansheer.ndk.caventa;
 
 import android.content.Intent;
-import android.support.design.widget.TabLayout;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Home extends AppCompatActivity {
+public class Sales_Man extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,7 +43,10 @@ public class Home extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_sales);
+
+        Bundle extras=getIntent().getExtras();
+        setTitle(extras.getString("sales_man"));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,7 +68,7 @@ public class Home extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent i=new Intent(Home.this,MainActivity.class);
+                Intent i=new Intent(Sales_Man.this,Add_Work.class);
                 startActivity(i);
             }
         });
@@ -78,7 +79,7 @@ public class Home extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_sales, menu);
         return true;
     }
 
@@ -91,8 +92,6 @@ public class Home extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_bank) {
-            Intent i=new Intent(Home.this,Accounts.class);
-            startActivity(i);
             return true;
         }
 
@@ -287,7 +286,7 @@ public class Home extends AppCompatActivity {
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new MoviesAdapter(movieList);
+            mAdapter = new MoviesAdapter_Color(movieList);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -316,7 +315,7 @@ public class Home extends AppCompatActivity {
 
         private List<Movie> movieList = new ArrayList<>();
         private RecyclerView recyclerView;
-        private MoviesAdapter mAdapter;
+        private MoviesAdapter_Color mAdapter;
 
         private void prepareMovieData() {
 
@@ -388,5 +387,13 @@ public class Home extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        fin_data_flag = 0;
+        pen_data_flag = 0;
+        up_data_flag = 0;
+        super.onBackPressed();
     }
 }
