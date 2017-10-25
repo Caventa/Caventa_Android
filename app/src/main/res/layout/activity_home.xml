@@ -23,6 +23,19 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
+            <!--<FrameLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+
+                <!--<SearchView-->
+                    <!--android:id="@+id/menu_search"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="right|top"-->
+                    <!--android:maxWidth="250dp"-->
+                    <!--android:paddingTop="@dimen/appbar_padding_top" />-->
+
+            <!--</FrameLayout>-->
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.TabLayout
