@@ -10,5 +10,6 @@
     <string name="add_other_expense_sales"><![CDATA[Add Other Expense & Sales]]></string>
     <string name="detailed_monthly_expense_sales"><![CDATA[Detailed Monthly Expense & Sales]]></string>
     <string name="total_sales_total_expense"><![CDATA[Total Sales & Total Expense]]></string>
+    <string name="other_expenses_sales"><![CDATA[Other Expenses & Sales]]></string>
 
 </resources>

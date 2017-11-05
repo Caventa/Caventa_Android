@@ -1,20 +1,27 @@
 package caventa.ansheer.ndk.caventa;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -27,6 +34,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -65,6 +74,8 @@ public class Add_Work extends AppCompatActivity {
     double total_advance = 0, total_expense = 0, total_profit = 0;
     private Calendar calendar;
     private SimpleDateFormat sdf;
+    private EditText txt_name;
+    private EditText txt_address;
 
 
     @Override
@@ -305,6 +316,7 @@ public class Add_Work extends AppCompatActivity {
 
             }
         }));
+        initView();
     }
 
     private void calculate_total_profit() {
@@ -397,6 +409,11 @@ public class Add_Work extends AppCompatActivity {
     /* Keep track of the login task to ensure we can cancel it if requested. */
     private Work_Save_Task mAuthTask = null;
 
+    private void initView() {
+        txt_name = (EditText) findViewById(R.id.name);
+        txt_address = (EditText) findViewById(R.id.address);
+    }
+
     /* Represents an asynchronous login task used to authenticate the user. */
     public class Work_Save_Task extends AsyncTask<Void, Void, String[]> {
 
@@ -408,12 +425,12 @@ public class Add_Work extends AppCompatActivity {
                        Date work_date,
                        int sales_person_id
         ) {
-            task_work_name=work_name;
-            task_work_address=work_address;
-            task_advances_json=advances_json;
-            task_expenses_json=expenses_json;
-            task_work_date=work_date;
-            task_sales_person_id=sales_person_id;
+            task_work_name = work_name;
+            task_work_address = work_address;
+            task_advances_json = advances_json;
+            task_expenses_json = expenses_json;
+            task_work_date = work_date;
+            task_sales_person_id = sales_person_id;
         }
 
         DefaultHttpClient http_client;
@@ -428,12 +445,11 @@ public class Add_Work extends AppCompatActivity {
                 http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/add_work.php");
                 name_pair_value = new ArrayList<NameValuePair>(6);
                 name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
-
                 name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
                 name_pair_value.add(new BasicNameValuePair("work_date", task_work_date.toString()));
-                name_pair_value.add(new BasicNameValuePair("sales_person_id", task_work_address));
-                name_pair_value.add(new BasicNameValuePair("advances_json", task_work_address));
-                name_pair_value.add(new BasicNameValuePair("expenses_json", task_work_address));
+                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(task_sales_person_id)));
+                name_pair_value.add(new BasicNameValuePair("advances_json", task_advances_json));
+                name_pair_value.add(new BasicNameValuePair("expenses_json", task_expenses_json));
 
                 http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
@@ -452,13 +468,14 @@ public class Add_Work extends AppCompatActivity {
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
             mAuthTask = null;
+
             showProgress(false);
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
 
             if (network_action_response_array[0].equals("1")) {
-                Toast.makeText(Login.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Toast.makeText(Add_Work.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
 
@@ -525,47 +542,57 @@ public class Add_Work extends AppCompatActivity {
         }
     }
 
+
     private void attempt_work_save() {
         if (mAuthTask != null) {
             return;
         }
 
+        reset_errors(new EditText[]{txt_name, txt_address});
+
         // Reset errors.
-        username.setError(null);
-        passcode.setError(null);
+//        username.setError(null);
+//        passcode.setError(null);
 
         // Store values at the time of the login attempt.
-        String entered_username = username.getText().toString();
-        String entered_passcode = passcode.getText().toString();
+//        String entered_username = username.getText().toString();
+//        String entered_passcode = passcode.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+//        Pair<Integer, String> simplePair = new Pair<>(42, "Second");
+//        empty_check(new Pair<>(txt_name, "Please Enter Work Name..."));
+//        empty_check(new Pair[] {    new Pair(txt_name, "Please Enter Work Name..."),
+//                                    new Pair(txt_address, "Please Enter Work Address...")});
 
-        // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(entered_passcode)) {
-            passcode.setError("Please enter passcode");
-            focusView = passcode;
-            cancel = true;
-        }
+//        boolean cancel = false;
+//        View error_focus_View = null;
+//
+//        // Check for a valid password, if the user entered one.
+//        if (TextUtils.isEmpty(entered_passcode)) {
+//            passcode.setError("Please enter passcode");
+//            error_focus_View = passcode;
+//            cancel = true;
+//        }
+//
+//        // Check for a valid email address.
+//        if (TextUtils.isEmpty(entered_username)) {
+//            username.setError("Please enter username");
+//            error_focus_View = username;
+//            cancel = true;
+//        }
+        Pair<Boolean, EditText> empty_check_result=empty_check(new Pair[] { new Pair(txt_name, "Please Enter Work Name..."),
+                new Pair(txt_address, "Please Enter Work Address...")});
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(entered_username)) {
-            username.setError("Please enter username");
-            focusView = username;
-            cancel = true;
-        }
-
-        if (cancel) {
+        if (empty_check_result.first) {
             // There was an error; don't attempt login and focus the first form field with an error.
-            focusView.requestFocus();
+            empty_check_result.second.requestFocus();
         } else {
 
-            InputMethodManager inputManager =
-                    (InputMethodManager) getApplicationContext().
-                            getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(
-                    this.getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
+//            InputMethodManager inputManager =
+//                    (InputMethodManager) getApplicationContext().
+//                            getSystemService(Context.INPUT_METHOD_SERVICE);
+//            inputManager.hideSoftInputFromWindow(
+//                    this.getCurrentFocus().getWindowToken(),
+//                    InputMethodManager.HIDE_NOT_ALWAYS);
 
             // Show a progress spinner, and kick off a background task to perform the user login attempt.
             if (isOnline()) {
@@ -575,6 +602,23 @@ public class Add_Work extends AppCompatActivity {
             } else {
                 Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
             }
+        }
+    }
+
+    private Pair<Boolean, EditText> empty_check(Pair[] editText_Error_Pairs) {
+        for (Pair<EditText,String> editText_Error_Pair : editText_Error_Pairs) {
+            if(TextUtils.isEmpty(editText_Error_Pair.first.getText().toString()))
+            {
+                editText_Error_Pair.first.setError(editText_Error_Pair.second);
+                return new Pair<>(true,editText_Error_Pair.first);
+            }
+        }
+        return new Pair<>(false,null);
+    }
+
+    private void reset_errors(EditText[] edit_texts) {
+        for (EditText edit_text : edit_texts) {
+            edit_text.setError(null);
         }
     }
 

@@ -51,10 +51,10 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".Sales_Persons"
             android:label="Sales Persons" />
         <activity
-            android:name=".Sales_Man"
+            android:name=".Sales_Person"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Accounts"

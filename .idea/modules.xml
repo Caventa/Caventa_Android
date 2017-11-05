@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Caventa.iml" filepath="$PROJECT_DIR$/Caventa.iml" />
+      <module fileurl="file://D:\DK-HP-PA-2000AR\Laboratory\Android_Studio\Caventa_Android\Caventa.iml" filepath="D:\DK-HP-PA-2000AR\Laboratory\Android_Studio\Caventa_Android\Caventa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Caventa_Android.iml" filepath="$PROJECT_DIR$/Caventa_Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

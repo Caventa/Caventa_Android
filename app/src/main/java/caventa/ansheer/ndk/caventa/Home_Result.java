@@ -71,7 +71,7 @@ public class Home_Result extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent i=new Intent(Home_Result.this,MainActivity.class);
+                Intent i=new Intent(Home_Result.this,Sales_Persons.class);
                 startActivity(i);
             }
         });

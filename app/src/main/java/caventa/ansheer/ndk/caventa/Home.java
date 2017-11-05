@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,27 +49,27 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent i=new Intent(Home.this,MainActivity.class);
+                Intent i=new Intent(Home.this,Sales_Persons.class);
                 startActivity(i);
             }
         });
@@ -376,13 +375,15 @@ public class Home extends AppCompatActivity {
             // Return a Pending_Works_Fragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return Pending_Works_Fragment.newInstance();
+                    return Upcoming_Works_Fragment.newInstance();
+
 
                 case 1:
-                    return Finished_Works_Fragment.newInstance();
+                    return Pending_Works_Fragment.newInstance();
+
 
                 default:
-                    return Upcoming_Works_Fragment.newInstance();
+                    return Finished_Works_Fragment.newInstance();
 
 
             }
@@ -398,11 +399,11 @@ public class Home extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Fin";
+                    return "Up";
                 case 1:
                     return "Pen";
                 case 2:
-                    return "Up";
+                    return "Fin";
             }
             return null;
         }
