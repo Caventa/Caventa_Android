@@ -5,33 +5,33 @@ package caventa.ansheer.ndk.caventa.models;
  */
 
 public class Work_Advance {
-    int id,work_id;
+//    int id,work_id;
     Double amount;
-    String description,insertion_date_time;
+    String description; //insertion_date_time
 
-    public Work_Advance(int id, int work_id, Double amount, String description, String insertion_date_time) {
-        this.id = id;
-        this.work_id = work_id;
+    public Work_Advance(Double amount, String description) {
+//        this.id = id;
+//        this.work_id = work_id;
         this.amount = amount;
         this.description = description;
-        this.insertion_date_time = insertion_date_time;
+//        this.insertion_date_time = insertion_date_time;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getWork_id() {
-        return work_id;
-    }
-
-    public void setWork_id(int work_id) {
-        this.work_id = work_id;
-    }
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
+//
+//    public int getWork_id() {
+//        return work_id;
+//    }
+//
+//    public void setWork_id(int work_id) {
+//        this.work_id = work_id;
+//    }
 
     public Double getAmount() {
         return amount;
@@ -49,11 +49,11 @@ public class Work_Advance {
         this.description = description;
     }
 
-    public String getInsertion_date_time() {
-        return insertion_date_time;
-    }
-
-    public void setInsertion_date_time(String insertion_date_time) {
-        this.insertion_date_time = insertion_date_time;
-    }
+//    public String getInsertion_date_time() {
+//        return insertion_date_time;
+//    }
+//
+//    public void setInsertion_date_time(String insertion_date_time) {
+//        this.insertion_date_time = insertion_date_time;
+//    }
 }

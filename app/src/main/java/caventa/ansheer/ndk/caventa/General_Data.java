@@ -5,6 +5,7 @@ package caventa.ansheer.ndk.caventa;
  */
 
 class General_Data {
+    public static final String SERVER_IP_ADDRESS = "http://filebooker.com.md-1.webhostbox.net/caventa_production";
     public static String TAG = "Caventa Manager";
 }
 

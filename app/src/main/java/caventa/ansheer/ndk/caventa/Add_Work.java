@@ -1,6 +1,7 @@
 package caventa.ansheer.ndk.caventa;
 
 import android.app.DatePickerDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,10 +19,22 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -63,7 +76,6 @@ public class Add_Work extends AppCompatActivity {
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_total_profit = findViewById(R.id.total_profit);
-
 
 
         work_advances = new ArrayList<>();
@@ -132,10 +144,16 @@ public class Add_Work extends AppCompatActivity {
         pick_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date_Picker_Utils.show_date_picker(Add_Work.this,date,calendar);
+                Date_Picker_Utils.show_date_picker(Add_Work.this, date, calendar);
             }
         });
 
+        txt_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date_Picker_Utils.show_date_picker(Add_Work.this, date, calendar);
+            }
+        });
 
         ImageView add_advance_button = findViewById(R.id.add_advance);
         add_advance_button.setOnClickListener(new View.OnClickListener() {
@@ -167,7 +185,7 @@ public class Add_Work extends AppCompatActivity {
 //                                String name = ((EditText)dialog.findViewById(R.id.address)).getText().toString();
 //                                String number = ((EditText)dialog.findViewById(R.id.name)).getText().toString();
 
-                                Work_Advance work_advance = new Work_Advance(2, 1, Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString(), "2017-10-05 05:20:23");
+                                Work_Advance work_advance = new Work_Advance(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
                                 work_advances.add(work_advance);
 
                                 total_advance = total_advance + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
@@ -213,7 +231,7 @@ public class Add_Work extends AppCompatActivity {
 //                                work_expenses_sugar_adapter = new Work_Expenses_Sugar_Adapter(Add_Work.this, work_expense_sugars);
 //                                work_expenses_recycler_view.setAdapter(work_expenses_sugar_adapter);
 
-                                Work_Expense work_expense = new Work_Expense(2, 1, Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString(), "2017-10-05 05:20:23");
+                                Work_Expense work_expense = new Work_Expense(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
                                 work_expenses.add(work_expense);
 
                                 total_expense = total_expense + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
@@ -242,17 +260,17 @@ public class Add_Work extends AppCompatActivity {
 //                Toast_Utils.longToast(getApplicationContext(),view.toString());
 //                ImageView delete_icon=(ImageView)view.findViewById(R.id.delete_icon);
 //                Toast_Utils.longToast(getApplicationContext(),delete_icon.getContentDescription().toString());
-                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
-                    work_advances.remove(position);
+//                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
+                work_advances.remove(position);
 
-                    String description_amount=((TextView)view.findViewById(R.id.description_amount)).getText().toString();
-                    total_advance = total_advance - Double.parseDouble(description_amount.substring(description_amount.indexOf("-")+1));
-                    txt_total_advance.setText("Advances : " + total_advance);
+                String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
+                total_advance = total_advance - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
+                txt_total_advance.setText("Advances : " + total_advance);
 
-                    calculate_total_profit();
+                calculate_total_profit();
 
-                    work_advances_adapter.notifyDataSetChanged();
-                }
+                work_advances_adapter.notifyDataSetChanged();
+//                }
             }
 
             @Override
@@ -267,19 +285,19 @@ public class Add_Work extends AppCompatActivity {
 //                Toast_Utils.longToast(getApplicationContext(), view.toString());
 //                ImageView delete_icon = (ImageView) view.findViewById(R.id.delete_icon);
 //                Toast_Utils.longToast(getApplicationContext(), delete_icon.getContentDescription().toString());
-                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
-                    work_expenses.remove(position);
+//                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
+                work_expenses.remove(position);
 
 
-                    String description_amount=((TextView)view.findViewById(R.id.description_amount)).getText().toString();
+                String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
 
-                    total_expense = total_expense - Double.parseDouble(description_amount.substring(description_amount.indexOf("-")+1));
+                total_expense = total_expense - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
 
-                    txt_total_expense.setText("Expenses : " + total_expense);
-                    calculate_total_profit();
+                txt_total_expense.setText("Expenses : " + total_expense);
+                calculate_total_profit();
 
-                    work_expenses_adapter.notifyDataSetChanged();
-                }
+                work_expenses_adapter.notifyDataSetChanged();
+//                }
             }
 
             @Override
@@ -325,24 +343,24 @@ public class Add_Work extends AppCompatActivity {
 //        work_advances_sugar_adapter.notifyDataSetChanged();
 //    }
 
-    private void fill_work_expenses_demo_Data() {
-        Work_Expense work_expense = new Work_Expense(1, 1, 10.5, "Test Expense", "2017-10-05 05:20:23");
-        work_expenses.add(work_expense);
-        work_expense = new Work_Expense(2, 1, 12.5, "Test Expense 2", "2017-10-05 05:22:23");
-        work_expenses.add(work_expense);
-
-        work_expenses_adapter.notifyDataSetChanged();
-    }
-
-    private void fill_work_advances_demo_Data() {
-        Work_Advance work_advance = new Work_Advance(1, 1, 10.5, "Test Advance", "2017-10-05 05:20:23");
-        work_advances.add(work_advance);
-
-        work_advance = new Work_Advance(2, 1, 15.5, "Test Advance 2", "2017-10-05 05:22:23");
-        work_advances.add(work_advance);
-
-        work_advances_adapter.notifyDataSetChanged();
-    }
+//    private void fill_work_expenses_demo_Data() {
+//        Work_Expense work_expense = new Work_Expense(1, 1, 10.5, "Test Expense", "2017-10-05 05:20:23");
+//        work_expenses.add(work_expense);
+//        work_expense = new Work_Expense(2, 1, 12.5, "Test Expense 2", "2017-10-05 05:22:23");
+//        work_expenses.add(work_expense);
+//
+//        work_expenses_adapter.notifyDataSetChanged();
+//    }
+//
+//    private void fill_work_advances_demo_Data() {
+//        Work_Advance work_advance = new Work_Advance(1, 1, 10.5, "Test Advance", "2017-10-05 05:20:23");
+//        work_advances.add(work_advance);
+//
+//        work_advance = new Work_Advance(2, 1, 15.5, "Test Advance 2", "2017-10-05 05:22:23");
+//        work_advances.add(work_advance);
+//
+//        work_advances_adapter.notifyDataSetChanged();
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -366,13 +384,198 @@ public class Add_Work extends AppCompatActivity {
 
         if (id == R.id.menu_item_save) {
 //            this.finish();
-            Toast_Utils.longToast(getApplicationContext(), "Success...");
+//            Toast_Utils.longToast(getApplicationContext(), "Success...");
+            attempt_work_save();
             this.finish();
             return true;
         }
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /* Keep track of the login task to ensure we can cancel it if requested. */
+    private Work_Save_Task mAuthTask = null;
+
+    /* Represents an asynchronous login task used to authenticate the user. */
+    public class Work_Save_Task extends AsyncTask<Void, Void, String[]> {
+
+        String task_work_name, task_work_address, task_advances_json, task_expenses_json;
+        Date task_work_date;
+        int task_sales_person_id;
+
+        Work_Save_Task(String work_name, String work_address, String advances_json, String expenses_json,
+                       Date work_date,
+                       int sales_person_id
+        ) {
+            task_work_name=work_name;
+            task_work_address=work_address;
+            task_advances_json=advances_json;
+            task_expenses_json=expenses_json;
+            task_work_date=work_date;
+            task_sales_person_id=sales_person_id;
+        }
+
+        DefaultHttpClient http_client;
+        HttpPost http_post;
+        ArrayList<NameValuePair> name_pair_value;
+        String network_action_response;
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                http_client = new DefaultHttpClient();
+                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/add_work.php");
+                name_pair_value = new ArrayList<NameValuePair>(6);
+                name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
+
+                name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
+                name_pair_value.add(new BasicNameValuePair("work_date", task_work_date.toString()));
+                name_pair_value.add(new BasicNameValuePair("sales_person_id", task_work_address));
+                name_pair_value.add(new BasicNameValuePair("advances_json", task_work_address));
+                name_pair_value.add(new BasicNameValuePair("expenses_json", task_work_address));
+
+                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                ResponseHandler<String> response_handler = new BasicResponseHandler();
+                network_action_response = http_client.execute(http_post, response_handler);
+                return new String[]{"0", network_action_response};
+
+            } catch (UnsupportedEncodingException e) {
+                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+            } catch (ClientProtocolException e) {
+                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+            } catch (IOException e) {
+                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final String[] network_action_response_array) {
+            mAuthTask = null;
+            showProgress(false);
+
+            Log.d(General_Data.TAG, network_action_response_array[0]);
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+
+            if (network_action_response_array[0].equals("1")) {
+                Toast.makeText(Login.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+            } else {
+
+                try {
+                    JSONArray json = new JSONArray(network_action_response_array[1]);
+                    String count = json.getJSONObject(0).getString("count");
+                    switch (count) {
+                        case "1":
+                            SharedPreferences settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = settings.edit();
+                            editor.putString("username", task_username);
+                            editor.putFloat("A", Float.parseFloat(json.getJSONObject(0).getString("A")));
+                            editor.putFloat("AB", Float.parseFloat(json.getJSONObject(0).getString("AB")));
+                            editor.putFloat("ABC", Float.parseFloat(json.getJSONObject(0).getString("ABC")));
+
+                            editor.putFloat("agent_money_lsk1", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk1")));
+                            editor.putFloat("agent_money_lsk2", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk2")));
+                            editor.putFloat("agent_money_lsk3", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk3")));
+                            editor.putFloat("agent_money_lsk4", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk4")));
+                            editor.putFloat("agent_money_lsk5", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk5")));
+                            editor.putFloat("agent_money_lsk6", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk6")));
+
+                            editor.putFloat("agent_money_box1", Float.parseFloat(json.getJSONObject(0).getString("agent_money_box1")));
+                            editor.putFloat("agent_money_box2", Float.parseFloat(json.getJSONObject(0).getString("agent_money_box2")));
+
+                            editor.putFloat("agent_money_ab", Float.parseFloat(json.getJSONObject(0).getString("agent_money_ab")));
+
+                            editor.putFloat("agent_money_a", Float.parseFloat(json.getJSONObject(0).getString("agent_money_a")));
+
+                            editor.putString("phone", json.getJSONObject(0).getString("phone"));
+
+                            if (json.getJSONObject(1).getString("time_status").equals("1")) {
+                                editor.putString("resume_time", json.getJSONObject(1).getString("resume"));
+                            }
+                            editor.putString("time_status", json.getJSONObject(1).getString("time_status"));
+                            editor.apply();
+                            Intent i = new Intent(Login.this, POS.class);
+                            startActivity(i);
+                            finish();
+                            break;
+                        case "0":
+                            Toast.makeText(Login.this, "Login Failure!", Toast.LENGTH_LONG).show();
+                            username.requestFocus();
+                            break;
+                        default:
+                            Toast.makeText(Login.this, "Error : Check json", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    Toast.makeText(Login.this, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                }
+
+
+            }
+
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    private void attempt_work_save() {
+        if (mAuthTask != null) {
+            return;
+        }
+
+        // Reset errors.
+        username.setError(null);
+        passcode.setError(null);
+
+        // Store values at the time of the login attempt.
+        String entered_username = username.getText().toString();
+        String entered_passcode = passcode.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (TextUtils.isEmpty(entered_passcode)) {
+            passcode.setError("Please enter passcode");
+            focusView = passcode;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(entered_username)) {
+            username.setError("Please enter username");
+            focusView = username;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first form field with an error.
+            focusView.requestFocus();
+        } else {
+
+            InputMethodManager inputManager =
+                    (InputMethodManager) getApplicationContext().
+                            getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(
+                    this.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+
+            // Show a progress spinner, and kick off a background task to perform the user login attempt.
+            if (isOnline()) {
+                showProgress(true);
+                mAuthTask = new Work_Save_Task(entered_username, entered_passcode);
+                mAuthTask.execute((Void) null);
+            } else {
+                Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+            }
+        }
     }
 
 }
