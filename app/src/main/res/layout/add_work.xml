@@ -64,6 +64,11 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.v4.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -93,6 +98,7 @@
                     android:layout_toRightOf="@+id/space"
 
                     android:text="22-10-2015"
+                    android:textAlignment="center"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </RelativeLayout>

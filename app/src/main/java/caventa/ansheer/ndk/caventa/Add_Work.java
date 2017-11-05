@@ -1,22 +1,19 @@
 package caventa.ansheer.ndk.caventa;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -26,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
@@ -122,7 +118,8 @@ public class Add_Work extends AppCompatActivity {
         final TextView txt_date = findViewById(R.id.work_date);
 
         calendar = Calendar.getInstance();
-        sdf = Date_Utils.normal_Date_Format;
+        sdf = Date_Utils.normal_Date_Format_words;
+        txt_date.setText(sdf.format(calendar.getTime()));
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 calendar.set(Calendar.YEAR, year);
@@ -135,7 +132,7 @@ public class Add_Work extends AppCompatActivity {
         pick_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date_Picker_Utils.show_date_picker_upto_today(getApplicationContext(),date,calendar);
+                Date_Picker_Utils.show_date_picker(Add_Work.this,date,calendar);
             }
         });
 
