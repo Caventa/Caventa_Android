@@ -141,14 +141,14 @@ public class Add_Work extends AppCompatActivity {
         final TextView txt_date = findViewById(R.id.work_date);
 
         calendar = Calendar.getInstance();
-        sdf = Date_Utils.normal_Date_Format_words;
-        txt_date.setText(sdf.format(calendar.getTime()));
+//        sdf = Date_Utils.normal_Date_Format_words;
+        txt_date.setText(Date_Utils.normal_Date_Format_words.format(calendar.getTime()));
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, monthOfYear);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                txt_date.setText(sdf.format(calendar.getTime()));
+                txt_date.setText(Date_Utils.normal_Date_Format_words.format(calendar.getTime()));
             }
         };
 
@@ -410,8 +410,8 @@ public class Add_Work extends AppCompatActivity {
     private Work_Save_Task mAuthTask = null;
 
     private void initView() {
-        txt_name = (EditText) findViewById(R.id.name);
-        txt_address = (EditText) findViewById(R.id.address);
+        txt_name = findViewById(R.id.name);
+        txt_address = findViewById(R.id.address);
     }
 
     /* Represents an asynchronous login task used to authenticate the user. */
@@ -446,7 +446,7 @@ public class Add_Work extends AppCompatActivity {
                 name_pair_value = new ArrayList<NameValuePair>(6);
                 name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
                 name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
-                name_pair_value.add(new BasicNameValuePair("work_date", task_work_date.toString()));
+                name_pair_value.add(new BasicNameValuePair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)));
                 name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(task_sales_person_id)));
                 name_pair_value.add(new BasicNameValuePair("advances_json", task_advances_json));
                 name_pair_value.add(new BasicNameValuePair("expenses_json", task_expenses_json));
