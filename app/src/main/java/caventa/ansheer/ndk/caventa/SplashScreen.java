@@ -60,7 +60,7 @@ public class SplashScreen extends Activity {
         @Override
         protected String[] doInBackground(Void... params) {
 
-            return Update_Utils.get_server_version("master", "http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_version.php");
+            return Update_Utils.get_server_version("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_version.php");
         }
 
         @Override
