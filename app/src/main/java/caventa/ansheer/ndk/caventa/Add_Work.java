@@ -1,10 +1,15 @@
 package caventa.ansheer.ndk.caventa;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
@@ -16,7 +21,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,6 +40,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -77,17 +82,23 @@ public class Add_Work extends AppCompatActivity {
     private EditText txt_name;
     private EditText txt_address;
 
+    private View mProgressView;
+    private View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_work);
         setTitle("New Work");
-
+        application_context = getApplicationContext();
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
+                Context.MODE_PRIVATE);
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_total_profit = findViewById(R.id.total_profit);
 
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
 
         work_advances = new ArrayList<>();
         work_advances_adapter = new Work_Advances_Adapter(this, work_advances);
@@ -398,7 +409,7 @@ public class Add_Work extends AppCompatActivity {
 //            this.finish();
 //            Toast_Utils.longToast(getApplicationContext(), "Success...");
             attempt_work_save();
-            this.finish();
+//            this.finish();
             return true;
         }
 
@@ -465,6 +476,7 @@ public class Add_Work extends AppCompatActivity {
             }
         }
 
+
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
             mAuthTask = null;
@@ -480,52 +492,25 @@ public class Add_Work extends AppCompatActivity {
             } else {
 
                 try {
-                    JSONArray json = new JSONArray(network_action_response_array[1]);
-                    String count = json.getJSONObject(0).getString("count");
+                    JSONObject json = new JSONObject(network_action_response_array[1]);
+                    String count = json.getString("status");
                     switch (count) {
-                        case "1":
-                            SharedPreferences settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putString("username", task_username);
-                            editor.putFloat("A", Float.parseFloat(json.getJSONObject(0).getString("A")));
-                            editor.putFloat("AB", Float.parseFloat(json.getJSONObject(0).getString("AB")));
-                            editor.putFloat("ABC", Float.parseFloat(json.getJSONObject(0).getString("ABC")));
-
-                            editor.putFloat("agent_money_lsk1", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk1")));
-                            editor.putFloat("agent_money_lsk2", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk2")));
-                            editor.putFloat("agent_money_lsk3", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk3")));
-                            editor.putFloat("agent_money_lsk4", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk4")));
-                            editor.putFloat("agent_money_lsk5", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk5")));
-                            editor.putFloat("agent_money_lsk6", Float.parseFloat(json.getJSONObject(0).getString("agent_money_lsk6")));
-
-                            editor.putFloat("agent_money_box1", Float.parseFloat(json.getJSONObject(0).getString("agent_money_box1")));
-                            editor.putFloat("agent_money_box2", Float.parseFloat(json.getJSONObject(0).getString("agent_money_box2")));
-
-                            editor.putFloat("agent_money_ab", Float.parseFloat(json.getJSONObject(0).getString("agent_money_ab")));
-
-                            editor.putFloat("agent_money_a", Float.parseFloat(json.getJSONObject(0).getString("agent_money_a")));
-
-                            editor.putString("phone", json.getJSONObject(0).getString("phone"));
-
-                            if (json.getJSONObject(1).getString("time_status").equals("1")) {
-                                editor.putString("resume_time", json.getJSONObject(1).getString("resume"));
-                            }
-                            editor.putString("time_status", json.getJSONObject(1).getString("time_status"));
-                            editor.apply();
-                            Intent i = new Intent(Login.this, POS.class);
-                            startActivity(i);
-                            finish();
-                            break;
                         case "0":
-                            Toast.makeText(Login.this, "Login Failure!", Toast.LENGTH_LONG).show();
-                            username.requestFocus();
+                            Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
+//                            Intent i = new Intent(Agent_Addition.this, Agent_Addition.class);
+//                            startActivity(i);
+//                            finish();
+                            break;
+                        case "1":
+                            Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
+                            txt_name.requestFocus();
                             break;
                         default:
-                            Toast.makeText(Login.this, "Error : Check json", Toast.LENGTH_LONG).show();
+                            Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
-                    Toast.makeText(Login.this, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
                 }
 
@@ -579,7 +564,7 @@ public class Add_Work extends AppCompatActivity {
 //            error_focus_View = username;
 //            cancel = true;
 //        }
-        Pair<Boolean, EditText> empty_check_result=empty_check(new Pair[] { new Pair(txt_name, "Please Enter Work Name..."),
+        Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair(txt_name, "Please Enter Work Name..."),
                 new Pair(txt_address, "Please Enter Work Address...")});
 
         if (empty_check_result.first) {
@@ -597,7 +582,7 @@ public class Add_Work extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to perform the user login attempt.
             if (isOnline()) {
                 showProgress(true);
-                mAuthTask = new Work_Save_Task(entered_username, entered_passcode);
+                mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person", 0));
                 mAuthTask.execute((Void) null);
             } else {
                 Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -605,15 +590,103 @@ public class Add_Work extends AppCompatActivity {
         }
     }
 
+    private String generate_expenses_json() {
+
+        JSONArray mJSONArray = new JSONArray();
+        for (int i = 0; i < work_expenses.size(); i++) {
+//            TableRow rw = (TableRow) table_tickets.getChildAt(i);
+//
+//            if (((ColorDrawable) rw.getBackground()).getColor() == GREEN) {
+            JSONObject json_obj = new JSONObject();
+            try {
+                json_obj.put("description", work_expenses.get(i).getDescription());
+//                    String cnt = ((TextView) rw.getChildAt(1)).getText().toString();
+//                    json_obj.put("serial", cnt.substring(0, cnt.indexOf("-")).trim());
+//                    json_obj.put("count", cnt.substring(cnt.indexOf("-") + 1).trim());
+                json_obj.put("amount", work_expenses.get(i).getAmount());
+                mJSONArray.put(json_obj);
+            } catch (JSONException e) {
+                Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
+            }
+//            }
+        }
+        Log.d(General_Data.TAG, mJSONArray.toString());
+        return mJSONArray.toString();
+
+    }
+
+    private String generate_advances_json() {
+
+
+        JSONArray mJSONArray = new JSONArray();
+        for (int i = 0; i < work_advances.size(); i++) {
+//            TableRow rw = (TableRow) table_tickets.getChildAt(i);
+//
+//            if (((ColorDrawable) rw.getBackground()).getColor() == GREEN) {
+            JSONObject json_obj = new JSONObject();
+            try {
+                json_obj.put("description", work_advances.get(i).getDescription());
+//                    String cnt = ((TextView) rw.getChildAt(1)).getText().toString();
+//                    json_obj.put("serial", cnt.substring(0, cnt.indexOf("-")).trim());
+//                    json_obj.put("count", cnt.substring(cnt.indexOf("-") + 1).trim());
+                json_obj.put("amount", work_advances.get(i).getAmount());
+                mJSONArray.put(json_obj);
+            } catch (JSONException e) {
+                Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
+            }
+//            }
+        }
+        Log.d(General_Data.TAG, mJSONArray.toString());
+        return mJSONArray.toString();
+    }
+
+    Context application_context;
+    private SharedPreferences settings;
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
     private Pair<Boolean, EditText> empty_check(Pair[] editText_Error_Pairs) {
-        for (Pair<EditText,String> editText_Error_Pair : editText_Error_Pairs) {
-            if(TextUtils.isEmpty(editText_Error_Pair.first.getText().toString()))
-            {
+        for (Pair<EditText, String> editText_Error_Pair : editText_Error_Pairs) {
+            if (TextUtils.isEmpty(editText_Error_Pair.first.getText().toString())) {
                 editText_Error_Pair.first.setError(editText_Error_Pair.second);
-                return new Pair<>(true,editText_Error_Pair.first);
+                return new Pair<>(true, editText_Error_Pair.first);
             }
         }
-        return new Pair<>(false,null);
+        return new Pair<>(false, null);
     }
 
     private void reset_errors(EditText[] edit_texts) {
