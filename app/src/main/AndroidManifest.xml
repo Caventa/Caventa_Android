@@ -58,7 +58,7 @@
             android:name=".Sales_Persons"
             android:label="Sales Persons" />
         <activity
-            android:name=".Sales_Person"
+            android:name=".Sales_Person_Home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Accounts"

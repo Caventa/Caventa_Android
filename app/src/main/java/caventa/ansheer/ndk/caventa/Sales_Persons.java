@@ -1,25 +1,55 @@
 package caventa.ansheer.ndk.caventa;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import ndk.prism.common_utils.Date_Utils;
 
 public class Sales_Persons extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private AlbumsAdapter adapter;
     private List<Album> albumList;
+    Context application_context;
+    private View mProgressView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +59,8 @@ public class Sales_Persons extends AppCompatActivity {
 //        setSupportActionBar(toolbar);
 //
 //        initCollapsingToolbar();
+        mProgressView = findViewById(R.id.login_progress);
+        application_context = getApplicationContext();
 
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -41,30 +73,204 @@ public class Sales_Persons extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+//        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                Album album = albumList.get(position);
+//                Toast.makeText(getApplicationContext(), album.getName() + " is selected!", Toast.LENGTH_SHORT).show();
+//                Intent i=new Intent(Sales_Persons.this,Sales_Person_Home.class);
+//                i.putExtra("sales_person",album.getName());
+//                startActivity(i);
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//        }));
+
+
+//        prepareAlbums();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view, int position) {
-                Album album = albumList.get(position);
-                Toast.makeText(getApplicationContext(), album.getName() + " is selected!", Toast.LENGTH_SHORT).show();
-                Intent i=new Intent(Sales_Persons.this,Sales_Person.class);
-                i.putExtra("sales_person",album.getName());
-                startActivity(i);
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+//                Intent i=new Intent(application_context,Sales_Persons.class);
+//                startActivity(i);
             }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
-
-
-        prepareAlbums();
+        });
 
 //        try {
 //            Glide.with(this).load(R.drawable.cover).into((ImageView) findViewById(R.id.backdrop));
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    /* Represents an asynchronous login task used to authenticate the user. */
+    public class Load_Sales_Persons extends AsyncTask<Void, Void, String[]> {
+
+//        String task_work_name, task_work_address, task_advances_json, task_expenses_json;
+//        Date task_work_date;
+//        int task_sales_person_id;
+
+        Load_Sales_Persons()
+//                (String work_name, String work_address, String advances_json, String expenses_json, Date work_date, int sales_person_id)
+        {
+//            task_work_name = work_name;
+//            task_work_address = work_address;
+//            task_advances_json = advances_json;
+//            task_expenses_json = expenses_json;
+//            task_work_date = work_date;
+//            task_sales_person_id = sales_person_id;
+        }
+
+        DefaultHttpClient http_client;
+        HttpPost http_post;
+        //        ArrayList<NameValuePair> name_pair_value;
+        String network_action_response;
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                http_client = new DefaultHttpClient();
+                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_persons.php");
+//                name_pair_value = new ArrayList<NameValuePair>(6);
+//                name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
+//                name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
+//                name_pair_value.add(new BasicNameValuePair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)));
+//                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(task_sales_person_id)));
+//                name_pair_value.add(new BasicNameValuePair("advances_json", task_advances_json));
+//                name_pair_value.add(new BasicNameValuePair("expenses_json", task_expenses_json));
+//
+//                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                ResponseHandler<String> response_handler = new BasicResponseHandler();
+                network_action_response = http_client.execute(http_post, response_handler);
+                return new String[]{"0", network_action_response};
+
+            } catch (UnsupportedEncodingException e) {
+                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+            } catch (ClientProtocolException e) {
+                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+            } catch (IOException e) {
+                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final String[] network_action_response_array) {
+            mAuthTask = null;
+
+            showProgress(false);
+
+            Log.d(General_Data.TAG, network_action_response_array[0]);
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+
+            if (network_action_response_array[0].equals("1")) {
+                Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+            } else {
+
+
+                try {
+
+                    JSONArray json_array = new JSONArray(network_action_response_array[1]);
+                    if (json_array.getJSONObject(0).getString("status").equals("1")) {
+                        Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                    } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
+
+
+                        for (int i = 1; i < json_array.length(); i++) {
+
+//                                spinner_list.add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
+//                                pum.getMenu().add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
+
+
+
+                        }
+
+
+                    }
+
+
+//                    JSONObject json = new JSONObject(network_action_response_array[1]);
+//                    String count = json.getString("status");
+//                    switch (count) {
+//                        case "0":
+//                            Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
+////                            Intent i = new Intent(Agent_Addition.this, Agent_Addition.class);
+////                            startActivity(i);
+////                            finish();
+//                            break;
+//                        case "1":
+//                            Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
+////                            txt_name.requestFocus();
+//                            finish();
+//                            break;
+//                        default:
+//                            Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
+//                    }
+
+                } catch (JSONException e) {
+                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                }
+
+
+            }
+
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    /* Keep track of the login task to ensure we can cancel it if requested. */
+    private Load_Sales_Persons mAuthTask = null;
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+//        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+//        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+//                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+//            }
+//        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     /**

@@ -23,7 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sales_Person extends AppCompatActivity {
+public class Sales_Person_Home extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -48,7 +48,7 @@ public class Sales_Person extends AppCompatActivity {
         Bundle extras=getIntent().getExtras();
         setTitle(extras.getString("sales_person"));
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -68,7 +68,7 @@ public class Sales_Person extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent i=new Intent(Sales_Person.this,Add_Work.class);
+                Intent i=new Intent(Sales_Person_Home.this,Add_Work.class);
                 startActivity(i);
             }
         });
