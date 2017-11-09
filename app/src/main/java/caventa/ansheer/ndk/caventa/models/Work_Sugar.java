@@ -2,10 +2,6 @@ package caventa.ansheer.ndk.caventa.models;
 
 import com.orm.SugarRecord;
 
-/**
- * Created by prism on 01-11-2017.
- */
-
 public class Work_Sugar extends SugarRecord {
     int sales_person_id;
     boolean status;

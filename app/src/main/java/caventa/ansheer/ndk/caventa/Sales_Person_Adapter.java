@@ -8,55 +8,61 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 
-/**
- * Created by Ravi Tamada on 18/05/16.
- */
+import static com.koushikdutta.ion.Ion.with;
+
 public class Sales_Person_Adapter extends RecyclerView.Adapter<Sales_Person_Adapter.MyViewHolder> {
 
     private Context mContext;
-    private List<Sales_Person> albumList;
+    private List<Sales_Person> sales_persons;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, count;
-        public ImageView thumbnail, overflow;
+        public ImageView thumbnail;
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
-            count = (TextView) view.findViewById(R.id.count);
-            thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
+            title = view.findViewById(R.id.title);
+            thumbnail = view.findViewById(R.id.thumbnail);
 //            overflow = (ImageView) view.findViewById(R.id.overflow);
+
         }
     }
 
 
-    public Sales_Person_Adapter(Context mContext, List<Sales_Person> albumList) {
+    public Sales_Person_Adapter(Context mContext, List<Sales_Person> sales_persons) {
         this.mContext = mContext;
-        this.albumList = albumList;
+        this.sales_persons = sales_persons;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.album_card, parent, false);
+                .inflate(R.layout.card_sales_person, parent, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Sales_Person album = albumList.get(position);
+        Sales_Person album = sales_persons.get(position);
         holder.title.setText(album.getName());
-        holder.count.setText(album.getNumOfSongs() + " works");
 
         // loading album cover using Glide library
-        Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
+//        Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
+
+        // This is the "long" way to do build an ImageView request... it allows you to set headers, etc.
+        with(mContext)
+                .load("http://"+General_Data.SERVER_IP_ADDRESS+"/icons/"+album.getId()+".jpg")
+                .withBitmap()
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.error_image)
+//                .animateLoad(spinAnimation)
+//                .animateIn(fadeInAnimation)
+                .intoImageView(holder.thumbnail);
 
 //        holder.overflow.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -103,6 +109,6 @@ public class Sales_Person_Adapter extends RecyclerView.Adapter<Sales_Person_Adap
 
     @Override
     public int getItemCount() {
-        return albumList.size();
+        return sales_persons.size();
     }
 }

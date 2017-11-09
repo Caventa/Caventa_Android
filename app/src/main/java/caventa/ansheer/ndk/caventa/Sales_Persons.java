@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
@@ -23,31 +24,26 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import ndk.prism.common_utils.Date_Utils;
+import caventa.ansheer.ndk.caventa.models.Sales_Person;
 
 public class Sales_Persons extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private AlbumsAdapter adapter;
-    private List<Album> albumList;
+    private Sales_Person_Adapter sales_person_adapter;
+    private List<Sales_Person> sales_persons;
     Context application_context;
     private View mProgressView;
 
@@ -59,35 +55,45 @@ public class Sales_Persons extends AppCompatActivity {
 //        setSupportActionBar(toolbar);
 //
 //        initCollapsingToolbar();
+
+        final SharedPreferences settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
+                Context.MODE_PRIVATE);
+
         mProgressView = findViewById(R.id.login_progress);
         application_context = getApplicationContext();
 
         recyclerView = findViewById(R.id.recycler_view);
 
-        albumList = new ArrayList<>();
-        adapter = new AlbumsAdapter(this, albumList);
+        sales_persons = new ArrayList<>();
+        sales_person_adapter = new Sales_Person_Adapter(this, sales_persons);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(sales_person_adapter);
 
-//        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                Album album = albumList.get(position);
-//                Toast.makeText(getApplicationContext(), album.getName() + " is selected!", Toast.LENGTH_SHORT).show();
-//                Intent i=new Intent(Sales_Persons.this,Sales_Person_Home.class);
-//                i.putExtra("sales_person",album.getName());
-//                startActivity(i);
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Sales_Person sales_person = sales_persons.get(position);
+                Toast.makeText(getApplicationContext(), sales_person.getName() + " is selected!", Toast.LENGTH_SHORT).show();
+
+
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putInt("sales_person_id", Integer.parseInt(sales_person.getId()));
+                editor.apply();
+
+                Intent i=new Intent(application_context,Add_Work.class);
+//                i.putExtra("sales_person",sales_person.getName());
+                startActivity(i);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
 
 //        prepareAlbums();
@@ -109,8 +115,14 @@ public class Sales_Persons extends AppCompatActivity {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-    }
 
+        if (load_sales_persons_task != null) {
+            return;
+        }
+        load_sales_persons_task = new Load_Sales_Persons();
+        load_sales_persons_task.execute((Void) null);
+    }
+    private Load_Sales_Persons load_sales_persons_task = null;
     /* Represents an asynchronous login task used to authenticate the user. */
     public class Load_Sales_Persons extends AsyncTask<Void, Void, String[]> {
 
@@ -189,10 +201,12 @@ public class Sales_Persons extends AppCompatActivity {
 
 //                                spinner_list.add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
 //                                pum.getMenu().add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
-
+sales_persons.add(new Sales_Person(json_array.getJSONObject(i).getString("name"),json_array.getJSONObject(i).getString("id")));
 
 
                         }
+
+                        sales_person_adapter.notifyDataSetChanged();
 
 
                     }
@@ -308,52 +322,52 @@ public class Sales_Persons extends AppCompatActivity {
     /**
      * Adding few albums for testing
      */
-    private void prepareAlbums() {
-        int[] covers = new int[]{
-                R.drawable.album1,
-                R.drawable.album2,
-                R.drawable.album3,
-                R.drawable.album4,
-                R.drawable.album5,
-                R.drawable.album6,
-                R.drawable.album7,
-                R.drawable.album8,
-                R.drawable.album9,
-                R.drawable.album10,
-                R.drawable.album11};
-
-        Album a = new Album("True Romance", 13, covers[0]);
-        albumList.add(a);
-
-        a = new Album("Xscpae", 8, covers[1]);
-        albumList.add(a);
-
-        a = new Album("Maroon 5", 11, covers[2]);
-        albumList.add(a);
-
-        a = new Album("Born to Die", 12, covers[3]);
-        albumList.add(a);
-
-        a = new Album("Honeymoon", 14, covers[4]);
-        albumList.add(a);
-
-        a = new Album("I Need a Doctor", 1, covers[5]);
-        albumList.add(a);
-
-        a = new Album("Loud", 11, covers[6]);
-        albumList.add(a);
-
-        a = new Album("Legend", 14, covers[7]);
-        albumList.add(a);
-
-        a = new Album("Hello", 11, covers[8]);
-        albumList.add(a);
-
-        a = new Album("Greatest Hits", 17, covers[9]);
-        albumList.add(a);
-
-        adapter.notifyDataSetChanged();
-    }
+//    private void prepareAlbums() {
+//        int[] covers = new int[]{
+//                R.drawable.album1,
+//                R.drawable.album2,
+//                R.drawable.album3,
+//                R.drawable.album4,
+//                R.drawable.album5,
+//                R.drawable.album6,
+//                R.drawable.album7,
+//                R.drawable.album8,
+//                R.drawable.album9,
+//                R.drawable.album10,
+//                R.drawable.album11};
+//
+//        Album a = new Album("True Romance", 13, covers[0]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Xscpae", 8, covers[1]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Maroon 5", 11, covers[2]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Born to Die", 12, covers[3]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Honeymoon", 14, covers[4]);
+//        sales_persons.add(a);
+//
+//        a = new Album("I Need a Doctor", 1, covers[5]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Loud", 11, covers[6]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Legend", 14, covers[7]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Hello", 11, covers[8]);
+//        sales_persons.add(a);
+//
+//        a = new Album("Greatest Hits", 17, covers[9]);
+//        sales_persons.add(a);
+//
+//        sales_person_adapter.notifyDataSetChanged();
+//    }
 
     /**
      * RecyclerView item decoration - give equal margin around grid item

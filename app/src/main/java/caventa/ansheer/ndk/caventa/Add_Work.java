@@ -84,6 +84,7 @@ public class Add_Work extends AppCompatActivity {
 
     private View mProgressView;
     private View mLoginFormView;
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -499,7 +500,7 @@ public class Add_Work extends AppCompatActivity {
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
 //                            Intent i = new Intent(Agent_Addition.this, Agent_Addition.class);
 //                            startActivity(i);
-//                            finish();
+                            finish();
                             break;
                         case "1":
                             Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
@@ -582,7 +583,7 @@ public class Add_Work extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to perform the user login attempt.
             if (isOnline()) {
                 showProgress(true);
-                mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person", 0));
+                mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0));
                 mAuthTask.execute((Void) null);
             } else {
                 Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -641,7 +642,8 @@ public class Add_Work extends AppCompatActivity {
     }
 
     Context application_context;
-    private SharedPreferences settings;
+
+
 
     /**
      * Shows the progress UI and hides the login form.
