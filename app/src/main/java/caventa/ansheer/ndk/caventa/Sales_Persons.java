@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
+import ndk.prism.common_utils.Toast_Utils;
 
 public class Sales_Persons extends AppCompatActivity {
 
@@ -76,17 +77,25 @@ public class Sales_Persons extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Sales_Person sales_person = sales_persons.get(position);
-                Toast.makeText(getApplicationContext(), sales_person.getName() + " is selected!", Toast.LENGTH_SHORT).show();
+
+                // Show a progress spinner, and kick off a background task to perform the user login attempt.
+                if (isOnline()) {
+                    Sales_Person sales_person = sales_persons.get(position);
+                    Toast.makeText(getApplicationContext(), sales_person.getName() + " is selected!", Toast.LENGTH_SHORT).show();
 
 
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putInt("sales_person_id", Integer.parseInt(sales_person.getId()));
-                editor.apply();
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putInt("sales_person_id", Integer.parseInt(sales_person.getId()));
+                    editor.apply();
 
-                Intent i=new Intent(application_context,Add_Work.class);
+                    Intent i = new Intent(application_context, Sales_Person_Home.class);
 //                i.putExtra("sales_person",sales_person.getName());
-                startActivity(i);
+                    startActivity(i);
+                } else {
+                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+                }
+
+
             }
 
             @Override
@@ -119,10 +128,13 @@ public class Sales_Persons extends AppCompatActivity {
         if (load_sales_persons_task != null) {
             return;
         }
+        showProgress(true);
         load_sales_persons_task = new Load_Sales_Persons();
         load_sales_persons_task.execute((Void) null);
     }
+
     private Load_Sales_Persons load_sales_persons_task = null;
+
     /* Represents an asynchronous login task used to authenticate the user. */
     public class Load_Sales_Persons extends AsyncTask<Void, Void, String[]> {
 
@@ -201,7 +213,7 @@ public class Sales_Persons extends AppCompatActivity {
 
 //                                spinner_list.add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
 //                                pum.getMenu().add(json_array.getJSONObject(i).getString("name") + " " + json_array.getJSONObject(i).getString("place") + "[" + json_array.getJSONObject(i).getString("username") + "]");
-sales_persons.add(new Sales_Person(json_array.getJSONObject(i).getString("name"),json_array.getJSONObject(i).getString("id")));
+                            sales_persons.add(new Sales_Person(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("id")));
 
 
                         }
