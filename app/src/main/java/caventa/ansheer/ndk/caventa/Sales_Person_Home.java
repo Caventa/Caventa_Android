@@ -4,13 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -54,26 +55,43 @@ public class Sales_Person_Home extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static List<Sales_Person> sales_persons;
+    private static Sales_Person_Adapter sales_person_adapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private Context application_context;
+
+    private static Context application_context;
+    private SharedPreferences settings;
+    private static View mProgressView;
+    private static View mLoginFormView;
+    private static int shortAnimTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sales);
+        setContentView(R.layout.sales_person_home);
 
-        Bundle extras = getIntent().getExtras();
-        setTitle(extras.getString("sales_person"));
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
+                Context.MODE_PRIVATE);
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
+
+        //        Bundle extras = getIntent().getExtras();
+//        setTitle(extras.getString("sales_person"));
+
+        shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        setTitle(settings.getString("sales_person", "Unknown"));
 
         application_context = getApplicationContext();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -89,11 +107,11 @@ public class Sales_Person_Home extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
 
-                Intent i = new Intent(Sales_Person_Home.this, Add_Work.class);
-                startActivity(i);
+//                Intent i = new Intent(Sales_Person_Home.this, Add_Work.class);
+//                startActivity(i);
             }
         });
 
@@ -149,21 +167,24 @@ public class Sales_Person_Home extends AppCompatActivity {
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new MoviesAdapter(movieList);
+//            mAdapter = new MoviesAdapter(movieList);
+            sales_person_adapter = new Sales_Person_Adapter(application_context, sales_persons);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-            recyclerView.setAdapter(mAdapter);
+//            recyclerView.setAdapter(mAdapter);
+            recyclerView.setAdapter(sales_person_adapter);
+
 
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Movie movie = movieList.get(position);
-                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(getContext(), Work.class);
-                    i.putExtra("work", movie.getTitle());
-                    startActivity(i);
+//                    Movie movie = movieList.get(position);
+//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+//                    Intent i = new Intent(getContext(), Work.class);
+//                    i.putExtra("work", movie.getTitle());
+//                    startActivity(i);
                 }
 
                 @Override
@@ -289,10 +310,10 @@ public class Sales_Person_Home extends AppCompatActivity {
         }
     }
 
-    private Sales_Persons.Load_Sales_Persons load_sales_persons_task = null;
+    private static Load_Sales_Persons load_sales_persons_task = null;
 
     /* Represents an asynchronous login task used to authenticate the user. */
-    public class Load_Sales_Persons extends AsyncTask<Void, Void, String[]> {
+    public static class Load_Sales_Persons extends AsyncTask<Void, Void, String[]> {
 
 //        String task_work_name, task_work_address, task_advances_json, task_expenses_json;
 //        Date task_work_date;
@@ -344,7 +365,7 @@ public class Sales_Person_Home extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            mAuthTask = null;
+            load_sales_persons_task = null;
 
             showProgress(false);
 
@@ -375,6 +396,7 @@ public class Sales_Person_Home extends AppCompatActivity {
                         }
 
                         sales_person_adapter.notifyDataSetChanged();
+                        up_data_flag=1;
 
 
                     }
@@ -411,32 +433,32 @@ public class Sales_Person_Home extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
+            load_sales_persons_task = null;
             showProgress(false);
         }
     }
 
     /* Keep track of the login task to ensure we can cancel it if requested. */
-    private Sales_Persons.Load_Sales_Persons mAuthTask = null;
+    private static Sales_Persons.Load_Sales_Persons mAuthTask = null;
 
     /**
      * Shows the progress UI and hides the login form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
+    private static void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+//        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-//        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-//                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//            }
-//        });
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
 
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         mProgressView.animate().setDuration(shortAnimTime).alpha(
@@ -462,12 +484,7 @@ public class Sales_Person_Home extends AppCompatActivity {
 
         public Upcoming_Works_Fragment() {
 
-            if (load_sales_persons_task != null) {
-                return;
-            }
-            showProgress(true);
-            load_sales_persons_task = new Load_Sales_Persons();
-            load_sales_persons_task.execute((Void) null);
+
         }
 
         /**
@@ -486,7 +503,7 @@ public class Sales_Person_Home extends AppCompatActivity {
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
 
-            mAdapter = new MoviesAdapter_Color(movieList);
+            mAdapter = new Sales_Person_Adapter(application_context,sales_persons);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -496,8 +513,10 @@ public class Sales_Person_Home extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Movie movie = movieList.get(position);
-                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+//                    Movie movie = movieList.get(position);
+//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
 
                 @Override
@@ -507,38 +526,47 @@ public class Sales_Person_Home extends AppCompatActivity {
             }));
 
             if (up_data_flag == 0) {
-                prepareMovieData();
+//                prepareMovieData();
+
+                if (load_sales_persons_task != null) {
+                    return rootView;
+                }
+                showProgress(true);
+                load_sales_persons_task = new Load_Sales_Persons();
+                load_sales_persons_task.execute((Void) null);
+
             }
 
             return rootView;
         }
 
-        private List<Movie> movieList = new ArrayList<>();
+//        private List<Movie> movieList = new ArrayList<>();
         private RecyclerView recyclerView;
-        private MoviesAdapter_Color mAdapter;
-
-        private void prepareMovieData() {
-
-
-            Movie movie = new Movie("Chicken Run", "Animation", "2000");
-            movieList.add(movie);
-
-            movie = new Movie("Back to the Future", "Science Fiction", "1985");
-            movieList.add(movie);
-
-            movie = new Movie("Raiders of the Lost Ark", "Action & Adventure", "1981");
-            movieList.add(movie);
-
-            movie = new Movie("Goldfinger", "Action & Adventure", "1965");
-            movieList.add(movie);
-
-            movie = new Movie("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014");
-            movieList.add(movie);
-
-            mAdapter.notifyDataSetChanged();
-
-            up_data_flag = 1;
-        }
+//        private MoviesAdapter_Color mAdapter;
+        private Sales_Person_Adapter mAdapter;
+//
+//        private void prepareMovieData() {
+//
+//
+//            Movie movie = new Movie("Chicken Run", "Animation", "2000");
+//            movieList.add(movie);
+//
+//            movie = new Movie("Back to the Future", "Science Fiction", "1985");
+//            movieList.add(movie);
+//
+//            movie = new Movie("Raiders of the Lost Ark", "Action & Adventure", "1981");
+//            movieList.add(movie);
+//
+//            movie = new Movie("Goldfinger", "Action & Adventure", "1965");
+//            movieList.add(movie);
+//
+//            movie = new Movie("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014");
+//            movieList.add(movie);
+//
+//            mAdapter.notifyDataSetChanged();
+//
+//            up_data_flag = 1;
+//        }
     }
 
     /**

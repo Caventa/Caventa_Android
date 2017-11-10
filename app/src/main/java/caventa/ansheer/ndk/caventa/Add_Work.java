@@ -60,16 +60,12 @@ import ndk.prism.common_utils.Toast_Utils;
 public class Add_Work extends AppCompatActivity {
 
     private Work_Advances_Adapter work_advances_adapter;
-//    private Work_Advances_Sugar_Adapter work_advances_sugar_adapter;
 
     private Work_Expense_Adapter work_expenses_adapter;
-//    private Work_Expenses_Sugar_Adapter work_expenses_sugar_adapter;
 
     private List<Work_Advance> work_advances;
-//    List<Work_Advance_Sugar> work_advance_sugars;
 
     private List<Work_Expense> work_expenses;
-//    List<Work_Expense_Sugar> work_expense_sugars;
 
     private RecyclerView work_expenses_recycler_view;
     private RecyclerView work_advances_recycler_view;
@@ -103,36 +99,21 @@ public class Add_Work extends AppCompatActivity {
 
         work_advances = new ArrayList<>();
         work_advances_adapter = new Work_Advances_Adapter(this, work_advances);
-//        work_advance_sugars =new ArrayList<>();
-//        fill_work_advances_demo_Database();
-//        work_advances_sugar_adapter = new Work_Advances_Sugar_Adapter(this, work_advance_sugars);
 
-        work_advances_recycler_view = (RecyclerView) findViewById(R.id.recycler_view_advance);
+        work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         work_advances_recycler_view.setHasFixedSize(false);
 
         // use a linear layout manager
         LinearLayoutManager work_advances_recycler_view_layout_manager = new LinearLayoutManager(this);
         work_advances_recycler_view.setLayoutManager(work_advances_recycler_view_layout_manager);
 
-//        fill_work_advances_demo_Data();
-
-        // specify an work_advances_adapter (see also next example)
-
         work_advances_recycler_view.setAdapter(work_advances_adapter);
-//        work_advances_recycler_view.setAdapter(work_advances_sugar_adapter);
-
 
         work_expenses = new ArrayList<>();
         work_expenses_adapter = new Work_Expense_Adapter(this, work_expenses);
-//        work_expense_sugars =new ArrayList<>();
-//        fill_work_expenses_demo_Database();
-//        work_expenses_sugar_adapter = new Work_Expenses_Sugar_Adapter(this, work_expense_sugars);
 
-
-        work_expenses_recycler_view = (RecyclerView) findViewById(R.id.recycler_view_expense);
+        work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -142,18 +123,12 @@ public class Add_Work extends AppCompatActivity {
         LinearLayoutManager work_expenses_recycler_view_layout_manager = new LinearLayoutManager(this);
         work_expenses_recycler_view.setLayoutManager(work_expenses_recycler_view_layout_manager);
 
-//        fill_work_expenses_demo_Data();
-
-        // specify an work_advances_adapter (see also next example)
-
         work_expenses_recycler_view.setAdapter(work_expenses_adapter);
-//        work_expenses_recycler_view.setAdapter(work_expenses_sugar_adapter);
 
         ImageView pick_date = findViewById(R.id.show_calendar);
         final TextView txt_date = findViewById(R.id.work_date);
 
         calendar = Calendar.getInstance();
-//        sdf = Date_Utils.normal_Date_Format_words;
         txt_date.setText(Date_Utils.normal_Date_Format_words.format(calendar.getTime()));
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -190,23 +165,6 @@ public class Add_Work extends AppCompatActivity {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                Work_Advance_Sugar work_advance_sugar = new Work_Advance_Sugar();
-//                                work_advance_sugar.setId(2);
-//                                work_advance_sugar.setAmount(100.0);
-//                                work_advance_sugar.setDescription("Advance");
-//                                work_advance_sugar.setWork_id(1);
-//                                work_advance_sugar.setInsertion_date_time("2017-10-12 11:25:22");
-//                                work_advance_sugar.save();
-//
-//                                work_advance_sugars = Select.from(Work_Advance_Sugar.class)
-//                                        .where(Condition.prop("id").eq(1),Condition.prop("id").eq(2))
-//                                        .list();
-//                                work_advances_sugar_adapter.notifyDataSetChanged();
-//                                work_advances_sugar_adapter = new Work_Advances_Sugar_Adapter(Add_Work.this, work_advance_sugars);
-//                                work_advances_recycler_view.setAdapter(work_advances_sugar_adapter);
-
-//                                String name = ((EditText)dialog.findViewById(R.id.address)).getText().toString();
-//                                String number = ((EditText)dialog.findViewById(R.id.name)).getText().toString();
 
                                 Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Description..."),
                                         new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Amount...")});
@@ -227,8 +185,7 @@ public class Add_Work extends AppCompatActivity {
 
                                     work_advances_adapter.notifyDataSetChanged();
                                 }
-//                                Log.d(General_Data.TAG, String.valueOf(work_advances.size()));
-//                                Log.d(General_Data.TAG, Arrays.toString(work_advances.toArray()));
+
                             }
 
                         })
@@ -247,22 +204,6 @@ public class Add_Work extends AppCompatActivity {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                Work_Expense_Sugar work_expense_sugar = new Work_Expense_Sugar();
-//                                work_expense_sugar.setId(2);
-//                                work_expense_sugar.setAmount(100.0);
-//                                work_expense_sugar.setDescription("Expense");
-//                                work_expense_sugar.setWork_id(1);
-//                                work_expense_sugar.setInsertion_date_time("2017-10-12 11:25:22");
-//                                work_expense_sugar.save();
-//
-//                                work_expense_sugars = Select.from(Work_Expense_Sugar.class)
-//                                        .where(Condition.prop("id").eq(1),Condition.prop("id").eq(2))
-//                                        .list();
-//
-//                                work_expenses_sugar_adapter.notifyDataSetChanged();
-//                                work_expenses_sugar_adapter = new Work_Expenses_Sugar_Adapter(Add_Work.this, work_expense_sugars);
-//                                work_expenses_recycler_view.setAdapter(work_expenses_sugar_adapter);
-
                                 Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Description..."),
                                         new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Amount...")});
 
@@ -297,10 +238,6 @@ public class Add_Work extends AppCompatActivity {
                 Log.d(General_Data.TAG, String.valueOf(work_advances.size()));
                 Log.d(General_Data.TAG, Arrays.toString(work_advances.toArray()));
 
-//                Toast_Utils.longToast(getApplicationContext(),view.toString());
-//                ImageView delete_icon=(ImageView)view.findViewById(R.id.delete_icon);
-//                Toast_Utils.longToast(getApplicationContext(),delete_icon.getContentDescription().toString());
-//                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
                 if (Work_Advances_Adapter.delete_status) {
 
 
@@ -315,7 +252,6 @@ public class Add_Work extends AppCompatActivity {
                     Work_Advances_Adapter.delete_status = false;
                     work_advances_adapter.notifyDataSetChanged();
                 }
-//                }
             }
 
             @Override
@@ -327,10 +263,6 @@ public class Add_Work extends AppCompatActivity {
         work_expenses_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), work_advances_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-//                Toast_Utils.longToast(getApplicationContext(), view.toString());
-//                ImageView delete_icon = (ImageView) view.findViewById(R.id.delete_icon);
-//                Toast_Utils.longToast(getApplicationContext(), delete_icon.getContentDescription().toString());
-//                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
                 if (Work_Expense_Adapter.delete_status) {
 
                     work_expenses.remove(position);
@@ -345,7 +277,6 @@ public class Add_Work extends AppCompatActivity {
 
                     work_expenses_adapter.notifyDataSetChanged();
                 }
-//                }
             }
 
             @Override
@@ -361,55 +292,6 @@ public class Add_Work extends AppCompatActivity {
         txt_total_profit.setText("Profit : " + total_profit);
     }
 
-//    private void fill_work_expenses_demo_Database() {
-//        Work_Expense_Sugar work_expense_sugar = new Work_Expense_Sugar();
-//        work_expense_sugar.setId(1);
-//        work_expense_sugar.setAmount(100.0);
-//        work_expense_sugar.setDescription("Expense 1");
-//        work_expense_sugar.setWork_id(1);
-//        work_expense_sugar.setInsertion_date_time("2017-10-12 11:25:22");
-//        work_expense_sugar.save();
-//
-//        work_expense_sugars = Select.from(Work_Expense_Sugar.class)
-//                .where(Condition.prop("id").eq(1))
-//                .list();
-//    }
-//
-//    private void fill_work_advances_demo_Database() {
-//
-//        Work_Advance_Sugar work_advance_sugar = new Work_Advance_Sugar();
-//        work_advance_sugar.setId(1);
-//        work_advance_sugar.setAmount(100.0);
-//        work_advance_sugar.setDescription("Advance 1");
-//        work_advance_sugar.setWork_id(1);
-//        work_advance_sugar.setInsertion_date_time("2017-10-12 11:25:22");
-//        work_advance_sugar.save();
-//
-//        work_advance_sugars = Select.from(Work_Advance_Sugar.class)
-//                .where(Condition.prop("id").eq(1))
-//                .list();
-//        Log.d(General_Data.TAG, String.valueOf(work_advance_sugars.size()));
-//        work_advances_sugar_adapter.notifyDataSetChanged();
-//    }
-
-//    private void fill_work_expenses_demo_Data() {
-//        Work_Expense work_expense = new Work_Expense(1, 1, 10.5, "Test Expense", "2017-10-05 05:20:23");
-//        work_expenses.add(work_expense);
-//        work_expense = new Work_Expense(2, 1, 12.5, "Test Expense 2", "2017-10-05 05:22:23");
-//        work_expenses.add(work_expense);
-//
-//        work_expenses_adapter.notifyDataSetChanged();
-//    }
-//
-//    private void fill_work_advances_demo_Data() {
-//        Work_Advance work_advance = new Work_Advance(1, 1, 10.5, "Test Advance", "2017-10-05 05:20:23");
-//        work_advances.add(work_advance);
-//
-//        work_advance = new Work_Advance(2, 1, 15.5, "Test Advance 2", "2017-10-05 05:22:23");
-//        work_advances.add(work_advance);
-//
-//        work_advances_adapter.notifyDataSetChanged();
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -432,10 +314,7 @@ public class Add_Work extends AppCompatActivity {
         }
 
         if (id == R.id.menu_item_save) {
-//            this.finish();
-//            Toast_Utils.longToast(getApplicationContext(), "Success...");
             attempt_work_save();
-//            this.finish();
             return true;
         }
 
@@ -523,8 +402,6 @@ public class Add_Work extends AppCompatActivity {
                     switch (count) {
                         case "0":
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
-//                            Intent i = new Intent(Agent_Addition.this, Agent_Addition.class);
-//                            startActivity(i);
                             finish();
                             break;
                         case "1":
@@ -561,35 +438,6 @@ public class Add_Work extends AppCompatActivity {
 
         reset_errors(new EditText[]{txt_name, txt_address});
 
-        // Reset errors.
-//        username.setError(null);
-//        passcode.setError(null);
-
-        // Store values at the time of the login attempt.
-//        String entered_username = username.getText().toString();
-//        String entered_passcode = passcode.getText().toString();
-
-//        Pair<Integer, String> simplePair = new Pair<>(42, "Second");
-//        empty_check(new Pair<>(txt_name, "Please Enter Work Name..."));
-//        empty_check(new Pair[] {    new Pair(txt_name, "Please Enter Work Name..."),
-//                                    new Pair(txt_address, "Please Enter Work Address...")});
-
-//        boolean cancel = false;
-//        View error_focus_View = null;
-//
-//        // Check for a valid password, if the user entered one.
-//        if (TextUtils.isEmpty(entered_passcode)) {
-//            passcode.setError("Please enter passcode");
-//            error_focus_View = passcode;
-//            cancel = true;
-//        }
-//
-//        // Check for a valid email address.
-//        if (TextUtils.isEmpty(entered_username)) {
-//            username.setError("Please enter username");
-//            error_focus_View = username;
-//            cancel = true;
-//        }
         Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair(txt_name, "Please Enter Work Name..."),
                 new Pair(txt_address, "Please Enter Work Address...")});
 
@@ -597,13 +445,6 @@ public class Add_Work extends AppCompatActivity {
             // There was an error; don't attempt login and focus the first form field with an error.
             empty_check_result.second.requestFocus();
         } else {
-
-//            InputMethodManager inputManager =
-//                    (InputMethodManager) getApplicationContext().
-//                            getSystemService(Context.INPUT_METHOD_SERVICE);
-//            inputManager.hideSoftInputFromWindow(
-//                    this.getCurrentFocus().getWindowToken(),
-//                    InputMethodManager.HIDE_NOT_ALWAYS);
 
             // Show a progress spinner, and kick off a background task to perform the user login attempt.
             if (isOnline()) {
@@ -620,21 +461,14 @@ public class Add_Work extends AppCompatActivity {
 
         JSONArray mJSONArray = new JSONArray();
         for (int i = 0; i < work_expenses.size(); i++) {
-//            TableRow rw = (TableRow) table_tickets.getChildAt(i);
-//
-//            if (((ColorDrawable) rw.getBackground()).getColor() == GREEN) {
             JSONObject json_obj = new JSONObject();
             try {
                 json_obj.put("description", work_expenses.get(i).getDescription());
-//                    String cnt = ((TextView) rw.getChildAt(1)).getText().toString();
-//                    json_obj.put("serial", cnt.substring(0, cnt.indexOf("-")).trim());
-//                    json_obj.put("count", cnt.substring(cnt.indexOf("-") + 1).trim());
                 json_obj.put("amount", work_expenses.get(i).getAmount());
                 mJSONArray.put(json_obj);
             } catch (JSONException e) {
                 Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
             }
-//            }
         }
         Log.d(General_Data.TAG, mJSONArray.toString());
         return mJSONArray.toString();
@@ -646,21 +480,14 @@ public class Add_Work extends AppCompatActivity {
 
         JSONArray mJSONArray = new JSONArray();
         for (int i = 0; i < work_advances.size(); i++) {
-//            TableRow rw = (TableRow) table_tickets.getChildAt(i);
-//
-//            if (((ColorDrawable) rw.getBackground()).getColor() == GREEN) {
             JSONObject json_obj = new JSONObject();
             try {
                 json_obj.put("description", work_advances.get(i).getDescription());
-//                    String cnt = ((TextView) rw.getChildAt(1)).getText().toString();
-//                    json_obj.put("serial", cnt.substring(0, cnt.indexOf("-")).trim());
-//                    json_obj.put("count", cnt.substring(cnt.indexOf("-") + 1).trim());
                 json_obj.put("amount", work_advances.get(i).getAmount());
                 mJSONArray.put(json_obj);
             } catch (JSONException e) {
                 Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
             }
-//            }
         }
         Log.d(General_Data.TAG, mJSONArray.toString());
         return mJSONArray.toString();

@@ -86,6 +86,7 @@ public class Sales_Persons extends AppCompatActivity {
 
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putInt("sales_person_id", Integer.parseInt(sales_person.getId()));
+                    editor.putString("sales_person", sales_person.getName());
                     editor.apply();
 
                     Intent i = new Intent(application_context, Sales_Person_Home.class);
