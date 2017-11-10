@@ -210,7 +210,6 @@ public class Sales_Person_Home extends AppCompatActivity {
 
                             sales_persons.add(new Work(json_array.getJSONObject(i).getString("name"),
                                     json_array.getJSONObject(i).getString("address"),
-                                    "", "",
                                     json_array.getJSONObject(i).getString("id"),
                                     Date_Utils.normal_Date_Format_words.parse(json_array.getJSONObject(i).getString("work_date")),
                                     Integer.parseInt(json_array.getJSONObject(i).getString("sales_person_id"))));
@@ -416,7 +415,7 @@ public class Sales_Person_Home extends AppCompatActivity {
 ////                    return rootView;
 ////                }
 ////                showProgress(true);
-////                load_sales_persons_task = new Load_Sales_Person_Works();
+////                load_sales_persons_task = new Load_Sales_Person_Works_Task();
 ////                load_sales_persons_task.execute((Void) null);
 ////
 ////            }

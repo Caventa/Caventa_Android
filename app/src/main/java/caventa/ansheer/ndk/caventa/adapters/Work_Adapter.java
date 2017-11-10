@@ -50,7 +50,7 @@ public class Work_Adapter extends RecyclerView.Adapter<Work_Adapter.MyViewHolder
 
     @Override
     public int getItemCount() {
-        return 0;
+        return work_List.size();
     }
 
 //    @Override
