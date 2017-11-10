@@ -14,22 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <!--android:name="com.orm.SugarApp">-->
-
-        <!--<meta-data android:name="DATABASE" android:value="caventa.db" />-->
-        <!--<meta-data android:name="VERSION" android:value="1" />-->
-        <!--<meta-data android:name="QUERY_LOG" android:value="true" />-->
-        <!--<meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="caventa.ansheer.ndk.caventa" />-->
 
         <activity
-            android:name=".Home"
+            android:name=".activities.Home"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
 
             <meta-data
                 android:name="android.app.default_searchable"
@@ -39,7 +28,7 @@
         </activity>
 
         <activity
-            android:name=".Home_Result"
+            android:name=".activities.Home_Result"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 
@@ -55,20 +44,20 @@
         </activity>
 
         <activity
-            android:name=".Sales_Persons"
+            android:name=".activities.Sales_Persons"
             android:label="Sales Persons" />
         <activity
-            android:name=".Sales_Person_Home"
+            android:name=".activities.Sales_Person_Home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Accounts"
+            android:name=".activities.Accounts"
             android:label="Accounts" />
-        <activity android:name=".Add_Work">
+        <activity android:name=".activities.Add_Work">
 
 
         </activity>
-        <activity android:name=".Work" />
-        <activity android:name=".SplashScreen">
+        <activity android:name=".activities.Work_Page" />
+        <activity android:name=".activities.Splash_Screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

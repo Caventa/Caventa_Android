@@ -1,8 +1,4 @@
-package caventa.ansheer.ndk.caventa;
-
-/**
- * Created by prism on 24-10-2017.
- */
+package caventa.ansheer.ndk.caventa.commons;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -13,9 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-/**
- * Created by Lincoln on 30/10/15.
- */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = new int[]{

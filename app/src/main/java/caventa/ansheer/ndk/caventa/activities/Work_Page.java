@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +10,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Work extends AppCompatActivity {
+import caventa.ansheer.ndk.caventa.R;
+
+public class Work_Page extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

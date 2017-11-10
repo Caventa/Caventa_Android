@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.adapters;
 
 /**
  * Created by prism on 24-10-2017.
@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.models.Movie;
 
 public class MoviesAdapter_Color extends RecyclerView.Adapter<MoviesAdapter_Color.MyViewHolder> {
 

@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,11 +22,13 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.R;
 import ndk.prism.common_utils.Network_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 import ndk.prism.common_utils.Update_Utils;
 
-public class SplashScreen extends Activity {
+public class Splash_Screen extends Activity {
 
 //    String now_playing, earned;
     Context application_context;
@@ -96,7 +98,7 @@ public class SplashScreen extends Activity {
 
                                 // After completing http call
                                 // will close this activity and lauch main activity
-                                Intent i = new Intent(SplashScreen.this, Sales_Persons.class);
+                                Intent i = new Intent(Splash_Screen.this, Sales_Persons.class);
 //                                i.putExtra("now_playing", now_playing);
 //                                i.putExtra("earned", earned);
                                 startActivity(i);
@@ -281,7 +283,7 @@ public class SplashScreen extends Activity {
 //            super.onPostExecute(result);
 //            // After completing http call
 //            // will close this activity and lauch main activity
-//            Intent i = new Intent(SplashScreen.this, MainActivity.class);
+//            Intent i = new Intent(Splash_Screen.this, MainActivity.class);
 //            i.putExtra("now_playing", now_playing);
 //            i.putExtra("earned", earned);
 //            startActivity(i);

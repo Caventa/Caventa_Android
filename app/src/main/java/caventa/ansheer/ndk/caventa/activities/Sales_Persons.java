@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -37,6 +37,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.adapters.Sales_Person_Adapter;
+import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import ndk.prism.common_utils.Toast_Utils;
 
@@ -89,7 +93,7 @@ public class Sales_Persons extends AppCompatActivity {
                     editor.putString("sales_person", sales_person.getName());
                     editor.apply();
 
-                    Intent i = new Intent(application_context, Sales_Person_Home.class);
+                    Intent i = new Intent(application_context, Home.class);
 //                i.putExtra("sales_person",sales_person.getName());
                     startActivity(i);
                 } else {

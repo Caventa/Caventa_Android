@@ -1,10 +1,6 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.constants;
 
-/**
- * Created by prism on 01-11-2017.
- */
-
-class General_Data {
+public class General_Data {
 //    public static final String SERVER_IP_ADDRESS = "filebooker.com.md-1.webhostbox.net/caventa_production";
     public static String SERVER_IP_ADDRESS = "vfmob.com/baneeishaque/caventa_production";
     public static final String SHARED_PREFERENCE = "Caventa Manager";

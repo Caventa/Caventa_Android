@@ -1,21 +1,26 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,12 +28,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
+import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
+import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.models.Movie;
+import caventa.ansheer.ndk.caventa.adapters.MoviesAdapter;
+import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
+import caventa.ansheer.ndk.caventa.models.Work;
+import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
-public class Home_Result extends AppCompatActivity {
+public class Home extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -39,42 +68,61 @@ public class Home_Result extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static ArrayList<Work> work_List;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private static Context application_context;
+    private static SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        handleIntent(getIntent());
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        application_context = getApplicationContext();
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+//                Intent i=new Intent(Home.this,Sales_Persons.class);
+//                startActivity(i);
+            }
+        });
+
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
+                Context.MODE_PRIVATE);
+//        mLoginFormView = findViewById(R.id.login_form);
+//        mProgressView = findViewById(R.id.login_progress);
+//
+//        shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        setTitle(settings.getString("sales_person", "Unknown"));
+
+
+//            showProgress(true);
+
+        work_List = new ArrayList<>();
+        load_sales_person_works_task = new Load_Sales_Person_Works();
+        load_sales_person_works_task.execute((Void) null);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
-                Intent i=new Intent(Home_Result.this,Sales_Persons.class);
-                startActivity(i);
-            }
-        });
 
     }
 
@@ -95,21 +143,6 @@ public class Home_Result extends AppCompatActivity {
         return true;
     }
 
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent) {
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search
-            Toast_Utils.longToast(getApplicationContext(),query);
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -119,11 +152,10 @@ public class Home_Result extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_bank) {
-            Intent i=new Intent(Home_Result.this,Accounts.class);
+            Intent i = new Intent(Home.this, Accounts.class);
             startActivity(i);
             return true;
         }
-
 
 
         return super.onOptionsItemSelected(item);
@@ -169,8 +201,8 @@ public class Home_Result extends AppCompatActivity {
                     Movie movie = movieList.get(position);
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-                    Intent i=new Intent(getContext(),Work.class);
-                    i.putExtra("work",movie.getTitle());
+                    Intent i = new Intent(getContext(), Work_Page.class);
+                    i.putExtra("work", movie.getTitle());
                     startActivity(i);
                 }
 
@@ -212,7 +244,7 @@ public class Home_Result extends AppCompatActivity {
 
             mAdapter.notifyDataSetChanged();
 
-            pen_data_flag=1;
+            pen_data_flag = 1;
         }
     }
 
@@ -293,7 +325,7 @@ public class Home_Result extends AppCompatActivity {
 
             mAdapter.notifyDataSetChanged();
 
-            fin_data_flag=1;
+            fin_data_flag = 1;
         }
     }
 
@@ -322,11 +354,15 @@ public class Home_Result extends AppCompatActivity {
             recyclerView = rootView.findViewById(R.id.recycler_view);
 
             mAdapter = new MoviesAdapter(movieList);
+            wAdapter = new Work_Adapter(work_List);
+
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-            recyclerView.setAdapter(mAdapter);
+
+//            recyclerView.setAdapter(mAdapter);
+            recyclerView.setAdapter(wAdapter);
 
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
@@ -343,14 +379,39 @@ public class Home_Result extends AppCompatActivity {
 
             if (up_data_flag == 0) {
                 prepareMovieData();
+//                prepareWorkData();
+                prepare_work_cloud_data();
             }
 
             return rootView;
         }
 
+        private void prepare_work_cloud_data() {
+            wAdapter.notifyDataSetChanged();
+
+            up_data_flag = 1;
+        }
+
+        private void prepareWorkData() {
+            Work work = new Work("Chicken Run", "Animation", "", "", "1", Calendar.getInstance().getTime(), 0);
+            work_List.add(work);
+            work = new Work("Chicken Run", "Animation", "", "", "1", Calendar.getInstance().getTime(), 0);
+            work_List.add(work);
+            work = new Work("Chicken Run", "Animation", "", "", "1", Calendar.getInstance().getTime(), 0);
+            work_List.add(work);
+            work = new Work("Chicken Run", "Animation", "", "", "1", Calendar.getInstance().getTime(), 0);
+            work_List.add(work);
+            wAdapter.notifyDataSetChanged();
+
+            up_data_flag = 1;
+        }
+
         private List<Movie> movieList = new ArrayList<>();
+
         private RecyclerView recyclerView;
+
         private MoviesAdapter mAdapter;
+
 
         private void prepareMovieData() {
 
@@ -372,7 +433,7 @@ public class Home_Result extends AppCompatActivity {
 
             mAdapter.notifyDataSetChanged();
 
-            up_data_flag=1;
+            up_data_flag = 1;
         }
     }
 
@@ -392,13 +453,15 @@ public class Home_Result extends AppCompatActivity {
             // Return a Pending_Works_Fragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return Pending_Works_Fragment.newInstance();
+                    return Upcoming_Works_Fragment.newInstance();
+
 
                 case 1:
-                    return Finished_Works_Fragment.newInstance();
+                    return Pending_Works_Fragment.newInstance();
+
 
                 default:
-                    return Upcoming_Works_Fragment.newInstance();
+                    return Finished_Works_Fragment.newInstance();
 
 
             }
@@ -414,13 +477,127 @@ public class Home_Result extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Fin";
+                    return "Up";
                 case 1:
                     return "Pen";
                 case 2:
-                    return "Up";
+                    return "Fin";
             }
             return null;
+        }
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        fin_data_flag = 0;
+        pen_data_flag = 0;
+        up_data_flag = 0;
+        super.onBackPressed();
+    }
+
+    private static Load_Sales_Person_Works load_sales_person_works_task = null;
+
+    private static Work_Adapter wAdapter;
+
+    /* Represents an asynchronous login task used to authenticate the user. */
+    public static class Load_Sales_Person_Works extends AsyncTask<Void, Void, String[]> {
+
+
+        Load_Sales_Person_Works() {
+        }
+
+        DefaultHttpClient http_client;
+        HttpPost http_post;
+        ArrayList<NameValuePair> name_pair_value;
+        String network_action_response;
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                http_client = new DefaultHttpClient();
+                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_works.php");
+                name_pair_value = new ArrayList<>(1);
+                Log.d(General_Data.TAG, "Sales Man : "+String.valueOf(settings.getInt("sales_person_id", 0)));
+                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));
+
+                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                ResponseHandler<String> response_handler = new BasicResponseHandler();
+                network_action_response = http_client.execute(http_post, response_handler);
+                return new String[]{"0", network_action_response};
+
+            } catch (UnsupportedEncodingException e) {
+                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+            } catch (ClientProtocolException e) {
+                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+            } catch (IOException e) {
+                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final String[] network_action_response_array) {
+            load_sales_person_works_task = null;
+
+//            showProgress(false);
+
+            Log.d(General_Data.TAG, network_action_response_array[0]);
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+
+            if (network_action_response_array[0].equals("1")) {
+                Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+            } else {
+
+
+                try {
+
+                    JSONArray json_array = new JSONArray(network_action_response_array[1]);
+                    if (json_array.getJSONObject(0).getString("status").equals("1")) {
+                        Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                    } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
+
+
+                        for (int i = 1; i < json_array.length(); i++) {
+
+
+                            work_List.add(new Work(json_array.getJSONObject(i).getString("name"),
+                                    json_array.getJSONObject(i).getString("address"),
+                                    "", "",
+                                    json_array.getJSONObject(i).getString("id"),
+                                    Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date")),
+                                    Integer.parseInt(json_array.getJSONObject(i).getString("sales_person_id"))));
+
+
+                        }
+
+//                        wAdapter.notifyDataSetChanged();
+//                        up_data_flag = 1;
+
+
+                    }
+
+
+                } catch (JSONException e) {
+                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                } catch (ParseException e) {
+                    Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                }
+
+
+            }
+
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            load_sales_person_works_task = null;
+//            showProgress(false);
         }
     }
 }

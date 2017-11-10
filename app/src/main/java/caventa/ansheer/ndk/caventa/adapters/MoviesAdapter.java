@@ -1,8 +1,4 @@
-package caventa.ansheer.ndk.caventa;
-
-/**
- * Created by prism on 24-10-2017.
- */
+package caventa.ansheer.ndk.caventa.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.models.Movie;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHolder> {
 
@@ -21,9 +20,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
-            genre = (TextView) view.findViewById(R.id.genre);
-            year = (TextView) view.findViewById(R.id.year);
+            title = view.findViewById(R.id.title);
+            genre = view.findViewById(R.id.genre);
+            year = view.findViewById(R.id.year);
         }
     }
 

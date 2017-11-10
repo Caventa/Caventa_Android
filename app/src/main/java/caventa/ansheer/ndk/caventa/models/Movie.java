@@ -1,8 +1,4 @@
-package caventa.ansheer.ndk.caventa;
-
-/**
- * Created by prism on 24-10-2017.
- */
+package caventa.ansheer.ndk.caventa.models;
 
 public class Movie {
     private String title, genre, year;

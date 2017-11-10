@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 
 /**

@@ -1,22 +1,22 @@
-package caventa.ansheer.ndk.caventa;
+package caventa.ansheer.ndk.caventa.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.TabLayout;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +27,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Home extends AppCompatActivity {
+import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
+import caventa.ansheer.ndk.caventa.models.Movie;
+import caventa.ansheer.ndk.caventa.adapters.MoviesAdapter;
+import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
+import ndk.prism.common_utils.Toast_Utils;
+
+public class Home_Result extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -48,29 +55,30 @@ public class Home extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        handleIntent(getIntent());
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
 
-                Intent i=new Intent(Home.this,Sales_Persons.class);
-                startActivity(i);
+//                Intent i=new Intent(Home_Result.this,Sales_Persons.class);
+//                startActivity(i);
             }
         });
 
@@ -93,6 +101,21 @@ public class Home extends AppCompatActivity {
         return true;
     }
 
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search
+            Toast_Utils.longToast(getApplicationContext(),query);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -102,7 +125,7 @@ public class Home extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_bank) {
-            Intent i=new Intent(Home.this,Accounts.class);
+            Intent i=new Intent(Home_Result.this,Accounts.class);
             startActivity(i);
             return true;
         }
@@ -152,7 +175,7 @@ public class Home extends AppCompatActivity {
                     Movie movie = movieList.get(position);
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-                    Intent i=new Intent(getContext(),Work.class);
+                    Intent i=new Intent(getContext(),Work_Page.class);
                     i.putExtra("work",movie.getTitle());
                     startActivity(i);
                 }
@@ -375,15 +398,13 @@ public class Home extends AppCompatActivity {
             // Return a Pending_Works_Fragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return Upcoming_Works_Fragment.newInstance();
-
-
-                case 1:
                     return Pending_Works_Fragment.newInstance();
 
+                case 1:
+                    return Finished_Works_Fragment.newInstance();
 
                 default:
-                    return Finished_Works_Fragment.newInstance();
+                    return Upcoming_Works_Fragment.newInstance();
 
 
             }
@@ -399,11 +420,11 @@ public class Home extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Up";
+                    return "Fin";
                 case 1:
                     return "Pen";
                 case 2:
-                    return "Fin";
+                    return "Up";
             }
             return null;
         }
