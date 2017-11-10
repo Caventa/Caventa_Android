@@ -20,6 +20,7 @@ public class Work_Advances_Adapter extends RecyclerView.Adapter<Work_Advances_Ad
 
     private Context mContext;
     private List<Work_Advance> work_advances;
+    public static boolean delete_status=false;
 
 
     // Provide a reference to the views for each data item
@@ -38,9 +39,9 @@ public class Work_Advances_Adapter extends RecyclerView.Adapter<Work_Advances_Ad
 
         public ViewHolder(View view) {
             super(view);
-            description_amount = (TextView) view.findViewById(R.id.description_amount);
+            description_amount = view.findViewById(R.id.description_amount);
 //            count = (TextView) view.findViewById(R.id.count);
-            delete_icon = (ImageView) view.findViewById(R.id.delete_icon);
+            delete_icon = view.findViewById(R.id.delete_icon);
 //            edit_icon = (ImageView) view.findViewById(R.id.edit_icon);
 //            overflow = (ImageView) view.findViewById(R.id.overflow);
         }
@@ -93,6 +94,14 @@ public class Work_Advances_Adapter extends RecyclerView.Adapter<Work_Advances_Ad
 //
 //            }
 //        });
+
+        holder.delete_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(General_Data.TAG,"Delete");
+                delete_status=true;
+            }
+        });
 
     }
 

@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 
 /**
@@ -21,6 +20,7 @@ public class Work_Expense_Adapter extends RecyclerView.Adapter<Work_Expense_Adap
 
     private Context mContext;
     private List<Work_Expense> work_expenses;
+    public static boolean delete_status=false;
 
 
     // Provide a reference to the views for each data item
@@ -95,6 +95,14 @@ public class Work_Expense_Adapter extends RecyclerView.Adapter<Work_Expense_Adap
 //            }
 //        });
 
+
+        holder.delete_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(General_Data.TAG,"Delete");
+                delete_status=true;
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)

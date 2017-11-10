@@ -208,18 +208,27 @@ public class Add_Work extends AppCompatActivity {
 //                                String name = ((EditText)dialog.findViewById(R.id.address)).getText().toString();
 //                                String number = ((EditText)dialog.findViewById(R.id.name)).getText().toString();
 
-                                Work_Advance work_advance = new Work_Advance(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
-                                work_advances.add(work_advance);
+                                Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Description..."),
+                                        new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Amount...")});
 
-                                total_advance = total_advance + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
-                                txt_total_advance.setText("Advances : " + total_advance);
+                                if (empty_check_result.first) {
+                                    // There was an error; don't attempt login and focus the first form field with an error.
+                                    empty_check_result.second.requestFocus();
+                                } else {
 
-                                calculate_total_profit();
 
-                                work_advances_adapter.notifyDataSetChanged();
+                                    Work_Advance work_advance = new Work_Advance(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
+                                    work_advances.add(work_advance);
 
-                                Log.d(General_Data.TAG, String.valueOf(work_advances.size()));
-                                Log.d(General_Data.TAG, Arrays.toString(work_advances.toArray()));
+                                    total_advance = total_advance + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
+                                    txt_total_advance.setText("Advances : " + total_advance);
+
+                                    calculate_total_profit();
+
+                                    work_advances_adapter.notifyDataSetChanged();
+                                }
+//                                Log.d(General_Data.TAG, String.valueOf(work_advances.size()));
+//                                Log.d(General_Data.TAG, Arrays.toString(work_advances.toArray()));
                             }
 
                         })
@@ -254,16 +263,24 @@ public class Add_Work extends AppCompatActivity {
 //                                work_expenses_sugar_adapter = new Work_Expenses_Sugar_Adapter(Add_Work.this, work_expense_sugars);
 //                                work_expenses_recycler_view.setAdapter(work_expenses_sugar_adapter);
 
-                                Work_Expense work_expense = new Work_Expense(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
-                                work_expenses.add(work_expense);
+                                Pair<Boolean, EditText> empty_check_result = empty_check(new Pair[]{new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Description..."),
+                                        new Pair((EditText) dialog.findViewById(R.id.name), "Please Enter Advance Amount...")});
 
-                                total_expense = total_expense + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
-                                txt_total_expense.setText("Expenses : " + total_expense);
+                                if (empty_check_result.first) {
+                                    // There was an error; don't attempt login and focus the first form field with an error.
+                                    empty_check_result.second.requestFocus();
+                                } else {
 
-                                calculate_total_profit();
+                                    Work_Expense work_expense = new Work_Expense(Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString()), ((EditText) dialog.findViewById(R.id.address)).getText().toString());
+                                    work_expenses.add(work_expense);
 
-                                work_expenses_adapter.notifyDataSetChanged();
+                                    total_expense = total_expense + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
+                                    txt_total_expense.setText("Expenses : " + total_expense);
 
+                                    calculate_total_profit();
+
+                                    work_expenses_adapter.notifyDataSetChanged();
+                                }
 
                             }
 
@@ -284,15 +301,20 @@ public class Add_Work extends AppCompatActivity {
 //                ImageView delete_icon=(ImageView)view.findViewById(R.id.delete_icon);
 //                Toast_Utils.longToast(getApplicationContext(),delete_icon.getContentDescription().toString());
 //                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
-                work_advances.remove(position);
+                if (Work_Advances_Adapter.delete_status) {
 
-                String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
-                total_advance = total_advance - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
-                txt_total_advance.setText("Advances : " + total_advance);
 
-                calculate_total_profit();
+                    work_advances.remove(position);
 
-                work_advances_adapter.notifyDataSetChanged();
+                    String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
+                    total_advance = total_advance - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
+                    txt_total_advance.setText("Advances : " + total_advance);
+
+                    calculate_total_profit();
+
+                    Work_Advances_Adapter.delete_status = false;
+                    work_advances_adapter.notifyDataSetChanged();
+                }
 //                }
             }
 
@@ -309,17 +331,20 @@ public class Add_Work extends AppCompatActivity {
 //                ImageView delete_icon = (ImageView) view.findViewById(R.id.delete_icon);
 //                Toast_Utils.longToast(getApplicationContext(), delete_icon.getContentDescription().toString());
 //                if (((ImageView) view.findViewById(R.id.delete_icon)).getContentDescription().toString().equals("delete_icon")) {
-                work_expenses.remove(position);
+                if (Work_Expense_Adapter.delete_status) {
 
+                    work_expenses.remove(position);
 
-                String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
+                    String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
 
-                total_expense = total_expense - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
+                    total_expense = total_expense - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
 
-                txt_total_expense.setText("Expenses : " + total_expense);
-                calculate_total_profit();
+                    txt_total_expense.setText("Expenses : " + total_expense);
+                    calculate_total_profit();
+                    Work_Expense_Adapter.delete_status = false;
 
-                work_expenses_adapter.notifyDataSetChanged();
+                    work_expenses_adapter.notifyDataSetChanged();
+                }
 //                }
             }
 
@@ -642,7 +667,6 @@ public class Add_Work extends AppCompatActivity {
     }
 
     Context application_context;
-
 
 
     /**
