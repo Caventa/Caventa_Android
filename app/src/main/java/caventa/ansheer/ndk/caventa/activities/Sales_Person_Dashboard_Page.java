@@ -55,7 +55,7 @@ import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
-public class Home extends AppCompatActivity {
+public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -123,12 +123,12 @@ public class Home extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_home, menu);
 
         // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
 
         return true;
     }
@@ -142,7 +142,7 @@ public class Home extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_bank) {
-            Intent i = new Intent(Home.this, Accounts.class);
+            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Accounts.class);
             startActivity(i);
             return true;
         }
@@ -461,7 +461,7 @@ public class Home extends AppCompatActivity {
 
             mAdapter = new MoviesAdapter(movieList);
 //            wAdapter = new Work_Adapter(work_List_Blank);
-            wAdapter = new Work_Adapter(Sales_Persons.work_List);
+            wAdapter = new Work_Adapter(List_Sales_Persons.work_List);
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
@@ -504,12 +504,12 @@ public class Home extends AppCompatActivity {
 
         private void prepareMovieData() {
 
-            for (int i = 0; i < Sales_Persons.work_List.size(); i++) {
-                Toast_Utils.longToast(application_context, Sales_Persons.work_List.get(i).getWork_name());
+            for (int i = 0; i < List_Sales_Persons.work_List.size(); i++) {
+                Toast_Utils.longToast(application_context, List_Sales_Persons.work_List.get(i).getWork_name());
 
 //                work_List_Blank.add(new Work(Sales_Persons.work_List.get(i).getWork_name(), Sales_Persons.work_List.get(i).getWork_address(), "", "", Sales_Persons.work_List.get(i).getId(), Sales_Persons.work_List.get(i).getWork_date(), Sales_Persons.work_List.get(i).getSales_person_id()));
 
-                movieList.add(new Movie(Sales_Persons.work_List.get(i).getWork_name(), Date_Utils.normal_Date_Format_words.format(Sales_Persons.work_List.get(i).getWork_date()), "1995"));
+                movieList.add(new Movie(List_Sales_Persons.work_List.get(i).getWork_name(), Date_Utils.normal_Date_Format_words.format(List_Sales_Persons.work_List.get(i).getWork_date()), "1995"));
             }
 
 
@@ -535,10 +535,10 @@ public class Home extends AppCompatActivity {
 
         private void prepareWorkData() {
 
-            for (int i = 0; i < Sales_Persons.work_List.size(); i++) {
-                Toast_Utils.longToast(application_context, Sales_Persons.work_List.get(i).getWork_name());
+            for (int i = 0; i < List_Sales_Persons.work_List.size(); i++) {
+                Toast_Utils.longToast(application_context, List_Sales_Persons.work_List.get(i).getWork_name());
 
-                work_List_Blank.add(new Work(Sales_Persons.work_List.get(i).getWork_name(), Sales_Persons.work_List.get(i).getWork_address(), Sales_Persons.work_List.get(i).getId(), Sales_Persons.work_List.get(i).getWork_date(), Sales_Persons.work_List.get(i).getSales_person_id()));
+                work_List_Blank.add(new Work(List_Sales_Persons.work_List.get(i).getWork_name(), List_Sales_Persons.work_List.get(i).getWork_address(), List_Sales_Persons.work_List.get(i).getId(), List_Sales_Persons.work_List.get(i).getWork_date(), List_Sales_Persons.work_List.get(i).getSales_person_id()));
             }
 
 //            Work work = new Work("Chicken Run", "Animation", "1", Calendar.getInstance().getTime(), 0);

@@ -50,7 +50,7 @@ import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
-public class Sales_Persons extends AppCompatActivity {
+public class List_Sales_Persons extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private Sales_Person_Adapter sales_person_adapter;
@@ -215,7 +215,7 @@ public class Sales_Persons extends AppCompatActivity {
                         }
 
 
-                        Intent i = new Intent(application_context, Home.class);
+                        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
                         startActivity(i);
 
                     }

@@ -35,7 +35,7 @@ public class Splash_Screen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.splash_screen);
         application_context = getApplicationContext();
         attempt_Update_Check();
 
@@ -86,7 +86,7 @@ public class Splash_Screen extends Activity {
                                 Toast.makeText(application_context, "Latest Version...", Toast.LENGTH_LONG).show();
                                 // After completing http call
                                 // will close this activity and lauch main activity
-                                Intent i = new Intent(Splash_Screen.this, Sales_Persons.class);
+                                Intent i = new Intent(Splash_Screen.this, Dashboard_Page.class);
                                 startActivity(i);
 
                                 // close this activity

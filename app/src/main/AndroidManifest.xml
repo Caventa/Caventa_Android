@@ -6,23 +6,47 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application xmlns:tools="http://schemas.android.com/tools"
+    <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".activities.Splash_Screen">
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
 
         <activity
-            android:name=".activities.Home"
+            android:name=".activities.Dashboard_Page"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.List_Sales_Persons"
+            android:label="Sales Persons">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.Sales_Person_Dashboard_Page"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".Home_Result" />
+            <!--<meta-data-->
+                <!--android:name="android.app.default_searchable"-->
+                <!--android:value=".Home_Result" />-->
 
 
         </activity>
@@ -33,22 +57,17 @@
             android:theme="@style/AppTheme.NoActionBar">
 
             <!-- to identify this activity as "searchable" -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.SEARCH" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
 
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+            <!--<meta-data-->
+                <!--android:name="android.app.searchable"-->
+                <!--android:resource="@xml/searchable" />-->
         </activity>
 
-        <activity
-            android:name=".activities.Sales_Persons"
-            android:label="Sales Persons" />
-        <activity
-            android:name=".activities.Sales_Person_Home"
-            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".activities.Accounts"
             android:label="Accounts" />
@@ -57,12 +76,6 @@
 
         </activity>
         <activity android:name=".activities.Work_Page" />
-        <activity android:name=".activities.Splash_Screen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
 
     </application>
