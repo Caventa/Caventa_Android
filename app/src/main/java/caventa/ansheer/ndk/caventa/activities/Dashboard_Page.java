@@ -587,7 +587,7 @@ public class Dashboard_Page extends AppCompatActivity {
             protected String[] doInBackground(Void... params) {
                 try {
                     http_client = new DefaultHttpClient();
-                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_pending_works.php");
+                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_upcoming_works.php");
                     ResponseHandler<String> response_handler = new BasicResponseHandler();
                     network_action_response = http_client.execute(http_post, response_handler);
                     return new String[]{"0", network_action_response};
