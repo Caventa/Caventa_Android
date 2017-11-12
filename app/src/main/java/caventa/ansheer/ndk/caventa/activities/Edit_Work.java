@@ -147,9 +147,9 @@ public class Edit_Work extends AppCompatActivity {
         final TextView txt_date = findViewById(R.id.work_date);
 
         calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, selected_work.getWork_date().getYear());
-        calendar.set(Calendar.MONTH, selected_work.getWork_date().getMonth());
-        calendar.set(Calendar.DAY_OF_MONTH, selected_work.getWork_date().getDay());
+//        calendar.set(Calendar.YEAR, selected_work.getWork_date().getYear());
+//        calendar.set(Calendar.MONTH, selected_work.getWork_date().getMonth());
+//        calendar.set(Calendar.DAY_OF_MONTH, selected_work.getWork_date().getDay());
 
         txt_date.setText(Date_Utils.normal_Date_Format_words.format(selected_work.getWork_date()));
 
@@ -337,14 +337,20 @@ public class Edit_Work extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        View_Work_Sales_Person.total_advance=0;
+        View_Work_Sales_Person.total_expense=0;
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_cancel) {
-            this.finish();
+
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
             return true;
         }
 
         if (id == R.id.menu_item_save) {
-//            attempt_work_save();
+            attempt_work_save();
             Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
             startActivity(i);
             finish();
@@ -391,12 +397,12 @@ public class Edit_Work extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/add_work.php");
+                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/edit_work.php");
                 name_pair_value = new ArrayList<NameValuePair>(6);
                 name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
                 name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
                 name_pair_value.add(new BasicNameValuePair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)));
-                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(task_sales_person_id)));
+                name_pair_value.add(new BasicNameValuePair("work_id", selected_work.getId()));
                 name_pair_value.add(new BasicNameValuePair("advances_json", task_advances_json));
                 name_pair_value.add(new BasicNameValuePair("expenses_json", task_expenses_json));
 
@@ -435,6 +441,8 @@ public class Edit_Work extends AppCompatActivity {
                     switch (count) {
                         case "0":
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+                            startActivity(i);
                             finish();
                             break;
                         case "1":

@@ -54,6 +54,7 @@ import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
+import ndk.prism.common_utils.Toast_Utils;
 
 public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
@@ -143,7 +144,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_bank) {
-            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Accounts.class);
+            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Sales_Person_Accounts.class);
             startActivity(i);
             return true;
         }
@@ -596,6 +597,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
                     CachePot.getInstance().push(upcoming_works_list.get(position));
                     startActivity(intent);
+
                 }
 
                 @Override
@@ -824,5 +826,10 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 //        finish();
     }
 
-
+    @Override
+    protected void onPause() {
+        Toast_Utils.longToast(application_context,"Pause");
+        finish();
+        super.onPause();
+    }
 }

@@ -64,7 +64,12 @@
 
         <activity
             android:name=".activities.Accounts"
-            android:label="Accounts" />
+            android:label="Accounts" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".activities.Add_Work"></activity>
 
@@ -73,6 +78,7 @@
         <activity android:name=".activities.View_Work"></activity>
         <activity android:name=".activities.View_Work_Sales_Person" />
         <activity android:name=".activities.Edit_Work" />
+        <activity android:name=".activities.Sales_Person_Accounts" />
 
     </application>
 

@@ -4,10 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -307,7 +309,41 @@ public class View_Work_Sales_Person extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_cancel) {
-            this.finish();
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
+            return true;
+        }
+
+        if (id == R.id.menu_item_finish) {
+
+            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
+            after_time_dialog.setMessage("Work is Finished, Is it?").setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            dialog.cancel();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    dialog.cancel();
+                }
+            });
+            AlertDialog alert = after_time_dialog.create();
+            alert.setTitle("Warning!");
+            alert.show();
+
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
+            return true;
+        }
+
+        if (id == R.id.menu_item_work_cancel) {
+//            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+//            startActivity(i);
+//            finish();
             return true;
         }
 
