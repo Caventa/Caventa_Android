@@ -1,13 +1,15 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.app.SearchManager;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -45,15 +48,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.adapters.MoviesAdapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
 import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import caventa.ansheer.ndk.caventa.models.Movie;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
-import ndk.prism.common_utils.Toast_Utils;
 
 public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
@@ -74,7 +74,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
     private ViewPager mViewPager;
     private static Context application_context;
     private static SharedPreferences settings;
-//    static ArrayList<Work> work_List_Blank;
+    private static int shortAnimTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +90,14 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
-//                Intent i=new Intent(Home.this,Sales_Persons.class);
-//                startActivity(i);
+                Intent i = new Intent(application_context, Add_Work.class);
+                startActivity(i);
             }
         });
+        shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
                 Context.MODE_PRIVATE);
@@ -153,6 +154,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     static int fin_data_flag = 0, pen_data_flag = 0, up_data_flag = 0;
 
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -177,26 +179,30 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_pending_works, container, false);
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
+            mLoginFormView = rootView.findViewById(R.id.login_form);
+            mProgressView = rootView.findViewById(R.id.login_progress);
 
-            mAdapter = new MoviesAdapter(movieList);
             pending_works_adaptor = new Work_Adapter(pending_works_list);
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-//            recyclerView.setAdapter(mAdapter);
+
             recyclerView.setAdapter(pending_works_adaptor);
 
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-//                    Movie movie = movieList.get(position);
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-//                    Intent i = new Intent(getContext(), Work_Page.class);
-//                    i.putExtra("work", movie.getTitle());
-//                    startActivity(i);
+                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
+                    CachePot.getInstance().push(pending_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -206,58 +212,33 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             }));
 
             if (pen_data_flag == 0) {
-//                prepareMovieData();
 
 
-                if (load_sales_person_works_task != null) {
-                    load_sales_person_works_task.cancel(true);
-                    load_sales_person_works_task = null;
+                if (load_pending_works_task != null) {
+                    load_pending_works_task.cancel(true);
+                    load_pending_works_task = null;
                 }
-
-                load_sales_person_works_task = new Load_Sales_Person_Works_Task();
-                load_sales_person_works_task.execute((Void) null);
+                showProgress(true);
+                load_pending_works_task = new Load_Pending_Works_Task();
+                load_pending_works_task.execute((Void) null);
 
             }
 
             return rootView;
         }
 
-        private List<Movie> movieList = new ArrayList<>();
-        private static List<Work> pending_works_list = new ArrayList<>();
+
+        static View mLoginFormView;
+        static View mProgressView;
+
 
         private RecyclerView recyclerView;
-        private MoviesAdapter mAdapter;
-        static Work_Adapter pending_works_adaptor;
-
-        private void prepareMovieData() {
-            Movie movie = new Movie("Mad Max: Fury Road", "Action & Adventure", "2015");
-            movieList.add(movie);
-
-            movie = new Movie("Inside Out", "Animation, Kids & Family", "2015");
-            movieList.add(movie);
-
-            movie = new Movie("Star Wars: Episode VII - The Force Awakens", "Action", "2015");
-            movieList.add(movie);
-
-            movie = new Movie("Shaun the Sheep", "Animation", "2015");
-            movieList.add(movie);
-
-            movie = new Movie("The Martian", "Science Fiction & Fantasy", "2015");
-            movieList.add(movie);
-
-            movie = new Movie("Mission: Impossible Rogue Nation", "Action", "2015");
-            movieList.add(movie);
-
-            mAdapter.notifyDataSetChanged();
-
-            pen_data_flag = 1;
-        }
 
 
-        public static class Load_Sales_Person_Works_Task extends AsyncTask<Void, Void, String[]> {
+        public static class Load_Pending_Works_Task extends AsyncTask<Void, Void, String[]> {
 
 
-            Load_Sales_Person_Works_Task() {
+            Load_Pending_Works_Task() {
             }
 
             DefaultHttpClient http_client;
@@ -291,9 +272,9 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(final String[] network_action_response_array) {
-                load_sales_person_works_task = null;
+                load_pending_works_task = null;
 
-//                showProgress(false);
+                showProgress(false);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -308,7 +289,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(application_context, "No Pending Works...", Toast.LENGTH_LONG).show();
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
 
@@ -345,12 +326,41 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
             @Override
             protected void onCancelled() {
-                load_sales_person_works_task = null;
+                load_pending_works_task = null;
 //                showProgress(false);
             }
         }
 
-        private static Load_Sales_Person_Works_Task load_sales_person_works_task = null;
+        private static Load_Pending_Works_Task load_pending_works_task = null;
+
+        /**
+         * Shows the progress UI and hides the login form.
+         */
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+        private static void showProgress(final boolean show) {
+            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+            // for very easy animations. If available, use these APIs to fade-in
+            // the progress spinner.
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
 
     }
 
@@ -363,10 +373,6 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         public Finished_Works_Fragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static Finished_Works_Fragment newInstance() {
             Finished_Works_Fragment fragment = new Finished_Works_Fragment();
             return fragment;
@@ -378,19 +384,29 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_finished_works, container, false);
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
+            mLoginFormView = rootView.findViewById(R.id.login_form);
+            mProgressView = rootView.findViewById(R.id.login_progress);
 
-            mAdapter = new MoviesAdapter(movieList);
+            finished_works_adaptor = new Work_Adapter(finished_works_list);
+
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-            recyclerView.setAdapter(mAdapter);
+            recyclerView.setAdapter(finished_works_adaptor);
 
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Movie movie = movieList.get(position);
-                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
+                    CachePot.getInstance().push(finished_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -400,38 +416,140 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             }));
 
             if (fin_data_flag == 0) {
-                prepareMovieData();
+                if (load_finished_works_task != null) {
+                    load_finished_works_task.cancel(true);
+                    load_finished_works_task = null;
+                }
+
+                showProgress(true);
+                load_finished_works_task = new Load_Finished_Works_Task();
+                load_finished_works_task.execute((Void) null);
             }
 
             return rootView;
         }
 
-        private List<Movie> movieList = new ArrayList<>();
         private RecyclerView recyclerView;
-        private MoviesAdapter mAdapter;
-
-        private void prepareMovieData() {
 
 
-            Movie movie = new Movie("Up", "Animation", "2009");
-            movieList.add(movie);
-
-            movie = new Movie("Star Trek", "Science Fiction", "2009");
-            movieList.add(movie);
-
-            movie = new Movie("The LEGO Movie", "Animation", "2014");
-            movieList.add(movie);
-
-            movie = new Movie("Iron Man", "Action & Adventure", "2008");
-            movieList.add(movie);
-
-            movie = new Movie("Aliens", "Science Fiction", "1986");
-            movieList.add(movie);
+        static View mLoginFormView;
+        static View mProgressView;
 
 
-            mAdapter.notifyDataSetChanged();
+        public static class Load_Finished_Works_Task extends AsyncTask<Void, Void, String[]> {
 
-            fin_data_flag = 1;
+            Load_Finished_Works_Task() {
+            }
+
+            DefaultHttpClient http_client;
+            HttpPost http_post;
+            String network_action_response;
+            ArrayList<NameValuePair> name_pair_value;
+
+            @Override
+            protected String[] doInBackground(Void... params) {
+                try {
+                    http_client = new DefaultHttpClient();
+                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_finished_works.php");
+                    name_pair_value = new ArrayList<>(1);
+                    Log.d(General_Data.TAG, "Sales Man : " + String.valueOf(settings.getInt("sales_person_id", 0)));
+                    name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));
+
+                    http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                    ResponseHandler<String> response_handler = new BasicResponseHandler();
+                    network_action_response = http_client.execute(http_post, response_handler);
+                    return new String[]{"0", network_action_response};
+
+                } catch (UnsupportedEncodingException e) {
+                    return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+                } catch (ClientProtocolException e) {
+                    return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+                } catch (IOException e) {
+                    return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+                }
+            }
+
+
+            @Override
+            protected void onPostExecute(final String[] network_action_response_array) {
+                load_finished_works_task = null;
+
+                showProgress(false);
+
+                Log.d(General_Data.TAG, network_action_response_array[0]);
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+
+                if (network_action_response_array[0].equals("1")) {
+                    Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, network_action_response_array[1]);
+                } else {
+
+                    try {
+
+                        JSONArray json_array = new JSONArray(network_action_response_array[1]);
+                        if (json_array.getJSONObject(0).getString("status").equals("1")) {
+                            Toast.makeText(application_context, "No Finished Works...", Toast.LENGTH_LONG).show();
+                        } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
+
+                            for (int i = 1; i < json_array.length(); i++) {
+
+                                finished_works_list.add(new Work(json_array.getJSONObject(i).getString("name"),
+                                        json_array.getJSONObject(i).getString("address"),
+                                        json_array.getJSONObject(i).getString("id"),
+                                        Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date")),
+                                        Integer.parseInt(json_array.getJSONObject(i).getString("sales_person_id"))));
+
+                            }
+                            finished_works_adaptor.notifyDataSetChanged();
+                            fin_data_flag = 1;
+                        }
+
+                    } catch (JSONException e) {
+                        Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Log.d(General_Data.TAG, e.getLocalizedMessage());
+                    } catch (ParseException e) {
+                        Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Log.d(General_Data.TAG, e.getLocalizedMessage());
+                    }
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                load_finished_works_task = null;
+                showProgress(false);
+            }
+        }
+
+        private static Load_Finished_Works_Task load_finished_works_task = null;
+
+        /**
+         * Shows the progress UI and hides the login form.
+         */
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+        private static void showProgress(final boolean show) {
+            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+            // for very easy animations. If available, use these APIs to fade-in
+            // the progress spinner.
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
         }
     }
 
@@ -443,39 +561,41 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         public Upcoming_Works_Fragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static Upcoming_Works_Fragment newInstance() {
             Upcoming_Works_Fragment fragment = new Upcoming_Works_Fragment();
             return fragment;
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_upcoming_works, container, false);
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
+            mLoginFormView = rootView.findViewById(R.id.login_form);
+            mProgressView = rootView.findViewById(R.id.login_progress);
 
-            mAdapter = new MoviesAdapter(movieList);
-//            wAdapter = new Work_Adapter(work_List_Blank);
-            wAdapter = new Work_Adapter(List_Sales_Persons.work_List);
+            upcoming_works_adaptor = new Work_Adapter(upcoming_works_list);
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//            recyclerView.setAdapter(mAdapter);
-            recyclerView.setAdapter(wAdapter);
+            recyclerView.setAdapter(upcoming_works_adaptor);
 
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-//                    Movie movie = movieList.get(position);
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
+                    CachePot.getInstance().push(upcoming_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -485,77 +605,153 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             }));
 
 
-//            if (up_data_flag == 0) {
-//                prepareWorkData();
-//                prepareMovieData();
-//            }
+            if (up_data_flag == 0) {
+
+                if (load_upcoming_works_task != null) {
+                    load_upcoming_works_task.cancel(true);
+                    load_upcoming_works_task = null;
+                }
+
+                showProgress(true);
+                load_upcoming_works_task = new Load_Upcoming_Works_Task();
+                load_upcoming_works_task.execute((Void) null);
+            }
 
             return rootView;
         }
 
-
-        private List<Movie> movieList = new ArrayList<>();
-        List<Work> work_List_Blank = new ArrayList<>();
-
         private RecyclerView recyclerView;
 
-        private MoviesAdapter mAdapter;
-        private Work_Adapter wAdapter;
+        static View mLoginFormView;
+        static View mProgressView;
 
-        private void prepareMovieData() {
 
-            for (int i = 0; i < List_Sales_Persons.work_List.size(); i++) {
-                Toast_Utils.longToast(application_context, List_Sales_Persons.work_List.get(i).getWork_name());
+        public static class Load_Upcoming_Works_Task extends AsyncTask<Void, Void, String[]> {
 
-//                work_List_Blank.add(new Work(Sales_Persons.work_List.get(i).getWork_name(), Sales_Persons.work_List.get(i).getWork_address(), "", "", Sales_Persons.work_List.get(i).getId(), Sales_Persons.work_List.get(i).getWork_date(), Sales_Persons.work_List.get(i).getSales_person_id()));
+            Load_Upcoming_Works_Task() {
+            }
 
-                movieList.add(new Movie(List_Sales_Persons.work_List.get(i).getWork_name(), Date_Utils.normal_Date_Format_words.format(List_Sales_Persons.work_List.get(i).getWork_date()), "1995"));
+            DefaultHttpClient http_client;
+            HttpPost http_post;
+            String network_action_response;
+            ArrayList<NameValuePair> name_pair_value;
+
+            @Override
+            protected String[] doInBackground(Void... params) {
+                try {
+                    http_client = new DefaultHttpClient();
+                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_upcoming_works.php");
+                    name_pair_value = new ArrayList<>(1);
+                    Log.d(General_Data.TAG, "Sales Man : " + String.valueOf(settings.getInt("sales_person_id", 0)));
+                    name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));
+                    http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                    ResponseHandler<String> response_handler = new BasicResponseHandler();
+                    network_action_response = http_client.execute(http_post, response_handler);
+                    return new String[]{"0", network_action_response};
+
+                } catch (UnsupportedEncodingException e) {
+                    return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+                } catch (ClientProtocolException e) {
+                    return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+                } catch (IOException e) {
+                    return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+                }
             }
 
 
-            Movie movie = new Movie("Chicken Run", "Animation", "2000");
-            movieList.add(movie);
+            @Override
+            protected void onPostExecute(final String[] network_action_response_array) {
+                load_upcoming_works_task = null;
 
-            movie = new Movie("Back to the Future", "Science Fiction", "1985");
-            movieList.add(movie);
+                showProgress(false);
 
-            movie = new Movie("Raiders of the Lost Ark", "Action & Adventure", "1981");
-            movieList.add(movie);
+                Log.d(General_Data.TAG, network_action_response_array[0]);
+                Log.d(General_Data.TAG, network_action_response_array[1]);
 
-            movie = new Movie("Goldfinger", "Action & Adventure", "1965");
-            movieList.add(movie);
+                if (network_action_response_array[0].equals("1")) {
+                    Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, network_action_response_array[1]);
+                } else {
 
-            movie = new Movie("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014");
-            movieList.add(movie);
+                    try {
 
-            mAdapter.notifyDataSetChanged();
+                        JSONArray json_array = new JSONArray(network_action_response_array[1]);
+                        if (json_array.getJSONObject(0).getString("status").equals("1")) {
+                            Toast.makeText(application_context, "No Upcoming Works...", Toast.LENGTH_LONG).show();
+                        } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-            up_data_flag = 1;
-        }
+                            for (int i = 1; i < json_array.length(); i++) {
 
-        private void prepareWorkData() {
+                                upcoming_works_list.add(new Work(json_array.getJSONObject(i).getString("name"),
+                                        json_array.getJSONObject(i).getString("address"),
+                                        json_array.getJSONObject(i).getString("id"),
+                                        Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date")),
+                                        Integer.parseInt(json_array.getJSONObject(i).getString("sales_person_id"))));
 
-            for (int i = 0; i < List_Sales_Persons.work_List.size(); i++) {
-                Toast_Utils.longToast(application_context, List_Sales_Persons.work_List.get(i).getWork_name());
+                            }
+                            upcoming_works_adaptor.notifyDataSetChanged();
+                            up_data_flag = 1;
+                        }
 
-                work_List_Blank.add(new Work(List_Sales_Persons.work_List.get(i).getWork_name(), List_Sales_Persons.work_List.get(i).getWork_address(), List_Sales_Persons.work_List.get(i).getId(), List_Sales_Persons.work_List.get(i).getWork_date(), List_Sales_Persons.work_List.get(i).getSales_person_id()));
+                    } catch (JSONException e) {
+                        Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Log.d(General_Data.TAG, e.getLocalizedMessage());
+                    } catch (ParseException e) {
+                        Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Log.d(General_Data.TAG, e.getLocalizedMessage());
+                    }
+                }
             }
 
-//            Work work = new Work("Chicken Run", "Animation", "1", Calendar.getInstance().getTime(), 0);
-//            work_List_Blank.add(work);
-//            work = new Work("Chicken Run", "Animation",  "1", Calendar.getInstance().getTime(), 0);
-//            work_List_Blank.add(work);
-//            work = new Work("Chicken Run", "Animation", "1", Calendar.getInstance().getTime(), 0);
-//            work_List_Blank.add(work);
-//            work = new Work("Chicken Run", "Animation", "1", Calendar.getInstance().getTime(), 0);
-//            work_List_Blank.add(work);
-
-            wAdapter.notifyDataSetChanged();
-
-            up_data_flag = 1;
+            @Override
+            protected void onCancelled() {
+                load_upcoming_works_task = null;
+                showProgress(false);
+            }
         }
+
+        private static Load_Upcoming_Works_Task load_upcoming_works_task = null;
+
+        /**
+         * Shows the progress UI and hides the login form.
+         */
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+        private static void showProgress(final boolean show) {
+            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+            // for very easy animations. If available, use these APIs to fade-in
+            // the progress spinner.
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
+
 
     }
+
+    private static List<Work> finished_works_list = new ArrayList<>();
+    static Work_Adapter finished_works_adaptor;
+
+    private static List<Work> pending_works_list = new ArrayList<>();
+    static Work_Adapter pending_works_adaptor;
+
+    private static List<Work> upcoming_works_list = new ArrayList<>();
+    static Work_Adapter upcoming_works_adaptor;
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -614,7 +810,18 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         fin_data_flag = 0;
         pen_data_flag = 0;
         up_data_flag = 0;
+
+        finished_works_list = new ArrayList<>();
+        finished_works_adaptor = new Work_Adapter(finished_works_list);
+
+        pending_works_list = new ArrayList<>();
+        pending_works_adaptor = new Work_Adapter(pending_works_list);
+
+        upcoming_works_list = new ArrayList<>();
+        upcoming_works_adaptor = new Work_Adapter(upcoming_works_list);
+
         super.onBackPressed();
+//        finish();
     }
 
 

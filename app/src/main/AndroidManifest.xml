@@ -15,14 +15,15 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activities.Splash_Screen">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
             android:name=".activities.Dashboard_Page"
+            android:label="Dashboard Page"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,14 +43,7 @@
         <activity
             android:name=".activities.Sales_Person_Dashboard_Page"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!--<meta-data-->
-                <!--android:name="android.app.default_searchable"-->
-                <!--android:value=".Home_Result" />-->
-
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.Home_Result"
@@ -57,26 +51,28 @@
             android:theme="@style/AppTheme.NoActionBar">
 
             <!-- to identify this activity as "searchable" -->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.SEARCH" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.SEARCH" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
 
-            <!--<meta-data-->
-                <!--android:name="android.app.searchable"-->
-                <!--android:resource="@xml/searchable" />-->
+
+            <!-- <meta-data -->
+            <!-- android:name="android.app.searchable" -->
+            <!-- android:resource="@xml/searchable" /> -->
         </activity>
-
 
         <activity
             android:name=".activities.Accounts"
             android:label="Accounts" />
-        <activity android:name=".activities.Add_Work">
 
+        <activity android:name=".activities.Add_Work"></activity>
 
-        </activity>
         <activity android:name=".activities.Work_Page" />
 
+        <activity android:name=".activities.View_Work"></activity>
+        <activity android:name=".activities.View_Work_Sales_Person" />
+        <activity android:name=".activities.Edit_Work" />
 
     </application>
 

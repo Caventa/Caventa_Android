@@ -8,7 +8,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
-        versionName "1.2"
+        versionName "1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         useLibrary 'org.apache.http.legacy'
         vectorDrawables.useSupportLibrary = true
@@ -41,4 +41,5 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:0.9.5.0'
     androidTestImplementation 'junit:junit:4.12'
     implementation 'com.koushikdutta.ion:ion:2.+'
+    implementation 'com.github.kimkevin:cachepot:1.1.0'
 }

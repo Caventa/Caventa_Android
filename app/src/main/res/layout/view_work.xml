@@ -29,39 +29,64 @@
             android:orientation="vertical">
 
 
-            <android.support.design.widget.TextInputLayout
+            <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/name"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="Name"-->
+            <!--android:imeOptions="actionNext"-->
+            <!--android:inputType="text" />-->
+
+            <!--</android.support.design.widget.TextInputLayout>-->
+
+            <TextView
+                android:id="@+id/name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Name"
-                    android:imeOptions="actionNext"
-                    android:inputType="text" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
+            <android.support.v4.widget.Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="16dp" />
+
+            <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
 
-                <EditText
-                    android:id="@+id/address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top|left"
-                    android:hint="Address"
-                    android:imeOptions="actionNext"
-                    android:inputType="textMultiLine"
-                    android:lines="5"
-                    android:maxLines="5"
-                    android:minLines="1"
-                    android:scrollbars="vertical" />
+            <!--<EditText-->
+            <!--android:id="@+id/address"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="top|left"-->
+            <!--android:hint="Address"-->
+            <!--android:imeOptions="actionNext"-->
+            <!--android:inputType="textMultiLine"-->
+            <!--android:lines="5"-->
+            <!--android:maxLines="5"-->
+            <!--android:minLines="1"-->
+            <!--android:scrollbars="vertical" />-->
 
-            </android.support.design.widget.TextInputLayout>
+            <!--</android.support.design.widget.TextInputLayout>-->
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|left"
+                android:lines="5"
+                android:maxLines="5"
+                android:minLines="1"
+                android:scrollbars="vertical"
+                android:text="Address"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <android.support.v4.widget.Space
                 android:layout_width="match_parent"
@@ -112,14 +137,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/add_advance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    app:srcCompat="@android:drawable/ic_input_add" />
+                <!--<ImageView-->
+                <!--android:id="@+id/add_advance"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--app:srcCompat="@android:drawable/ic_input_add" />-->
 
                 <TextView
                     android:id="@+id/total_advance"
@@ -160,14 +185,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/add_expense"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    app:srcCompat="@android:drawable/ic_input_add" />
+                <!--<ImageView-->
+                <!--android:id="@+id/add_expense"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--app:srcCompat="@android:drawable/ic_input_add" />-->
 
                 <TextView
                     android:id="@+id/total_expense"

@@ -3,14 +3,12 @@ package caventa.ansheer.ndk.caventa.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -88,7 +87,7 @@ public class Dashboard_Page extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent i=new Intent(application_context,List_Sales_Persons.class);
+                Intent i = new Intent(application_context, List_Sales_Persons.class);
                 startActivity(i);
             }
         });
@@ -177,14 +176,15 @@ public class Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-//                    Movie movie = movieList.get(position);
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-//                    Intent i = new Intent(getContext(), Work_Page.class);
-//                    i.putExtra("work", movie.getTitle());
-//                    startActivity(i);
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Intent intent = new Intent(application_context, View_Work.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
+                    CachePot.getInstance().push(pending_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -262,7 +262,7 @@ public class Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(application_context, "No Pending Works...", Toast.LENGTH_LONG).show();
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                             for (int i = 1; i < json_array.length(); i++) {
@@ -362,8 +362,15 @@ public class Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-//                    Movie movie = movieList.get(position);
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(application_context, View_Work.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
+                    CachePot.getInstance().push(finished_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -408,7 +415,7 @@ public class Dashboard_Page extends AppCompatActivity {
             protected String[] doInBackground(Void... params) {
                 try {
                     http_client = new DefaultHttpClient();
-                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_pending_works.php");
+                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_finished_works.php");
                     ResponseHandler<String> response_handler = new BasicResponseHandler();
                     network_action_response = http_client.execute(http_post, response_handler);
                     return new String[]{"0", network_action_response};
@@ -441,7 +448,7 @@ public class Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(application_context, "No Finished Works...", Toast.LENGTH_LONG).show();
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                             for (int i = 1; i < json_array.length(); i++) {
@@ -520,7 +527,7 @@ public class Dashboard_Page extends AppCompatActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_upcoming_works, container, false);
 
@@ -540,8 +547,15 @@ public class Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-//                    Movie movie = movieList.get(position);
-//                    Toast.makeText(getContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(application_context, View_Work.class);
+//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
+//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
+//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
+//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
+//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+                    Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
+                    CachePot.getInstance().push(upcoming_works_list.get(position));
+                    startActivity(intent);
                 }
 
                 @Override
@@ -620,7 +634,7 @@ public class Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(application_context, "No Upcoming Works...", Toast.LENGTH_LONG).show();
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                             for (int i = 1; i < json_array.length(); i++) {
@@ -736,17 +750,5 @@ public class Dashboard_Page extends AppCompatActivity {
             }
             return null;
         }
-
-
     }
-
-    @Override
-    public void onBackPressed() {
-        fin_data_flag = 0;
-        pen_data_flag = 0;
-        up_data_flag = 0;
-        super.onBackPressed();
-    }
-
-
 }

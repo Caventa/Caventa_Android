@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -51,18 +53,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_Adapter;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
+import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 import ndk.prism.common_utils.Date_Picker_Utils;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
-public class Add_Work extends AppCompatActivity {
+public class Edit_Work extends AppCompatActivity {
 
     private Work_Advances_Adapter work_advances_adapter;
 
@@ -77,7 +80,8 @@ public class Add_Work extends AppCompatActivity {
 
     TextView txt_total_advance, txt_total_expense, txt_total_profit;
 
-    double total_advance = 0, total_expense = 0, total_profit = 0;
+    double total_advance = View_Work_Sales_Person.total_advance, total_expense = View_Work_Sales_Person.total_expense;
+
     private Calendar calendar;
     private SimpleDateFormat sdf;
     private EditText txt_name;
@@ -86,13 +90,22 @@ public class Add_Work extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     private SharedPreferences settings;
+    Work selected_work;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_work);
-        setTitle("New Work");
+//        setTitle("New Work");
         application_context = getApplicationContext();
+
+//        selected_work_expenses = CachePot.getInstance().pop(ArrayList<Work_Expense>.class);
+//        selected_work_advances = CachePot.getInstance().pop(Work_Advance.class);
+
+        selected_work = CachePot.getInstance().pop(Work.class);
+
+        setTitle(selected_work.getWork_name());
+
         settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
                 Context.MODE_PRIVATE);
         txt_total_advance = findViewById(R.id.total_advance);
@@ -102,7 +115,7 @@ public class Add_Work extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        work_advances = new ArrayList<>();
+        work_advances = View_Work_Sales_Person.work_advances;
         work_advances_adapter = new Work_Advances_Adapter(this, work_advances);
 
         work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
@@ -115,7 +128,7 @@ public class Add_Work extends AppCompatActivity {
 
         work_advances_recycler_view.setAdapter(work_advances_adapter);
 
-        work_expenses = new ArrayList<>();
+        work_expenses = View_Work_Sales_Person.work_expenses;
         work_expenses_adapter = new Work_Expense_Adapter(this, work_expenses);
 
         work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
@@ -134,7 +147,12 @@ public class Add_Work extends AppCompatActivity {
         final TextView txt_date = findViewById(R.id.work_date);
 
         calendar = Calendar.getInstance();
-        txt_date.setText(Date_Utils.normal_Date_Format_words.format(calendar.getTime()));
+        calendar.set(Calendar.YEAR, selected_work.getWork_date().getYear());
+        calendar.set(Calendar.MONTH, selected_work.getWork_date().getMonth());
+        calendar.set(Calendar.DAY_OF_MONTH, selected_work.getWork_date().getDay());
+
+        txt_date.setText(Date_Utils.normal_Date_Format_words.format(selected_work.getWork_date()));
+
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 calendar.set(Calendar.YEAR, year);
@@ -147,14 +165,14 @@ public class Add_Work extends AppCompatActivity {
         pick_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date_Picker_Utils.show_date_picker(Add_Work.this, date, calendar);
+                Date_Picker_Utils.show_date_picker(Edit_Work.this, date, calendar);
             }
         });
 
         txt_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date_Picker_Utils.show_date_picker(Add_Work.this, date, calendar);
+                Date_Picker_Utils.show_date_picker(Edit_Work.this, date, calendar);
             }
         });
 
@@ -163,7 +181,7 @@ public class Add_Work extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean wrapInScrollView = false;
-                new MaterialDialog.Builder(Add_Work.this)
+                new MaterialDialog.Builder(Edit_Work.this)
                         .title("Advance+")
                         .customView(R.layout.add_advance, wrapInScrollView)
                         .positiveText("Submit")
@@ -202,7 +220,7 @@ public class Add_Work extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean wrapInScrollView = false;
-                new MaterialDialog.Builder(Add_Work.this)
+                new MaterialDialog.Builder(Edit_Work.this)
                         .title("Expense+")
                         .customView(R.layout.add_advance, wrapInScrollView)
                         .positiveText("Submit")
@@ -290,11 +308,18 @@ public class Add_Work extends AppCompatActivity {
             }
         }));
         initView();
+
+        txt_name.setText(selected_work.getWork_name());
+        txt_address.setText(selected_work.getWork_address());
+
+        txt_total_advance.setText("Advances : " + total_advance);
+        txt_total_expense.setText("Expenses : " + total_expense);
+
+        txt_total_profit.setText("Profit : " + (total_advance - total_expense));
     }
 
     private void calculate_total_profit() {
-        total_profit = total_advance - total_expense;
-        txt_total_profit.setText("Profit : " + total_profit);
+        txt_total_profit.setText("Profit : " + (total_advance - total_expense));
     }
 
 
@@ -319,7 +344,10 @@ public class Add_Work extends AppCompatActivity {
         }
 
         if (id == R.id.menu_item_save) {
-            attempt_work_save();
+//            attempt_work_save();
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
             return true;
         }
 
@@ -397,7 +425,7 @@ public class Add_Work extends AppCompatActivity {
             Log.d(General_Data.TAG, network_action_response_array[1]);
 
             if (network_action_response_array[0].equals("1")) {
-                Toast.makeText(Add_Work.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Toast.makeText(Edit_Work.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
 
