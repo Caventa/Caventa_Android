@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,7 +45,7 @@ import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 import ndk.prism.common_utils.Date_Utils;
 
-public class View_Work extends AppCompatActivity {
+public class View_Finished_Work_Sales_Person extends AppCompatActivity {
 
     private Context application_context;
     private View mProgressView;
@@ -54,21 +55,23 @@ public class View_Work extends AppCompatActivity {
 
     private Work_Expense_View_Adapter work_expenses_adapter;
 
-    private List<Work_Advance> work_advances;
+    static List<Work_Advance> work_advances;
 
-    private List<Work_Expense> work_expenses;
+    static List<Work_Expense> work_expenses;
 
     private RecyclerView work_expenses_recycler_view;
     private RecyclerView work_advances_recycler_view;
 
     private TextView txt_name, txt_address, txt_total_advance, txt_total_expense, txt_profit;
     Work selected_work;
+    private TextView txt_commision;
+    private TextView txt_net_Profit;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_work);
+        setContentView(R.layout.view_finished_work);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         application_context = getApplicationContext();
@@ -126,16 +129,20 @@ public class View_Work extends AppCompatActivity {
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_profit = findViewById(R.id.total_profit);
+        txt_commision = (TextView) findViewById(R.id.commision);
+        txt_net_Profit = (TextView) findViewById(R.id.net_profit);
     }
 
     private Load_Work_Profit_Task load_work_profit_task = null;
 
+    static double total_advance = 0;
+    static double total_expense = 0;
+
     public class Load_Work_Profit_Task extends AsyncTask<Void, Void, String[]> {
         private ArrayList<NameValuePair> name_pair_value;
-        private double total_advance = 0;
+
         private boolean work_advances_flag = true;
 
-        private double total_expense = 0;
 
         Load_Work_Profit_Task() {
         }
@@ -232,6 +239,10 @@ public class View_Work extends AppCompatActivity {
 
                             txt_profit.setText("Profit : " + (total_advance - total_expense));
 
+                            txt_commision.setText("Commision : " + ((total_advance - total_expense)*0.6));
+
+                            txt_net_Profit.setText("Net Profit : " + ((total_advance - total_expense)*0.4));
+
                         } catch (JSONException ex) {
                             Toast.makeText(application_context, "Error : " + ex.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                             Log.d(General_Data.TAG, ex.getLocalizedMessage());
@@ -304,11 +315,81 @@ public class View_Work extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_cancel) {
-            this.finish();
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
             return true;
         }
+
+//        if (id == R.id.menu_item_finish) {
+//
+//            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
+//            after_time_dialog.setMessage("Work is Finished, Is it?").setCancelable(false)
+//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//
+//                            dialog.cancel();
+//                        }
+//                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//
+//                    dialog.cancel();
+//                }
+//            });
+//            AlertDialog alert = after_time_dialog.create();
+//            alert.setTitle("Warning!");
+//            alert.show();
+//
+////            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+////            startActivity(i);
+////            finish();
+//            return true;
+//        }
+//
+//        if (id == R.id.menu_item_work_cancel) {
+////            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+////            startActivity(i);
+////            finish();
+//
+//            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
+//            after_time_dialog.setMessage("Work will be cancelled, OK?").setCancelable(false)
+//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//
+//                            dialog.cancel();
+//                        }
+//                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//
+//                    dialog.cancel();
+//                }
+//            });
+//            AlertDialog alert = after_time_dialog.create();
+//            alert.setTitle("Warning!");
+//            alert.show();
+//
+//            return true;
+//        }
+
+//        if (id == R.id.menu_item_edit) {
+//
+//            Intent i = new Intent(application_context, Edit_Work.class);
+//            CachePot.getInstance().push(selected_work);
+//            CachePot.getInstance().push(work_advances);
+//            CachePot.getInstance().push(work_expenses);
+//            startActivity(i);
+//            finish();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+        startActivity(i);
+        finish();
+    }
 }

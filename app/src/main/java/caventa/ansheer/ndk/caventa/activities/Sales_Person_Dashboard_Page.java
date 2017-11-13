@@ -54,7 +54,6 @@ import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
-import ndk.prism.common_utils.Toast_Utils;
 
 public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
@@ -399,7 +398,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+                    Intent intent = new Intent(application_context, View_Finished_Work_Sales_Person.class);
 //                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
 //                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
 //                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
@@ -828,7 +827,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Toast_Utils.longToast(application_context,"Pause");
+//        Toast_Utils.longToast(application_context,"Pause");
         finish();
         super.onPause();
     }

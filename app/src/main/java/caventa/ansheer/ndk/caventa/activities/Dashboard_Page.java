@@ -362,7 +362,7 @@ public class Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Intent intent = new Intent(application_context, View_Work.class);
+                    Intent intent = new Intent(application_context, View_Finished_Work.class);
 //                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
 //                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
 //                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());

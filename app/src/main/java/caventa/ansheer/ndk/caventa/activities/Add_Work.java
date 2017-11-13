@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -51,11 +52,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_Adapter;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
+import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 import ndk.prism.common_utils.Date_Picker_Utils;
@@ -314,7 +315,9 @@ public class Add_Work extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_cancel) {
-            this.finish();
+            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+            startActivity(i);
+            finish();
             return true;
         }
 
@@ -325,6 +328,13 @@ public class Add_Work extends AppCompatActivity {
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+        startActivity(i);
+        finish();
     }
 
     /* Keep track of the login task to ensure we can cancel it if requested. */
