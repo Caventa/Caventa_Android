@@ -42,4 +42,4 @@ before_install:
 script: ./gradlew build
 
 after_success:
-    - curl --ftp-create-dirs -T "{${TRAVIS_BUILD_DIR}/${DIR}/admin/build/outputs/apk/app-debug.apk}" -u $FTP_USER:$FTP_PASSWORD ftp://vfmob.com.md-in-64.webhostbox.net/baneeishaque/caventa_production/builds/travis/
+    - curl --ftp-create-dirs -T "{${TRAVIS_BUILD_DIR}/${DIR}/app/build/outputs/apk/app-debug.apk}" -u $FTP_USER:$FTP_PASSWORD ftp://vfmob.com.md-in-64.webhostbox.net/baneeishaque/caventa_production/builds/travis/
