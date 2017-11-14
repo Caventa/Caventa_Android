@@ -5,6 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
     <ScrollView
         android:id="@+id/login_form"
@@ -76,7 +83,7 @@
                 tools:layout_constraintRight_creator="1" />
 
             <Button
-                android:id="@+id/button_a"
+                android:id="@+id/button_commisions"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginEnd="16dp"

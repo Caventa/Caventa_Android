@@ -9,7 +9,6 @@
 
     tools:showIn="@layout/sales_persons">
 
-    <!-- Login progress -->
     <ProgressBar
         android:id="@+id/login_progress"
         style="?android:attr/progressBarStyleLarge"

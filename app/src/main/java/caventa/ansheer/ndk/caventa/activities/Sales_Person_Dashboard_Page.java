@@ -121,7 +121,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+//        getMenuInflater().inflate(R.menu.menu_home, menu);
 
         // Associate searchable configuration with the SearchView
 //        SearchManager searchManager =
@@ -134,23 +134,23 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_item_bank) {
-            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Sales_Person_Accounts.class);
-            startActivity(i);
-            return true;
-        }
-
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.menu_item_bank) {
+//            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Sales_Person_Accounts.class);
+//            startActivity(i);
+//            return true;
+//        }
+//
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     static int fin_data_flag = 0, pen_data_flag = 0, up_data_flag = 0;
 

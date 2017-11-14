@@ -16,7 +16,6 @@
         <activity android:name=".activities.Splash_Screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -35,7 +34,6 @@
             android:label="Sales Persons">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -44,27 +42,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.Home_Result"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- to identify this activity as "searchable" -->
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.SEARCH" /> -->
-            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-            <!-- </intent-filter> -->
-
-
-            <!-- <meta-data -->
-            <!-- android:name="android.app.searchable" -->
-            <!-- android:resource="@xml/searchable" /> -->
-        </activity>
-        <activity
             android:name=".activities.Accounts"
             android:label="Accounts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -73,13 +54,18 @@
         <activity android:name=".activities.View_Work" />
         <activity android:name=".activities.View_Work_Sales_Person" />
         <activity android:name=".activities.Edit_Work" />
-        <activity android:name=".activities.Sales_Person_Accounts" />
+        <activity android:name=".activities.extra.Sales_Person_Accounts" />
         <activity android:name=".activities.View_Finished_Work_Sales_Person" />
-        <activity android:name=".activities.CardViewActivity" />
+        <activity android:name=".activities.extra.Sales_Person_Commision_Page" />
         <activity
             android:name=".activities.Commision_Page"
             android:label="@string/title_activity_commision__page"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
