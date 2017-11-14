@@ -138,7 +138,7 @@ public class Accounts extends AppCompatActivity {
 
                         }
                         Intent intent = new Intent(getApplicationContext(),Commision_Page.class);
-                        intent.putExtra("sales_person", sales_persons.get(0).getName());
+                        intent.putExtra("sales_person", sales_persons.get(1).getName());
                         intent.putExtra("position", 0);
                         startActivity(intent);
                     }

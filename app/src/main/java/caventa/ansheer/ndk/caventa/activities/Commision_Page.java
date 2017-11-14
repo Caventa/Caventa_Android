@@ -18,7 +18,6 @@ import caventa.ansheer.ndk.caventa.R;
 import ndk.prism.common_utils.Toast_Utils;
 
 
-
 public class Commision_Page extends AppCompatActivity {
 
 
@@ -66,9 +65,9 @@ public class Commision_Page extends AppCompatActivity {
                 if (isOnline()) {
                     Intent i = new Intent(application_context, Commision_Page.class);
                     i.putExtra("sales_person", spinner_Scheme.getSelectedItem().toString());
-                    i.putExtra("position", 0);
+                    i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
                     startActivity(i);
-                    Commision_Page.this.finish();
+                    finish();
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -83,7 +82,7 @@ public class Commision_Page extends AppCompatActivity {
 
         spinner_list = new ArrayList<String>();
 
-        for(int i=0;i<Accounts.sales_persons.size();i++) {
+        for (int i = 1; i < Accounts.sales_persons.size(); i++) {
             spinner_list.add(Accounts.sales_persons.get(i).getName());
         }
         ArrayAdapter<String> spinner_adapter = new ArrayAdapter<String>(application_context, R.layout.spinner_item_actionbar, spinner_list);
