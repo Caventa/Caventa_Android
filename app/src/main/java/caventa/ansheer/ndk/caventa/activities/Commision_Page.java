@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,9 +34,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +47,7 @@ import caventa.ansheer.ndk.caventa.adapters.extra.Commision_Adapter;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import caventa.ansheer.ndk.caventa.models.extra.Commision;
+import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
 
@@ -60,6 +64,7 @@ public class Commision_Page extends AppCompatActivity {
     Spinner spinner_Scheme;
     private Context application_context;
     private Sales_Person selected_sales_person;
+    private Button button_payout;
 
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -98,12 +103,7 @@ public class Commision_Page extends AppCompatActivity {
                 }
 
                 if (isOnline()) {
-                    Intent i = new Intent(application_context, Commision_Page.class);
-                    CachePot.getInstance().push(Accounts.sales_persons.get(spinner_Scheme.getSelectedItemPosition()+1));
-//                    i.putExtra("sales_person", spinner_Scheme.getSelectedItem().toString());
-                    i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
-                    startActivity(i);
-                    finish();
+                    load_commision_page();
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -156,10 +156,36 @@ public class Commision_Page extends AppCompatActivity {
         load_sales_person_commision_task = new Load_Sales_Person_Commision_Task();
         load_sales_person_commision_task.execute((Void) null);
 
+        initView();
+
+        button_payout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (payout_task != null) {
+                    finish();
+                }
+                showProgress(true);
+                payout_task = new Payout_Task();
+                payout_task.execute((Void) null);
+            }
+        });
+    }
+
+    private void load_commision_page() {
+        Intent i = new Intent(application_context, Commision_Page.class);
+        CachePot.getInstance().push(Accounts.sales_persons.get(spinner_Scheme.getSelectedItemPosition() + 1));
+        i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
+        startActivity(i);
+        finish();
     }
 
     private Load_Sales_Person_Commision_Task load_sales_person_commision_task = null;
     private List<Commision> commisions;
+
+    private void initView() {
+        button_payout = (Button) findViewById(R.id.btnShow);
+    }
+
     public class Load_Sales_Person_Commision_Task extends AsyncTask<Void, Void, String[]> {
 
         Load_Sales_Person_Commision_Task() {
@@ -216,12 +242,15 @@ public class Commision_Page extends AppCompatActivity {
                     json_array = new JSONArray(network_action_response_array[1]);
                     if (json_array.getJSONObject(0).getString("status").equals("1")) {
                         Toast.makeText(application_context, "No Commisions...", Toast.LENGTH_LONG).show();
+                        button_payout.setEnabled(false);
 
                     } else {
+
+                        commisions.add(new Commision(Date_Utils.normal_Date_Format.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(1).getString("clear_date"))), json_array.getJSONObject(1).getString("clear_time")));
+
                         for (i = 1; i < json_array.length(); i++) {
 
                             commisions.add(new Commision(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("amount")));
-
 
                         }
 
@@ -236,6 +265,9 @@ public class Commision_Page extends AppCompatActivity {
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
                     e.printStackTrace();
 
+                } catch (ParseException e) {
+                    Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
                 }
 
 
@@ -279,6 +311,90 @@ public class Commision_Page extends AppCompatActivity {
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    /* Keep track of the login task to ensure we can cancel it if requested. */
+    private Payout_Task payout_task = null;
+
+    public class Payout_Task extends AsyncTask<Void, Void, String[]> {
+
+        Payout_Task() {
+
+        }
+
+        DefaultHttpClient http_client;
+        HttpPost http_post;
+        ArrayList<NameValuePair> name_pair_value;
+        String network_action_response;
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                http_client = new DefaultHttpClient();
+                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/payout.php");
+                name_pair_value = new ArrayList<NameValuePair>(1);
+                name_pair_value.add(new BasicNameValuePair("sales_person_id", selected_sales_person.getId()));
+
+                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                ResponseHandler<String> response_handler = new BasicResponseHandler();
+                network_action_response = http_client.execute(http_post, response_handler);
+                return new String[]{"0", network_action_response};
+
+            } catch (UnsupportedEncodingException e) {
+                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+            } catch (ClientProtocolException e) {
+                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+            } catch (IOException e) {
+                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final String[] network_action_response_array) {
+            payout_task = null;
+
+            showProgress(false);
+
+            Log.d(General_Data.TAG, network_action_response_array[0]);
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+
+            if (network_action_response_array[0].equals("1")) {
+                Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+            } else {
+
+                try {
+                    JSONObject json = new JSONObject(network_action_response_array[1]);
+                    String count = json.getString("status");
+                    switch (count) {
+                        case "0":
+                            Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
+                            load_commision_page();
+                            break;
+                        case "1":
+                            Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                }
+
+
+            }
+
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            payout_task = null;
+            showProgress(false);
+        }
     }
 
 }

@@ -417,7 +417,6 @@ public class View_Work_Sales_Person extends AppCompatActivity {
     /* Keep track of the login task to ensure we can cancel it if requested. */
     private Finish_Work_Task finish_work_task = null;
 
-    /* Represents an asynchronous login task used to authenticate the user. */
     public class Finish_Work_Task extends AsyncTask<Void, Void, String[]> {
 
         String task_work_id;
