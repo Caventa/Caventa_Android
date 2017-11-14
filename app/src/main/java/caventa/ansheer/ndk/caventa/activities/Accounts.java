@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.github.kimkevin.cachepot.CachePot;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
@@ -138,7 +140,8 @@ public class Accounts extends AppCompatActivity {
 
                         }
                         Intent intent = new Intent(getApplicationContext(),Commision_Page.class);
-                        intent.putExtra("sales_person", sales_persons.get(1).getName());
+                        CachePot.getInstance().push(sales_persons.get(1));
+//                        intent.putExtra("sales_person", sales_persons.get(1).getName());
                         intent.putExtra("position", 0);
                         startActivity(intent);
                     }
