@@ -120,7 +120,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_sales_person_home, menu);
 
         // Associate searchable configuration with the SearchView
 //        SearchManager searchManager =

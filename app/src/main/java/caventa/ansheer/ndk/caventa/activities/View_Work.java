@@ -115,7 +115,7 @@ public class View_Work extends AppCompatActivity {
         txt_date.setText(Date_Utils.normal_Date_Format_words.format(selected_work.getWork_date()));
 
         initView();
-
+Log.d(General_Data.TAG,selected_work.getWork_name());
         txt_name.setText(selected_work.getWork_name());
         txt_address.setText(selected_work.getWork_address());
     }
