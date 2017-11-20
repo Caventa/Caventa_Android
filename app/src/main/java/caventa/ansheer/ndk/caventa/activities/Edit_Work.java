@@ -397,7 +397,7 @@ public class Edit_Work extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/edit_work.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/edit_work.php");
                 name_pair_value = new ArrayList<NameValuePair>(6);
                 name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
                 name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));

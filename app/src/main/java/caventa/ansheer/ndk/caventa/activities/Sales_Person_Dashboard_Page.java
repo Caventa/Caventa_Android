@@ -23,7 +23,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -250,7 +249,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected String[] doInBackground(Void... params) {
                 try {
                     http_client = new DefaultHttpClient();
-                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_pending_works.php");
+                    http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_pending_works.php");
                     name_pair_value = new ArrayList<>(1);
                     Log.d(General_Data.TAG, "Sales Man : " + String.valueOf(settings.getInt("sales_person_id", 0)));
                     name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));
@@ -450,7 +449,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected String[] doInBackground(Void... params) {
                 try {
                     http_client = new DefaultHttpClient();
-                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_finished_works.php");
+                    http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_finished_works.php");
                     name_pair_value = new ArrayList<>(1);
                     Log.d(General_Data.TAG, "Sales Man : " + String.valueOf(settings.getInt("sales_person_id", 0)));
                     name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));
@@ -641,7 +640,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected String[] doInBackground(Void... params) {
                 try {
                     http_client = new DefaultHttpClient();
-                    http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_upcoming_works.php");
+                    http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_sales_person_upcoming_works.php");
                     name_pair_value = new ArrayList<>(1);
                     Log.d(General_Data.TAG, "Sales Man : " + String.valueOf(settings.getInt("sales_person_id", 0)));
                     name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(settings.getInt("sales_person_id", 0))));

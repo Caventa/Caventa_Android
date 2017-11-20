@@ -155,7 +155,7 @@ public class View_Finished_Work extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_work.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_work.php");
 
                 name_pair_value = new ArrayList<NameValuePair>(1);
                 name_pair_value.add(new BasicNameValuePair("work_id", selected_work.getId()));

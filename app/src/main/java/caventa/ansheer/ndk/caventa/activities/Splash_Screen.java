@@ -55,7 +55,7 @@ public class Splash_Screen extends Activity {
         @Override
         protected String[] doInBackground(Void... params) {
 
-            return Update_Utils.get_server_version("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_version.php");
+            return Update_Utils.get_server_version(General_Data.SERVER_IP_ADDRESS + "/android/get_version.php");
         }
 
         @Override
@@ -148,7 +148,7 @@ public class Splash_Screen extends Activity {
         }
 
         //get url of app on server
-        String url = "http://" + General_Data.UPDATE_URL;
+        String url = General_Data.UPDATE_URL;
 
         //set download manager
         Log.d(General_Data.TAG, url);

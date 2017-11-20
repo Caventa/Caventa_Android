@@ -96,7 +96,7 @@ public class Accounts extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_sales_persons.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_sales_persons.php");
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
                 network_action_response = http_client.execute(http_post, response_handler);
                 return new String[]{"0", network_action_response};

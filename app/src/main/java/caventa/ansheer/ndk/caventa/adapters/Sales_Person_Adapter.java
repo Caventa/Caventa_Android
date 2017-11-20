@@ -57,7 +57,7 @@ public class Sales_Person_Adapter extends RecyclerView.Adapter<Sales_Person_Adap
 
         // This is the "long" way to do build an ImageView request... it allows you to set headers, etc.
         with(mContext)
-                .load("http://" + General_Data.SERVER_IP_ADDRESS + "/icons/" + album.getId() + ".jpg")
+                .load(General_Data.SERVER_IP_ADDRESS + "/icons/" + album.getId() + ".jpg")
                 .withBitmap()
                 .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.error_image)

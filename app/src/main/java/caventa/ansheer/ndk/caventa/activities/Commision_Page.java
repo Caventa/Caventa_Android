@@ -200,7 +200,7 @@ public class Commision_Page extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/get_commision.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_commision.php");
 
                 name_pair_value = new ArrayList<NameValuePair>(1);
                 name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(selected_sales_person.getId())));
@@ -331,7 +331,7 @@ public class Commision_Page extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost("http://" + General_Data.SERVER_IP_ADDRESS + "/android/payout.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/payout.php");
                 name_pair_value = new ArrayList<NameValuePair>(1);
                 name_pair_value.add(new BasicNameValuePair("sales_person_id", selected_sales_person.getId()));
 
