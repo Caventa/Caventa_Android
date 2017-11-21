@@ -13,12 +13,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -30,89 +26,40 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import caventa.ansheer.ndk.caventa.models.Sales_Person;
-import ndk.prism.common_utils.Toast_Utils;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_Entry;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_TableView;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_Table_Data_Adapter;
 
-public class Accounts extends AppCompatActivity {
+import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 
-    private Button button_Commisions;
+public class Ledger extends AppCompatActivity {
+
+
     private Context application_context;
-    static List<Sales_Person> sales_persons;
-    private LinearLayout mLoginFormView;
+    static List<Ledger_Entry> ledger_entries;
     private ProgressBar mProgressView;
-    private Button button_Other_Expenses;
-    private Button button_sales;
-    private Button button_loans;
-    private Button button_investments;
-    private Button button_Ledger;
+    private Ledger_TableView ledger_tableView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.accounts);
+        setContentView(R.layout.ledger);
         initView();
+
         application_context = getApplicationContext();
-        button_Commisions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isOnline()) {
-                    if (load_sales_persons_commision_task != null) {
-                        load_sales_persons_commision_task.cancel(true);
-                        load_sales_persons_commision_task = null;
-                    }
-                    showProgress(true);
-                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task();
-                    load_sales_persons_commision_task.execute((Void) null);
-                } else {
-                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-                }
-            }
-        });
-
-        button_Other_Expenses.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_sales.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_loans.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_investments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_Ledger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Ledger.class);
-                } else {
-                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-                }
-
-            }
-        });
+        if (load_ledger_task != null) {
+            finish();
+        }
+        showProgress(true);
+        load_ledger_task = new Load_Ledger_Task();
+        load_ledger_task.execute((Void) null);
     }
 
     void start_activity(Class activity) {
@@ -120,16 +67,6 @@ public class Accounts extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void initView() {
-        button_Commisions = (Button) findViewById(R.id.button_commisions);
-        mLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
-        mProgressView = (ProgressBar) findViewById(R.id.login_progress);
-        button_Other_Expenses = (Button) findViewById(R.id.button_other_expenses);
-        button_sales = (Button) findViewById(R.id.button_sales);
-        button_loans = (Button) findViewById(R.id.button_loans);
-        button_investments = (Button) findViewById(R.id.button_investments);
-        button_Ledger = (Button) findViewById(R.id.button_ledger);
-    }
 
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -137,10 +74,16 @@ public class Accounts extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private Load_Sales_Persons_Commision_Task load_sales_persons_commision_task = null;
+    private Load_Ledger_Task load_ledger_task = null;
 
-    public class Load_Sales_Persons_Commision_Task extends AsyncTask<Void, Void, String[]> {
-        Load_Sales_Persons_Commision_Task() {
+    private void initView() {
+        mProgressView = (ProgressBar) findViewById(R.id.login_progress);
+        ledger_tableView = (Ledger_TableView) findViewById(R.id.tableView);
+
+    }
+
+    public class Load_Ledger_Task extends AsyncTask<Void, Void, String[]> {
+        Load_Ledger_Task() {
         }
 
         DefaultHttpClient http_client;
@@ -151,7 +94,7 @@ public class Accounts extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_sales_persons.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_ledger.php");
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
                 network_action_response = http_client.execute(http_post, response_handler);
                 return new String[]{"0", network_action_response};
@@ -168,7 +111,7 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            load_sales_persons_commision_task = null;
+            load_ledger_task = null;
 
             showProgress(false);
 
@@ -188,22 +131,39 @@ public class Accounts extends AppCompatActivity {
                         Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-                        sales_persons = new ArrayList<>();
+                        ledger_entries = new ArrayList<>();
+
+                        double balance = 0;
                         for (int i = 1; i < json_array.length(); i++) {
-                            sales_persons.add(new Sales_Person(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("id")));
+
+                            if (json_array.getJSONObject(i).getString("particulars").contains("Advance")) {
+                                balance = balance + Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
+                                ledger_entries.add(new Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), 0, Double.parseDouble(json_array.getJSONObject(i).getString("amount")), balance));
+                                Log.d(General_Data.TAG, String.valueOf(balance));
+                            }
+                            if (json_array.getJSONObject(i).getString("particulars").contains("Expense")||json_array.getJSONObject(i).getString("particulars").contains("Commision")) {
+                                balance = balance - Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
+                                ledger_entries.add(new Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), Double.parseDouble(json_array.getJSONObject(i).getString("amount")), 0, balance));
+                                Log.d(General_Data.TAG, String.valueOf(balance));
+                            }
 
 
                         }
-                        Intent intent = new Intent(getApplicationContext(), Commision_Page.class);
-                        CachePot.getInstance().push(sales_persons.get(1));
-//                        intent.putExtra("sales_person", ledger_entries.get(1).getName());
-                        intent.putExtra("position", 0);
-                        startActivity(intent);
+
+                        if (ledger_tableView != null) {
+                            final Ledger_Table_Data_Adapter ledger_table_data_adapter = new Ledger_Table_Data_Adapter(getApplicationContext(), ledger_entries, ledger_tableView);
+                            ledger_tableView.setDataAdapter(ledger_table_data_adapter);
+
+                        }
                     }
 
 
                 } catch (JSONException e) {
                     Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                } catch (ParseException e) {
+
+                    Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
                 }
 
@@ -215,7 +175,7 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            load_sales_persons_commision_task = null;
+            load_ledger_task = null;
             showProgress(false);
         }
     }
@@ -230,12 +190,12 @@ public class Accounts extends AppCompatActivity {
         // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+        ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+        ledger_tableView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 

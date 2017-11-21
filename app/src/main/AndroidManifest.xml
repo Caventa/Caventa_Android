@@ -13,22 +13,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".activities.Splash_Screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.Dashboard_Page"
             android:label="Dashboard Page"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.List_Sales_Persons"
             android:label="Sales Persons">
@@ -37,10 +39,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.Sales_Person_Dashboard_Page"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".activities.Accounts"
             android:label="Accounts">
@@ -49,6 +53,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".activities.Add_Work" />
         <activity android:name=".activities.Work_Page" />
         <activity android:name=".activities.View_Work" />
@@ -57,13 +62,25 @@
         <activity android:name=".activities.extra.Sales_Person_Accounts" />
         <activity android:name=".activities.View_Finished_Work_Sales_Person" />
         <activity android:name=".activities.extra.Sales_Person_Commision_Page" />
+
         <activity
             android:name=".activities.Commision_Page"
             android:label="@string/title_activity_commision__page"
             android:theme="@style/AppTheme.NoActionBar">
-
         </activity>
+
         <activity android:name=".activities.View_Finished_Work" />
+
+        <activity
+            android:name=".activities.Ledger"
+            android:screenOrientation="landscape"
+            android:label="Ledger">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
