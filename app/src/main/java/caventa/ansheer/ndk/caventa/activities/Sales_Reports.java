@@ -36,9 +36,8 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
-import ndk.prism.common_utils.Toast_Utils;
 
-public class Accounts extends AppCompatActivity {
+public class Sales_Reports extends AppCompatActivity {
 
     private Button button_Commisions;
     private Context application_context;
@@ -54,70 +53,10 @@ public class Accounts extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.accounts);
-        initView();
+        setContentView(R.layout.sales_reports);
+
         application_context = getApplicationContext();
-        button_Commisions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isOnline()) {
-                    if (load_sales_persons_commision_task != null) {
-                        load_sales_persons_commision_task.cancel(true);
-                        load_sales_persons_commision_task = null;
-                    }
-                    showProgress(true);
-                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task();
-                    load_sales_persons_commision_task.execute((Void) null);
-                } else {
-                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-                }
-            }
-        });
 
-        button_Other_Expenses.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_sales.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Sales_Reports.class);
-                } else {
-                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-                }
-
-            }
-        });
-
-        button_loans.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_investments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        button_Ledger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Ledger.class);
-                } else {
-                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-                }
-
-            }
-        });
     }
 
     void start_activity(Class activity) {
@@ -125,16 +64,7 @@ public class Accounts extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void initView() {
-        button_Commisions = (Button) findViewById(R.id.button_commisions);
-        mLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
-        mProgressView = (ProgressBar) findViewById(R.id.login_progress);
-        button_Other_Expenses = (Button) findViewById(R.id.button_other_expenses);
-        button_sales = (Button) findViewById(R.id.button_sales);
-        button_loans = (Button) findViewById(R.id.button_loans);
-        button_investments = (Button) findViewById(R.id.button_investments);
-        button_Ledger = (Button) findViewById(R.id.button_ledger);
-    }
+
 
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -142,10 +72,10 @@ public class Accounts extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private Load_Sales_Persons_Commision_Task load_sales_persons_commision_task = null;
+    private Load_Sales_Person_Sale_Reports_Task load_sales_person_sale_reports_task = null;
 
-    public class Load_Sales_Persons_Commision_Task extends AsyncTask<Void, Void, String[]> {
-        Load_Sales_Persons_Commision_Task() {
+    public class Load_Sales_Person_Sale_Reports_Task extends AsyncTask<Void, Void, String[]> {
+        Load_Sales_Person_Sale_Reports_Task() {
         }
 
         DefaultHttpClient http_client;
@@ -173,7 +103,7 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            load_sales_persons_commision_task = null;
+            load_sales_person_sale_reports_task = null;
 
             showProgress(false);
 
@@ -220,7 +150,7 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            load_sales_persons_commision_task = null;
+            load_sales_person_sale_reports_task = null;
             showProgress(false);
         }
     }

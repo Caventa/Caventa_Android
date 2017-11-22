@@ -46,8 +46,5 @@ dependencies {
 
     implementation 'com.github.kimkevin:cachepot:1.2.0'
 
-//    implementation 'com.github.Zuluft:AutoAdapter:v2.3.1'
-//    annotationProcessor 'com.github.Zuluft:AutoAdapter:v2.3.1'
-
     compile 'de.codecrafters.tableview:tableview:2.8.0'
 }
