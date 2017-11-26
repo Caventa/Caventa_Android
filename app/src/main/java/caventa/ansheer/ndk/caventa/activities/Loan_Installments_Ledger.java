@@ -20,11 +20,14 @@ import android.widget.Toast;
 
 import com.github.kimkevin.cachepot.CachePot;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -37,30 +40,31 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.commons.TODO_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_installments_ledger_table_view.Loan_Installments_Ledger_Entry;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_installments_ledger_table_view.Loan_Installments_Ledger_TableView;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_installments_ledger_table_view.Loan_Installments_Ledger_Table_Data_Adapter;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_ledger_table_view.Loan_Ledger_Entry;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_ledger_table_view.Loan_Ledger_TableView;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_ledger_table_view.Loan_Ledger_Table_Data_Adapter;
-import de.codecrafters.tableview.listeners.TableDataClickListener;
 
 import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 
 //TODO:Loans
 
-public class Loan_Ledger extends AppCompatActivity {
+public class Loan_Installments_Ledger extends AppCompatActivity {
 
 
     private Context application_context;
-    static List<Loan_Ledger_Entry> loan_ledger_entries;
+    static List<Loan_Installments_Ledger_Entry> loan_installments_ledger_entries;
     private ProgressBar mProgressView;
-    private Loan_Ledger_TableView loan_ledger_tableView;
-
+    private Loan_Installments_Ledger_TableView loan_installments_ledger_tableView;
+    Loan_Ledger_Entry selected_loan_ledger_entry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.loan_ledger);
+        setContentView(R.layout.loan_installments_ledger);
+        selected_loan_ledger_entry = CachePot.getInstance().pop(Loan_Ledger_Entry.class);
         initView();
-
+        setTitle(selected_loan_ledger_entry.getParticulars());
         application_context = getApplicationContext();
         if (load_account_ledger_task != null) {
             finish();
@@ -69,18 +73,9 @@ public class Loan_Ledger extends AppCompatActivity {
         load_account_ledger_task = new Load_Account_Ledger_Task();
         load_account_ledger_task.execute((Void) null);
 
-        loan_ledger_tableView.addDataClickListener(new Loan_Entry_Click_Listener());
+
     }
 
-    private class Loan_Entry_Click_Listener implements TableDataClickListener<Loan_Ledger_Entry> {
-        @Override
-        public void onDataClicked(int rowIndex, Loan_Ledger_Entry clicked_loan_ledger_entry) {
-            String clicked_loan_ledger_entry_string = clicked_loan_ledger_entry.getParticulars() + " " + clicked_loan_ledger_entry.getLoan_amount();
-            Toast.makeText(application_context, clicked_loan_ledger_entry_string, Toast.LENGTH_SHORT).show();
-            CachePot.getInstance().push(clicked_loan_ledger_entry);
-            start_activity(Loan_Installments_Ledger.class);
-        }
-    }
 
     void start_activity(Class activity) {
         Intent intent = new Intent(getApplicationContext(), activity);
@@ -98,7 +93,7 @@ public class Loan_Ledger extends AppCompatActivity {
 
     private void initView() {
         mProgressView = findViewById(R.id.login_progress);
-        loan_ledger_tableView = findViewById(R.id.tableView);
+        loan_installments_ledger_tableView = findViewById(R.id.tableView);
 
     }
 
@@ -109,12 +104,18 @@ public class Loan_Ledger extends AppCompatActivity {
         DefaultHttpClient http_client;
         HttpPost http_post;
         String network_action_response;
+        ArrayList<NameValuePair> name_pair_value;
 
         @Override
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_loans_ledger.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_loan_installments_ledger.php");
+
+                name_pair_value = new ArrayList<>(1);
+                name_pair_value.add(new BasicNameValuePair("loan_id", String.valueOf(selected_loan_ledger_entry.getId())));
+                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
                 network_action_response = http_client.execute(http_post, response_handler);
                 return new String[]{"0", network_action_response};
@@ -151,16 +152,16 @@ public class Loan_Ledger extends AppCompatActivity {
                         Toast.makeText(application_context, "No Entries...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-                        loan_ledger_entries = new ArrayList<>();
+                        loan_installments_ledger_entries = new ArrayList<>();
 
                         for (int i = 1; i < json_array.length(); i++) {
-                            loan_ledger_entries.add(new Loan_Ledger_Entry(Integer.parseInt(json_array.getJSONObject(i).getString("id")), mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("description"), Double.parseDouble(json_array.getJSONObject(i).getString("loan_amount")), Double.parseDouble(json_array.getJSONObject(i).getString("installment_amount"))));
+                            loan_installments_ledger_entries.add(new Loan_Installments_Ledger_Entry(Integer.parseInt(json_array.getJSONObject(i).getString("id")), mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("receipt_number"), Double.parseDouble(json_array.getJSONObject(i).getString("payed_amount")), Double.parseDouble(json_array.getJSONObject(i).getString("principle")), Double.parseDouble(json_array.getJSONObject(i).getString("intrest")), json_array.getJSONObject(i).getString("remarks")));
 
                         }
 
-                        if (loan_ledger_tableView != null) {
-                            final Loan_Ledger_Table_Data_Adapter loan_ledger_table_data_adapter = new Loan_Ledger_Table_Data_Adapter(getApplicationContext(), loan_ledger_entries, loan_ledger_tableView);
-                            loan_ledger_tableView.setDataAdapter(loan_ledger_table_data_adapter);
+                        if (loan_installments_ledger_tableView != null) {
+                            final Loan_Installments_Ledger_Table_Data_Adapter loan_installments_ledger_table_data_adapter = new Loan_Installments_Ledger_Table_Data_Adapter(getApplicationContext(), loan_installments_ledger_entries, loan_installments_ledger_tableView);
+                            loan_installments_ledger_tableView.setDataAdapter(loan_installments_ledger_table_data_adapter);
 
                         }
                     }
@@ -198,12 +199,12 @@ public class Loan_Ledger extends AppCompatActivity {
         // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        loan_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
-        loan_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
+        loan_installments_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+        loan_installments_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                loan_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+                loan_installments_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 

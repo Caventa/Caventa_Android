@@ -40,7 +40,7 @@ public class Loan_Ledger_TableView extends SortableTableView<Loan_Ledger_Entry> 
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
         final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(4);
-        tableColumnWeightModel.setColumnWeight(0, 3);
+        tableColumnWeightModel.setColumnWeight(0, 2);
         tableColumnWeightModel.setColumnWeight(1, 3);
         tableColumnWeightModel.setColumnWeight(2, 2);
         tableColumnWeightModel.setColumnWeight(3, 2);

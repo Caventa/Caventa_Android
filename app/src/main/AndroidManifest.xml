@@ -71,7 +71,7 @@
 
         <activity
             android:name=".activities.Account_Ledger"
-            android:label="Ledger"
+            android:label="Account Ledger"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,7 +82,7 @@
         <activity
             android:name=".activities.Sales_Reports"
             android:label="Sales Reports"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.Add_Other_Expense"
             android:label="Add Other Expense" />
@@ -99,12 +99,16 @@
         </activity>
         <activity
             android:name=".activities.Loan_Ledger"
-            android:label="Loan Ledger">
+            android:label="Loan Ledger"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.Loan_Installments_Ledger"
+            android:screenOrientation="landscape" />
 
     </application>
 

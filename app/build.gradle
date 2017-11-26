@@ -46,5 +46,5 @@ dependencies {
 
     implementation 'com.github.kimkevin:cachepot:1.2.0'
 
-    compile 'de.codecrafters.tableview:tableview:2.8.0'
+    implementation 'de.codecrafters.tableview:tableview:2.8.0'
 }

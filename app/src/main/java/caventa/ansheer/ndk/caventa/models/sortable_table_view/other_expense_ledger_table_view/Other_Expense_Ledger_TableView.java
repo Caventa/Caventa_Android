@@ -40,7 +40,7 @@ public class Other_Expense_Ledger_TableView extends SortableTableView<Other_Expe
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
         final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(3);
-        tableColumnWeightModel.setColumnWeight(0, 3);
+        tableColumnWeightModel.setColumnWeight(0, 2);
         tableColumnWeightModel.setColumnWeight(1, 3);
         tableColumnWeightModel.setColumnWeight(2, 2);
         setColumnModel(tableColumnWeightModel);

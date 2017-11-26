@@ -28,7 +28,7 @@ public class Loan_Ledger_Table_Data_Adapter extends LongPressAwareTableDataAdapt
 
         switch (columnIndex) {
             case 0:
-                renderedView = renderString(Date_Utils.normal_date_time_short_year_format.format(loan_ledger_entry.getInsertion_date()));
+                renderedView = renderString(Date_Utils.normal_date_short_year_format.format(loan_ledger_entry.getInsertion_date()));
                 break;
             case 1:
                 renderedView = renderString(loan_ledger_entry.getParticulars());

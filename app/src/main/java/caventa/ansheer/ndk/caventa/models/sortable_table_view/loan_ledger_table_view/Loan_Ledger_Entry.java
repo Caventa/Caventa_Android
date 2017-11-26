@@ -4,6 +4,23 @@ import java.util.Date;
 
 public class Loan_Ledger_Entry {
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Loan_Ledger_Entry(int id, Date insertion_date, String particulars, double loan_amount, double installment_amount) {
+        this.id = id;
+        this.insertion_date = insertion_date;
+        this.particulars = particulars;
+        this.loan_amount = loan_amount;
+        this.installment_amount = installment_amount;
+    }
+
+    int id;
     Date insertion_date;
     String particulars;
     double loan_amount;
@@ -41,10 +58,5 @@ public class Loan_Ledger_Entry {
         this.insertion_date = insertion_date;
     }
 
-    public Loan_Ledger_Entry(Date insertion_date, String particulars, double loan_amount, double installment_amount) {
-        this.insertion_date = insertion_date;
-        this.particulars = particulars;
-        this.loan_amount = loan_amount;
-        this.installment_amount = installment_amount;
-    }
+
 }

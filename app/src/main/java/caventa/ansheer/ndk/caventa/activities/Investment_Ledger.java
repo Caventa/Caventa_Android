@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.commons.TODO_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_Entry;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_TableView;
@@ -133,7 +134,7 @@ public class Investment_Ledger extends AppCompatActivity {
 
                     JSONArray json_array = new JSONArray(network_action_response_array[1]);
                     if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                        Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                        Toast.makeText(application_context, "No Entries...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                         other_expense_ledger_entries = new ArrayList<>();
@@ -223,7 +224,8 @@ public class Investment_Ledger extends AppCompatActivity {
 //        }
 
         if (id == R.id.menu_item_add) {
-            start_activity(Add_Other_Expense.class);
+//            start_activity(Add_Other_Expense.class);
+            TODO_Utils.display_TODO_SnackBar(getWindow().getDecorView());
             return true;
         }
 
