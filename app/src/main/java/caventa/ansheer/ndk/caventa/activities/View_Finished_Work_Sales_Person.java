@@ -45,6 +45,8 @@ import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 import ndk.prism.common_utils.Date_Utils;
 
+//TODO:No commision for caventa
+
 public class View_Finished_Work_Sales_Person extends AppCompatActivity {
 
     private Context application_context;
@@ -66,7 +68,6 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
     Work selected_work;
     private TextView txt_commision;
     private TextView txt_net_Profit;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

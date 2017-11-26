@@ -50,6 +50,9 @@ import caventa.ansheer.ndk.caventa.models.extra.Commision;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
+//TODO:Action bar redesign
+//TODO:Action bar combo box redesign
+//TODO:Payout disable redesign
 
 public class Commision_Page extends AppCompatActivity {
 
@@ -84,8 +87,8 @@ public class Commision_Page extends AppCompatActivity {
 
         final boolean[] mSpinnerInitialized = new boolean[1];
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        spinner_Scheme = (Spinner) findViewById(R.id.spinner_nav);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
+        spinner_Scheme = findViewById(R.id.spinner_nav);
 
         if (mToolbar != null) {
             setSupportActionBar(mToolbar);
@@ -128,7 +131,6 @@ public class Commision_Page extends AppCompatActivity {
         spinner_Scheme.setSelection(extras.getInt("position"));
 
         commisions = new ArrayList<>();
-
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -235,7 +237,7 @@ public class Commision_Page extends AppCompatActivity {
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
 
-                JSONArray json_array = new JSONArray();
+                JSONArray json_array;
                 int i = 0;
                 try {
 

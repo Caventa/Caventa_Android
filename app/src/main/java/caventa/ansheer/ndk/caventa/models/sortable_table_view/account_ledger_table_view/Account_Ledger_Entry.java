@@ -1,8 +1,8 @@
-package caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view;
+package caventa.ansheer.ndk.caventa.models.sortable_table_view.account_ledger_table_view;
 
 import java.util.Date;
 
-public class Ledger_Entry {
+public class Account_Ledger_Entry {
 
     Date insertion_date;
     String particulars;
@@ -18,7 +18,7 @@ public class Ledger_Entry {
         this.credit_amount = credit_amount;
     }
 
-    public Ledger_Entry(Date insertion_date, String particulars, double debit_amount, double credit_amount, double balance) {
+    public Account_Ledger_Entry(Date insertion_date, String particulars, double debit_amount, double credit_amount, double balance) {
         this.insertion_date = insertion_date;
         this.particulars = particulars;
         this.debit_amount = debit_amount;

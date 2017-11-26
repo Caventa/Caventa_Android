@@ -38,6 +38,10 @@ import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import ndk.prism.common_utils.Toast_Utils;
 
+//TODO:Other expenses and sales
+//TODO:Loans
+//TODO:Investments
+
 public class Accounts extends AppCompatActivity {
 
     private Button button_Commisions;
@@ -66,7 +70,7 @@ public class Accounts extends AppCompatActivity {
                         load_sales_persons_commision_task = null;
                     }
                     showProgress(true);
-                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task();
+                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task("Commisions");
                     load_sales_persons_commision_task.execute((Void) null);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -77,7 +81,11 @@ public class Accounts extends AppCompatActivity {
         button_Other_Expenses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (isOnline()) {
+                    load_other_expenses_ledger_page();
+                } else {
+                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+                }
             }
         });
 
@@ -85,7 +93,24 @@ public class Accounts extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isOnline()) {
-                    start_activity(Sales_Reports.class);
+                    if (load_sales_persons_commision_task != null) {
+                        load_sales_persons_commision_task.cancel(true);
+                        load_sales_persons_commision_task = null;
+                    }
+                    showProgress(true);
+                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task("Sales Reports");
+                    load_sales_persons_commision_task.execute((Void) null);
+                } else {
+                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+                }
+            }
+        });
+
+        button_loans.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isOnline()) {
+                    start_activity(Loan_Ledger.class);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -93,16 +118,14 @@ public class Accounts extends AppCompatActivity {
             }
         });
 
-        button_loans.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
         button_investments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isOnline()) {
+                    start_activity(Investment_Ledger.class);
+                } else {
+                    Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+                }
 
             }
         });
@@ -111,7 +134,7 @@ public class Accounts extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isOnline()) {
-                    start_activity(Ledger.class);
+                    start_activity(Account_Ledger.class);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -125,14 +148,21 @@ public class Accounts extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    private void load_other_expenses_ledger_page() {
+        Intent i = new Intent(application_context, Other_Expense_Ledger.class);
+        i.putExtra("position", 0);
+        startActivity(i);
+    }
+
     private void initView() {
-        button_Commisions = (Button) findViewById(R.id.button_commisions);
-        mLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
-        mProgressView = (ProgressBar) findViewById(R.id.login_progress);
-        button_Other_Expenses = (Button) findViewById(R.id.button_other_expenses);
-        button_sales = (Button) findViewById(R.id.button_sales);
-        button_loans = (Button) findViewById(R.id.button_loans);
-        button_investments = (Button) findViewById(R.id.button_investments);
+        button_Commisions = findViewById(R.id.button_commisions);
+        mLoginFormView = findViewById(R.id.email_login_form);
+        mProgressView = findViewById(R.id.login_progress);
+        button_Other_Expenses = findViewById(R.id.button_other_expenses);
+        button_sales = findViewById(R.id.button_sales);
+        button_loans = findViewById(R.id.button_loans);
+        button_investments = findViewById(R.id.button_investments);
         button_Ledger = (Button) findViewById(R.id.button_ledger);
     }
 
@@ -145,7 +175,10 @@ public class Accounts extends AppCompatActivity {
     private Load_Sales_Persons_Commision_Task load_sales_persons_commision_task = null;
 
     public class Load_Sales_Persons_Commision_Task extends AsyncTask<Void, Void, String[]> {
-        Load_Sales_Persons_Commision_Task() {
+        String task_origin;
+
+        Load_Sales_Persons_Commision_Task(String origin) {
+            this.task_origin = origin;
         }
 
         DefaultHttpClient http_client;
@@ -199,11 +232,18 @@ public class Accounts extends AppCompatActivity {
 
 
                         }
-                        Intent intent = new Intent(getApplicationContext(), Commision_Page.class);
-                        CachePot.getInstance().push(sales_persons.get(1));
-//                        intent.putExtra("sales_person", ledger_entries.get(1).getName());
-                        intent.putExtra("position", 0);
-                        startActivity(intent);
+                        if (task_origin.equals("Commisions")) {
+                            Intent intent = new Intent(getApplicationContext(), Commision_Page.class);
+                            CachePot.getInstance().push(sales_persons.get(1));
+                            intent.putExtra("position", 0);
+                            startActivity(intent);
+                        }
+                        else if (task_origin.equals("Sales Reports")) {
+                            Intent intent = new Intent(getApplicationContext(), Sales_Reports.class);
+                            CachePot.getInstance().push(sales_persons.get(0));
+                            intent.putExtra("position", 0);
+                            startActivity(intent);
+                        }
                     }
 
 

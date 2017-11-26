@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view;
+package caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_ledger_table_view;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -13,24 +13,24 @@ import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 
 
 /**
- * An extension of the {@link SortableTableView} that handles {@link Ledger_Entry}s.
+ * An extension of the {@link SortableTableView} that handles {@link Loan_Ledger_Entry}s.
  *
  * @author ISchwarz
  */
-public class Ledger_TableView extends SortableTableView<Ledger_Entry> {
+public class Loan_Ledger_TableView extends SortableTableView<Loan_Ledger_Entry> {
 
-    public Ledger_TableView(final Context context) {
+    public Loan_Ledger_TableView(final Context context) {
         this(context, null);
     }
 
-    public Ledger_TableView(final Context context, final AttributeSet attributes) {
+    public Loan_Ledger_TableView(final Context context, final AttributeSet attributes) {
         this(context, attributes, android.R.attr.listViewStyle);
     }
 
-    public Ledger_TableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
+    public Loan_Ledger_TableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
         super(context, attributes, styleAttributes);
 
-        final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(context, "#", "Par.", "Deb.", "Cre.", "Bal.");
+        final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(context, "#", "Par.", "LAm.", "IAm.");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(context, R.color.table_header_text));
         setHeaderAdapter(simpleTableHeaderAdapter);
 
@@ -39,19 +39,17 @@ public class Ledger_TableView extends SortableTableView<Ledger_Entry> {
         setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(rowColorEven, rowColorOdd));
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
-        final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(5);
+        final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(4);
         tableColumnWeightModel.setColumnWeight(0, 3);
         tableColumnWeightModel.setColumnWeight(1, 3);
         tableColumnWeightModel.setColumnWeight(2, 2);
         tableColumnWeightModel.setColumnWeight(3, 2);
-        tableColumnWeightModel.setColumnWeight(4, 2);
         setColumnModel(tableColumnWeightModel);
 
-        setColumnComparator(0, Ledger_Table_Comparators.get_Insertion_Date_Comparator());
-        setColumnComparator(1, Ledger_Table_Comparators.get_Particulars_Comparator());
-        setColumnComparator(2, Ledger_Table_Comparators.get_Debit_Amount_Comparator());
-        setColumnComparator(3, Ledger_Table_Comparators.get_Credit_Amount_Comparator());
-        setColumnComparator(4, Ledger_Table_Comparators.get_Balance_Comparator());
+        setColumnComparator(0, Loan_Ledger_Table_Comparators.get_Insertion_Date_Comparator());
+        setColumnComparator(1, Loan_Ledger_Table_Comparators.get_Particulars_Comparator());
+        setColumnComparator(2, Loan_Ledger_Table_Comparators.get_Loan_Amount_Comparator());
+        setColumnComparator(3, Loan_Ledger_Table_Comparators.get_Installment_Amount_Comparator());
     }
 
 }

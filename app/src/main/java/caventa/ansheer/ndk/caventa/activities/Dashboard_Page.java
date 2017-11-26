@@ -51,6 +51,10 @@ import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 
+//TODO:Redesign work list card
+//TODO:work search
+//TODO:login for sales person
+
 public class Dashboard_Page extends AppCompatActivity {
 
     /**

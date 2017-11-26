@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/viewBg"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:orientation="vertical">
 
-    tools:showIn="@layout/sales_persons">
 
     <ProgressBar
         android:id="@+id/login_progress"
@@ -16,6 +12,10 @@
         android:layout_height="fill_parent"
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_spinner" />
 
     <ScrollView
         android:id="@+id/login_form"
@@ -30,12 +30,13 @@
 
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycler_view"
+                android:id="@+id/my_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
                 android:scrollbars="vertical" />
+
         </LinearLayout>
     </ScrollView>
-
-</RelativeLayout>
+</LinearLayout>

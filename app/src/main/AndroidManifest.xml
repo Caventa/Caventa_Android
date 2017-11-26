@@ -55,7 +55,6 @@
         </activity>
 
         <activity android:name=".activities.Add_Work" />
-        <activity android:name=".activities.Work_Page" />
         <activity android:name=".activities.View_Work" />
         <activity android:name=".activities.View_Work_Sales_Person" />
         <activity android:name=".activities.Edit_Work" />
@@ -66,15 +65,41 @@
         <activity
             android:name=".activities.Commision_Page"
             android:label="@string/title_activity_commision__page"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".activities.View_Finished_Work" />
 
         <activity
-            android:name=".activities.Ledger"
-            android:screenOrientation="landscape"
-            android:label="Ledger">
+            android:name=".activities.Account_Ledger"
+            android:label="Ledger"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.Sales_Reports"
+            android:label="Sales Reports"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activities.Add_Other_Expense"
+            android:label="Add Other Expense" />
+        <activity
+            android:name=".activities.Other_Expense_Ledger"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.Investment_Ledger"
+            android:label="Investment Ledger">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.Loan_Ledger"
+            android:label="Loan Ledger">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

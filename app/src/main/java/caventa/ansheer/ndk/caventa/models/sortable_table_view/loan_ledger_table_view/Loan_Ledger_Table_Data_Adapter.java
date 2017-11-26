@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view;
+package caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_ledger_table_view;
 
 import android.content.Context;
 import android.view.View;
@@ -13,35 +13,33 @@ import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 
 import static android.graphics.Color.BLACK;
 
-public class Ledger_Table_Data_Adapter extends LongPressAwareTableDataAdapter<Ledger_Entry> {
+public class Loan_Ledger_Table_Data_Adapter extends LongPressAwareTableDataAdapter<Loan_Ledger_Entry> {
 
     private static final int TEXT_SIZE = 14;
 
-    public Ledger_Table_Data_Adapter(final Context context, final List<Ledger_Entry> data, final TableView<Ledger_Entry> tableView) {
+    public Loan_Ledger_Table_Data_Adapter(final Context context, final List<Loan_Ledger_Entry> data, final TableView<Loan_Ledger_Entry> tableView) {
         super(context, data, tableView);
     }
 
     @Override
     public View getDefaultCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        final Ledger_Entry lottery_ticket = getRowData(rowIndex);
+        final Loan_Ledger_Entry loan_ledger_entry = getRowData(rowIndex);
         View renderedView = null;
 
         switch (columnIndex) {
             case 0:
-                renderedView = renderString(Date_Utils.normal_date_time_short_year_format.format(lottery_ticket.getInsertion_date()));
+                renderedView = renderString(Date_Utils.normal_date_time_short_year_format.format(loan_ledger_entry.getInsertion_date()));
                 break;
             case 1:
-                renderedView = renderString(lottery_ticket.getParticulars());
+                renderedView = renderString(loan_ledger_entry.getParticulars());
                 break;
             case 2:
-                renderedView = renderString(String.valueOf(lottery_ticket.getDebit_amount()));
+                renderedView = renderString(String.valueOf(loan_ledger_entry.getLoan_amount()));
                 break;
             case 3:
-                renderedView = renderString(String.valueOf(lottery_ticket.getCredit_amount()));
+                renderedView = renderString(String.valueOf(loan_ledger_entry.getInstallment_amount()));
                 break;
-            case 4:
-                renderedView = renderString(String.valueOf(lottery_ticket.getBalance()));
-                break;
+
         }
 
         return renderedView;

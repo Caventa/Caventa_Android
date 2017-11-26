@@ -1,6 +1,5 @@
 package caventa.ansheer.ndk.caventa.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ public class Work_Overview_Adapter extends RecyclerView.Adapter<Work_Overview_Ad
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView work_address, work_profit;
+        TextView work_address, work_profit,work_date;
         public TextView work_name;
 
         public ViewHolder(View view) {
@@ -30,12 +29,12 @@ public class Work_Overview_Adapter extends RecyclerView.Adapter<Work_Overview_Ad
             work_name = view.findViewById(R.id.textView_work_name);
             work_address = view.findViewById(R.id.textView_work_address);
             work_profit = view.findViewById(R.id.textView_work_profit);
-
+            work_date = view.findViewById(R.id.textView_work_date);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public Work_Overview_Adapter(Context mContext, List<Work_Overview> work_overviews) {
+    public Work_Overview_Adapter(List<Work_Overview> work_overviews) {
         this.work_overviews = work_overviews;
     }
 
@@ -57,8 +56,9 @@ public class Work_Overview_Adapter extends RecyclerView.Adapter<Work_Overview_Ad
 
         Work_Overview work_overview = work_overviews.get(position);
         holder.work_name.setText(work_overview.getWork_name());
+        holder.work_date.setText(work_overview.getWork_date());
         holder.work_address.setText(work_overview.getWork_address());
-        holder.work_profit.setText("Pro. "+String.valueOf(work_overview.getTotal_advance())+String.valueOf(work_overview.getTotal_expense())+String.valueOf(work_overview.getTotal_advance()-work_overview.getTotal_expense()));
+        holder.work_profit.setText("Pro. "+String.valueOf(work_overview.getTotal_advance())+"-"+String.valueOf(work_overview.getTotal_expense())+"="+String.valueOf(work_overview.getTotal_advance()-work_overview.getTotal_expense()));
 
     }
 

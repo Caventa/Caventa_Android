@@ -11,26 +11,22 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.github.kimkevin.cachepot.CachePot;
-
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -41,35 +37,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.adapters.Work_Overview_Adapter;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import caventa.ansheer.ndk.caventa.models.Sales_Person;
-import caventa.ansheer.ndk.caventa.models.Work_Overview;
-import ndk.prism.common_utils.Date_Utils;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_Entry;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_TableView;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_Table_Data_Adapter;
 import ndk.prism.common_utils.Toast_Utils;
 
-//TODO:Sales reports
+import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 
-public class Sales_Reports extends AppCompatActivity {
+//TODO:Loans
+
+public class Other_Expense_Ledger extends AppCompatActivity {
+
 
     private Context application_context;
-
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-
-    private View mProgressView;
-    private View mLoginFormView;
-    private Sales_Person selected_sales_person;
+    static List<Other_Expense_Ledger_Entry> other_expense_ledger_entries;
+    private ProgressBar mProgressView;
+    private Other_Expense_Ledger_TableView other_expense_ledger_tableView;
+    Spinner spinner_Scheme;
     private Bundle extras;
     private ArrayList<String> spinner_list;
-    Spinner spinner_Scheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sales_reports);
-        selected_sales_person = CachePot.getInstance().pop(Sales_Person.class);
+        setContentView(R.layout.other_expense_ledger);
+        initView();
+
         application_context = getApplicationContext();
+
+        final boolean[] mSpinnerInitialized = new boolean[1];
 
         Toolbar mToolbar = findViewById(R.id.toolbar);
         spinner_Scheme = findViewById(R.id.spinner_nav);
@@ -79,7 +76,7 @@ public class Sales_Reports extends AppCompatActivity {
         }
 
         extras = getIntent().getExtras();
-        final boolean[] mSpinnerInitialized = new boolean[1];
+
         spinner_Scheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int item_position, long id) {
@@ -90,12 +87,10 @@ public class Sales_Reports extends AppCompatActivity {
                 }
 
                 if (isOnline()) {
-                    load_sales_reports_page();
+                    load_other_expenses_ledger_page();
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
-
-
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -105,54 +100,41 @@ public class Sales_Reports extends AppCompatActivity {
 
         spinner_list = new ArrayList<String>();
 
-        for (int i = 0; i < Accounts.sales_persons.size(); i++) {
-            spinner_list.add(Accounts.sales_persons.get(i).getName());
-        }
+        spinner_list.add("Other Expenses");
+        spinner_list.add("Other Sales");
         ArrayAdapter<String> spinner_adapter = new ArrayAdapter<String>(application_context, R.layout.spinner_item_actionbar, spinner_list);
         spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_Scheme.setAdapter(spinner_adapter);
 
         spinner_Scheme.setSelection(extras.getInt("position"));
 
-        work_overviews = new ArrayList<>();
+//        if (spinner_Scheme.getSelectedItemPosition() == 0) {
+//            setTitle("Other Expenses Ledger");
+//        } else if (spinner_Scheme.getSelectedItemPosition() == 1) {
+//            setTitle("Other Sales Ledger");
+//        }
 
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
-        mRecyclerView = findViewById(R.id.my_recycler_view);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // create an Object for Adapter
-        mAdapter = new Work_Overview_Adapter(work_overviews);
-
-        // set the adapter object to the Recyclerview
-        mRecyclerView.setAdapter(mAdapter);
-
-
-        if (load_sales_person_sale_reports_task != null) {
+        if (load_other_expense_ledger_task != null) {
             finish();
         }
         showProgress(true);
-        load_sales_person_sale_reports_task = new Load_Sales_Person_Sale_Reports_Task();
-        load_sales_person_sale_reports_task.execute((Void) null);
-
-
-
+        load_other_expense_ledger_task = new Load_Other_Expense_Ledger_Task();
+        load_other_expense_ledger_task.execute((Void) null);
     }
-    private List<Work_Overview> work_overviews;
 
+    //TODO:Intr. Common class
     void start_activity(Class activity) {
         Intent intent = new Intent(getApplicationContext(), activity);
         startActivity(intent);
+        finish();
     }
 
+    private void load_other_expenses_ledger_page() {
+        Intent i = new Intent(application_context, Other_Expense_Ledger.class);
+        i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
+        startActivity(i);
+        finish();
+    }
 
 
     public boolean isOnline() {
@@ -161,36 +143,31 @@ public class Sales_Reports extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private void load_sales_reports_page() {
-        Intent i = new Intent(application_context, Sales_Reports.class);
-        CachePot.getInstance().push(Accounts.sales_persons.get(spinner_Scheme.getSelectedItemPosition()));
-        i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
-        startActivity(i);
-        finish();
+    private Load_Other_Expense_Ledger_Task load_other_expense_ledger_task = null;
+
+    private void initView() {
+        mProgressView = findViewById(R.id.login_progress);
+        other_expense_ledger_tableView = findViewById(R.id.tableView);
+
     }
 
-    private Load_Sales_Person_Sale_Reports_Task load_sales_person_sale_reports_task = null;
-
-    public class Load_Sales_Person_Sale_Reports_Task extends AsyncTask<Void, Void, String[]> {
-        Load_Sales_Person_Sale_Reports_Task() {
+    public class Load_Other_Expense_Ledger_Task extends AsyncTask<Void, Void, String[]> {
+        Load_Other_Expense_Ledger_Task() {
         }
 
         DefaultHttpClient http_client;
         HttpPost http_post;
         String network_action_response;
-        ArrayList<NameValuePair> name_pair_value;
 
         @Override
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_work_overviews.php");
-
-                name_pair_value = new ArrayList<>(1);
-                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(selected_sales_person.getId())));
-
-                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
-
+                if (spinner_Scheme.getSelectedItemPosition() == 0) {
+                    http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_other_expenses_ledger.php");
+                } else if (spinner_Scheme.getSelectedItemPosition() == 1) {
+                    http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_other_sales_ledger.php");
+                }
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
                 network_action_response = http_client.execute(http_post, response_handler);
                 return new String[]{"0", network_action_response};
@@ -207,7 +184,7 @@ public class Sales_Reports extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            load_sales_person_sale_reports_task = null;
+            load_other_expense_ledger_task = null;
 
             showProgress(false);
 
@@ -219,36 +196,34 @@ public class Sales_Reports extends AppCompatActivity {
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
 
-                JSONArray json_array;
-                int i = 0;
+
                 try {
 
-                    json_array = new JSONArray(network_action_response_array[1]);
+                    JSONArray json_array = new JSONArray(network_action_response_array[1]);
                     if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                        Toast.makeText(application_context, "No Reports...", Toast.LENGTH_LONG).show();
+                        Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
+                    } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-                    } else {
+                        other_expense_ledger_entries = new ArrayList<>();
 
-                        for (i = 1; i < json_array.length(); i++) {
+                        for (int i = 1; i < json_array.length(); i++) {
 
-                            work_overviews.add(new Work_Overview(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("address"),Date_Utils.normal_Date_Format_words.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date"))),json_array.getJSONObject(i).getString("total_advance").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_advance")),json_array.getJSONObject(i).getString("total_expense").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_expense")) ));
-
+                            other_expense_ledger_entries.add(new Other_Expense_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("description"), Double.parseDouble(json_array.getJSONObject(i).getString("amount"))));
                         }
 
-                        mAdapter.notifyDataSetChanged();
+                        if (other_expense_ledger_tableView != null) {
+                            final Other_Expense_Ledger_Table_Data_Adapter other_expense_ledger_table_data_adapter = new Other_Expense_Ledger_Table_Data_Adapter(getApplicationContext(), other_expense_ledger_entries, other_expense_ledger_tableView);
+                            other_expense_ledger_tableView.setDataAdapter(other_expense_ledger_table_data_adapter);
+
+                        }
                     }
-
-
                 } catch (JSONException e) {
-
-
                     Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
-                    e.printStackTrace();
-
                 } catch (ParseException e) {
+
                     Toast.makeText(application_context, "Date Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
                 }
 
 
@@ -259,7 +234,7 @@ public class Sales_Reports extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            load_sales_person_sale_reports_task = null;
+            load_other_expense_ledger_task = null;
             showProgress(false);
         }
     }
@@ -274,12 +249,12 @@ public class Sales_Reports extends AppCompatActivity {
         // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+        other_expense_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+        other_expense_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                other_expense_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 
@@ -292,4 +267,33 @@ public class Sales_Reports extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.other_expense_ledger, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+//        if (id == R.id.menu_item_cancel) {
+//            finish();
+//            return true;
+//        }
+
+        if (id == R.id.menu_item_add) {
+            start_activity(Add_Other_Expense.class);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

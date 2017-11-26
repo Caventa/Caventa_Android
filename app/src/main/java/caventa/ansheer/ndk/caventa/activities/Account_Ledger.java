@@ -32,34 +32,36 @@ import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_Entry;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_TableView;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.ledger_table_view.Ledger_Table_Data_Adapter;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.account_ledger_table_view.Account_Ledger_Entry;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.account_ledger_table_view.Account_Ledger_TableView;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.account_ledger_table_view.Account_Ledger_Table_Data_Adapter;
 
 import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 
-public class Ledger extends AppCompatActivity {
+//TODO:Loans
+
+public class Account_Ledger extends AppCompatActivity {
 
 
     private Context application_context;
-    static List<Ledger_Entry> ledger_entries;
+    static List<Account_Ledger_Entry> account_ledger_entries;
     private ProgressBar mProgressView;
-    private Ledger_TableView ledger_tableView;
+    private Account_Ledger_TableView account_ledger_tableView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ledger);
+        setContentView(R.layout.account_ledger);
         initView();
 
         application_context = getApplicationContext();
-        if (load_ledger_task != null) {
+        if (load_account_ledger_task != null) {
             finish();
         }
         showProgress(true);
-        load_ledger_task = new Load_Ledger_Task();
-        load_ledger_task.execute((Void) null);
+        load_account_ledger_task = new Load_Account_Ledger_Task();
+        load_account_ledger_task.execute((Void) null);
     }
 
     void start_activity(Class activity) {
@@ -74,16 +76,16 @@ public class Ledger extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private Load_Ledger_Task load_ledger_task = null;
+    private Load_Account_Ledger_Task load_account_ledger_task = null;
 
     private void initView() {
-        mProgressView = (ProgressBar) findViewById(R.id.login_progress);
-        ledger_tableView = (Ledger_TableView) findViewById(R.id.tableView);
+        mProgressView = findViewById(R.id.login_progress);
+        account_ledger_tableView = findViewById(R.id.tableView);
 
     }
 
-    public class Load_Ledger_Task extends AsyncTask<Void, Void, String[]> {
-        Load_Ledger_Task() {
+    public class Load_Account_Ledger_Task extends AsyncTask<Void, Void, String[]> {
+        Load_Account_Ledger_Task() {
         }
 
         DefaultHttpClient http_client;
@@ -94,7 +96,7 @@ public class Ledger extends AppCompatActivity {
         protected String[] doInBackground(Void... params) {
             try {
                 http_client = new DefaultHttpClient();
-                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_ledger.php");
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/get_account_ledger.php");
                 ResponseHandler<String> response_handler = new BasicResponseHandler();
                 network_action_response = http_client.execute(http_post, response_handler);
                 return new String[]{"0", network_action_response};
@@ -111,7 +113,7 @@ public class Ledger extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            load_ledger_task = null;
+            load_account_ledger_task = null;
 
             showProgress(false);
 
@@ -131,28 +133,28 @@ public class Ledger extends AppCompatActivity {
                         Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-                        ledger_entries = new ArrayList<>();
+                        account_ledger_entries = new ArrayList<>();
 
                         double balance = 0;
                         for (int i = 1; i < json_array.length(); i++) {
 
                             if (json_array.getJSONObject(i).getString("particulars").contains("Advance")) {
                                 balance = balance + Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
-                                ledger_entries.add(new Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), 0, Double.parseDouble(json_array.getJSONObject(i).getString("amount")), balance));
+                                account_ledger_entries.add(new Account_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), 0, Double.parseDouble(json_array.getJSONObject(i).getString("amount")), balance));
                                 Log.d(General_Data.TAG, String.valueOf(balance));
                             }
                             if (json_array.getJSONObject(i).getString("particulars").contains("Expense")||json_array.getJSONObject(i).getString("particulars").contains("Commision")) {
                                 balance = balance - Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
-                                ledger_entries.add(new Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), Double.parseDouble(json_array.getJSONObject(i).getString("amount")), 0, balance));
+                                account_ledger_entries.add(new Account_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), Double.parseDouble(json_array.getJSONObject(i).getString("amount")), 0, balance));
                                 Log.d(General_Data.TAG, String.valueOf(balance));
                             }
 
 
                         }
 
-                        if (ledger_tableView != null) {
-                            final Ledger_Table_Data_Adapter ledger_table_data_adapter = new Ledger_Table_Data_Adapter(getApplicationContext(), ledger_entries, ledger_tableView);
-                            ledger_tableView.setDataAdapter(ledger_table_data_adapter);
+                        if (account_ledger_tableView != null) {
+                            final Account_Ledger_Table_Data_Adapter account_ledger_table_data_adapter = new Account_Ledger_Table_Data_Adapter(getApplicationContext(), account_ledger_entries, account_ledger_tableView);
+                            account_ledger_tableView.setDataAdapter(account_ledger_table_data_adapter);
 
                         }
                     }
@@ -175,7 +177,7 @@ public class Ledger extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            load_ledger_task = null;
+            load_account_ledger_task = null;
             showProgress(false);
         }
     }
@@ -190,12 +192,12 @@ public class Ledger extends AppCompatActivity {
         // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
-        ledger_tableView.animate().setDuration(shortAnimTime).alpha(
+        account_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+        account_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+                account_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 

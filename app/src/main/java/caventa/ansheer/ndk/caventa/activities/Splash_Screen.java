@@ -28,6 +28,8 @@ import ndk.prism.common_utils.Network_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 import ndk.prism.common_utils.Update_Utils;
 
+//TODO:Full screen splash
+
 public class Splash_Screen extends Activity {
 
     Context application_context;

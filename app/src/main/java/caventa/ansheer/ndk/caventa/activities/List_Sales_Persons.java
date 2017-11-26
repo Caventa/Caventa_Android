@@ -44,6 +44,8 @@ import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import ndk.prism.common_utils.Toast_Utils;
 
+//TODO:Add sales person with photo
+
 public class List_Sales_Persons extends AppCompatActivity {
 
     private RecyclerView recyclerView;
