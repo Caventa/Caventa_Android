@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,9 +58,6 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
 
     static List<Work_Expense> work_expenses;
 
-    private RecyclerView work_expenses_recycler_view;
-    private RecyclerView work_advances_recycler_view;
-
     private TextView txt_name, txt_address, txt_total_advance, txt_total_expense, txt_profit;
     Work selected_work;
     private TextView txt_commision;
@@ -83,7 +77,7 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
         work_advances = new ArrayList<>();
         work_advances_adapter = new Work_Advances_View_Adapter(this, work_advances);
 
-        work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
+        RecyclerView work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
 
         work_advances_recycler_view.setHasFixedSize(false);
 
@@ -96,7 +90,7 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
         work_expenses = new ArrayList<>();
         work_expenses_adapter = new Work_Expense_View_Adapter(this, work_expenses);
 
-        work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
+        RecyclerView work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -130,18 +124,17 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_profit = findViewById(R.id.total_profit);
-        txt_commision = (TextView) findViewById(R.id.commision);
-        txt_net_Profit = (TextView) findViewById(R.id.net_profit);
+        txt_commision = findViewById(R.id.commision);
+        txt_net_Profit = findViewById(R.id.net_profit);
     }
 
     private Load_Work_Profit_Task load_work_profit_task = null;
 
-    static double total_advance = 0;
-    static double total_expense = 0;
-
     public class Load_Work_Profit_Task extends AsyncTask<Void, Void, String[]> {
         private ArrayList<NameValuePair> name_pair_value;
 
+        private double total_advance = 0;
+        private double total_expense = 0;
         private boolean work_advances_flag = true;
 
 
@@ -240,9 +233,9 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
 
                             txt_profit.setText("Profit : " + (total_advance - total_expense));
 
-                            txt_commision.setText("Commision : " + ((total_advance - total_expense)*0.6));
+                            txt_commision.setText("Commision : " + ((total_advance - total_expense) * 0.6));
 
-                            txt_net_Profit.setText("Net Profit : " + ((total_advance - total_expense)*0.4));
+                            txt_net_Profit.setText("Net Profit : " + ((total_advance - total_expense) * 0.4));
 
                         } catch (JSONException ex) {
                             Toast.makeText(application_context, "Error : " + ex.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -252,8 +245,6 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
                     } else {
                         Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                         Log.d(General_Data.TAG, e.getLocalizedMessage());
-//                        Log.d(General_Data.TAG, e.getCause().toString());
-//                        Log.d(General_Data.TAG, e.getClass().toString());
                         e.printStackTrace();
                     }
                 }
@@ -300,97 +291,4 @@ public class View_Finished_Work_Sales_Person extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.view_work, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_item_cancel) {
-            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-            startActivity(i);
-            finish();
-            return true;
-        }
-
-//        if (id == R.id.menu_item_finish) {
-//
-//            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
-//            after_time_dialog.setMessage("Work is Finished, Is it?").setCancelable(false)
-//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//
-//                            dialog.cancel();
-//                        }
-//                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//
-//                    dialog.cancel();
-//                }
-//            });
-//            AlertDialog alert = after_time_dialog.create();
-//            alert.setTitle("Warning!");
-//            alert.show();
-//
-////            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-////            startActivity(i);
-////            finish();
-//            return true;
-//        }
-//
-//        if (id == R.id.menu_item_work_cancel) {
-////            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-////            startActivity(i);
-////            finish();
-//
-//            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
-//            after_time_dialog.setMessage("Work will be cancelled, OK?").setCancelable(false)
-//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//
-//                            dialog.cancel();
-//                        }
-//                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//
-//                    dialog.cancel();
-//                }
-//            });
-//            AlertDialog alert = after_time_dialog.create();
-//            alert.setTitle("Warning!");
-//            alert.show();
-//
-//            return true;
-//        }
-
-//        if (id == R.id.menu_item_edit) {
-//
-//            Intent i = new Intent(application_context, Edit_Work.class);
-//            CachePot.getInstance().push(selected_work);
-//            CachePot.getInstance().push(work_advances);
-//            CachePot.getInstance().push(work_expenses);
-//            startActivity(i);
-//            finish();
-//            return true;
-//        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-
-        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-        startActivity(i);
-        finish();
-    }
 }

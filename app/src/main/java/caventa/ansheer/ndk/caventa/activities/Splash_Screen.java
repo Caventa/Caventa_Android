@@ -1,6 +1,5 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -14,7 +13,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -22,15 +23,17 @@ import org.json.JSONException;
 
 import java.io.File;
 
-import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.R;
-import ndk.prism.common_utils.Network_Utils;
+import caventa.ansheer.ndk.caventa.constants.General_Data;
 import ndk.prism.common_utils.Toast_Utils;
 import ndk.prism.common_utils.Update_Utils;
 
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.display_Long_no_FAB_no_network_bottom_SnackBar;
+import static ndk.prism.common_utils.Network_Utils.display_Friendly_Exception_Message;
+
 //TODO:Full screen splash
 
-public class Splash_Screen extends Activity {
+public class Splash_Screen extends AppCompatActivity {
 
     Context application_context;
 
@@ -68,7 +71,7 @@ public class Splash_Screen extends Activity {
             Log.d(General_Data.TAG, network_action_response_array[1]);
 
             if (network_action_response_array[0].equals("1")) {
-                Network_Utils.display_Friendly_Exception_Message(application_context, network_action_response_array[1]);
+                display_Friendly_Exception_Message(application_context, network_action_response_array[1]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
                 finish();
             } else {
@@ -79,13 +82,13 @@ public class Splash_Screen extends Activity {
                     if (check_system_status(json_Array.getJSONObject(0).getString("system_status"))) {
 
                         if (Integer.parseInt(json_Array.getJSONObject(0).getString("version_code")) != Update_Utils.getVersionCode(application_context)) {
-                            update_applicatiion(Float.parseFloat(json_Array.getJSONObject(0).getString("version_name")));
+                            update_application(Float.parseFloat(json_Array.getJSONObject(0).getString("version_name")));
 
                         } else {
                             if (Float.parseFloat(json_Array.getJSONObject(0).getString("version_name")) != Update_Utils.getVersionName(application_context)) {
-                                update_applicatiion(Float.parseFloat(json_Array.getJSONObject(0).getString("version_name")));
+                                update_application(Float.parseFloat(json_Array.getJSONObject(0).getString("version_name")));
                             } else {
-                                Toast.makeText(application_context, "Latest Version...", Toast.LENGTH_LONG).show();
+                                Toast.makeText(application_context, "Latest Version...", Toast.LENGTH_SHORT).show();
                                 // After completing http call
                                 // will close this activity and lauch main activity
                                 Intent i = new Intent(Splash_Screen.this, Dashboard_Page.class);
@@ -111,13 +114,13 @@ public class Splash_Screen extends Activity {
             Toast.makeText(application_context, "System is in Maintenance, Try Again later...", Toast.LENGTH_LONG).show();
             finish();
         } else if (Integer.parseInt(system_status) == 1) {
-            Toast.makeText(application_context, "System Status is OK", Toast.LENGTH_LONG).show();
+            Toast.makeText(application_context, "System Status is OK", Toast.LENGTH_SHORT).show();
             return true;
         }
         return false;
     }
 
-    private void update_applicatiion(final float version_name) {
+    private void update_application(final float version_name) {
 
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
         builder1.setMessage("New version is available, please update...").setCancelable(false)
@@ -193,10 +196,16 @@ public class Splash_Screen extends Activity {
             Update_Task = new Update_Check_Task();
             Update_Task.execute((Void) null);
         } else {
-            Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
-            finish();
+            View.OnClickListener retry_Failed_Network_Task = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attempt_Update_Check();
+                }
+            };
+            display_Long_no_FAB_no_network_bottom_SnackBar(getWindow().getDecorView(),retry_Failed_Network_Task);
         }
 
     }
+
 
 }

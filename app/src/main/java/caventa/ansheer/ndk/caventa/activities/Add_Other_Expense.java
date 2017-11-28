@@ -284,12 +284,6 @@ public class Add_Other_Expense extends AppCompatActivity {
         initView();
     }
 
-    private void calculate_total_profit() {
-        total_profit = total_advance - total_expense;
-        txt_total_profit.setText("Profit : " + total_profit);
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

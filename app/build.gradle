@@ -41,10 +41,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.afollestad.material-dialogs:core:0.9.5.0'
     androidTestImplementation 'junit:junit:4.12'
-
+    implementation 'com.chootdev:csnackbar:1.3.2'
     implementation group: 'com.koushikdutta.ion', name: 'ion', version: '2.2.1'
-
     implementation 'com.github.kimkevin:cachepot:1.2.0'
-
     implementation 'de.codecrafters.tableview:tableview:2.8.0'
 }

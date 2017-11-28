@@ -1,14 +1,14 @@
 package caventa.ansheer.ndk.caventa.commons;
 
-import android.view.View;
+import android.content.Context;
 
 /**
  * Created by Srf on 26-11-2017.
  */
 
 public class TODO_Utils {
-    public static void display_TODO_SnackBar(View view)
+    public static void display_TODO_no_FAB_SnackBar(Context context)
     {
-        Snackbar_Utils.display_Long_no_action_bottom_SnackBar(view,"To Implement...");
+        Snackbar_Utils.display_Long_no_FAB_warning_bottom_SnackBar(context,"To Implement...");
     }
 }

@@ -2,9 +2,6 @@ package caventa.ansheer.ndk.caventa.commons;
 
 import java.text.SimpleDateFormat;
 
-/**
- * Created by Srf on 21-11-2017.
- */
 //TODO: Add to common class
 
 public class Date_Utils {

@@ -239,7 +239,7 @@ public class Loan_Ledger extends AppCompatActivity {
 
         if (id == R.id.menu_item_add) {
 //            start_activity(Add_Other_Expense.class);
-            TODO_Utils.display_TODO_SnackBar(getWindow().getDecorView());
+            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
             return true;
         }
 

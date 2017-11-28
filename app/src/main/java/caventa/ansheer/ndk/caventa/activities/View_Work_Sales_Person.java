@@ -44,6 +44,7 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_View_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_View_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -139,14 +140,12 @@ public class View_Work_Sales_Person extends AppCompatActivity {
 
     private Load_Work_Profit_Task load_work_profit_task = null;
 
-    static double total_advance = 0;
-    static double total_expense = 0;
-
     public class Load_Work_Profit_Task extends AsyncTask<Void, Void, String[]> {
         private ArrayList<NameValuePair> name_pair_value;
 
+        private double total_advance = 0;
+        private double total_expense = 0;
         private boolean work_advances_flag = true;
-
 
         Load_Work_Profit_Task() {
         }
@@ -252,8 +251,6 @@ public class View_Work_Sales_Person extends AppCompatActivity {
                     } else {
                         Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                         Log.d(General_Data.TAG, e.getLocalizedMessage());
-//                        Log.d(General_Data.TAG, e.getCause().toString());
-//                        Log.d(General_Data.TAG, e.getClass().toString());
                         e.printStackTrace();
                     }
                 }
@@ -314,14 +311,6 @@ public class View_Work_Sales_Person extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.menu_item_cancel) {
-//            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-//            startActivity(i);
-//            finish();
-//            return true;
-//        }
-
         if (id == R.id.menu_item_finish) {
 
             AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
@@ -353,16 +342,10 @@ public class View_Work_Sales_Person extends AppCompatActivity {
             alert.setTitle("Warning!");
             alert.show();
 
-//            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-//            startActivity(i);
-//            finish();
             return true;
         }
 
         if (id == R.id.menu_item_work_cancel) {
-//            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-//            startActivity(i);
-//            finish();
 
             AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
             after_time_dialog.setMessage("Work will be cancelled, OK?").setCancelable(false)
@@ -390,8 +373,6 @@ public class View_Work_Sales_Person extends AppCompatActivity {
 
             Intent i = new Intent(application_context, Edit_Work.class);
             CachePot.getInstance().push(selected_work);
-//            CachePot.getInstance().push(work_advances);
-//            CachePot.getInstance().push(work_expenses);
             startActivity(i);
             finish();
             return true;
@@ -402,12 +383,13 @@ public class View_Work_Sales_Person extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        total_advance = 0;
-        total_expense = 0;
 
-        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-        startActivity(i);
-        finish();
+        switch (getIntent().getExtras().getString("origin")) {
+            case "Up":
+                Activity_Utils.start_activity_with_finish(this, Sales_Person_Dashboard_Page.class);
+            default:
+                super.onBackPressed();
+        }
     }
 
     public boolean isOnline() {
@@ -425,6 +407,7 @@ public class View_Work_Sales_Person extends AppCompatActivity {
 
         Finish_Work_Task(String work_id) {
             task_work_id = work_id;
+
         }
 
         DefaultHttpClient http_client;
@@ -475,14 +458,9 @@ public class View_Work_Sales_Person extends AppCompatActivity {
                     switch (count) {
                         case "0":
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
-                            total_advance = 0;
-                            total_expense = 0;
-//                            Sales_Person_Dashboard_Page.fin_data_flag = 0;
-//                            Sales_Person_Dashboard_Page.up_data_flag = 0;
-//                            Sales_Person_Dashboard_Page.pen_data_flag = 0;
-                            Intent i = new Intent(application_context, List_Sales_Persons.class);
-                            startActivity(i);
-                            finish();
+
+                            Activity_Utils.start_activity_with_finish(View_Work_Sales_Person.this, List_Sales_Persons.class);
+
                             break;
                         case "1":
                             Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();

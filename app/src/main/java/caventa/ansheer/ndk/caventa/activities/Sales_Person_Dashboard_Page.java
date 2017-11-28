@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -26,8 +27,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -53,6 +52,10 @@ import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
+
+import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push;
+import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_finish_and_origin;
+import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_origin;
 
 //TODO:Work search
 
@@ -91,9 +94,6 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
                 Intent i = new Intent(application_context, Add_Work.class);
                 startActivity(i);
             }
@@ -170,12 +170,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
          * number.
          */
         public static Pending_Works_Fragment newInstance() {
-            Pending_Works_Fragment fragment = new Pending_Works_Fragment();
-            return fragment;
+            return new Pending_Works_Fragment();
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_pending_works, container, false);
 
@@ -195,15 +194,14 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
-//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
-//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
-//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
-//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
-//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
+
                     Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
-                    CachePot.getInstance().push(pending_works_list.get(position));
-                    startActivity(intent);
+
+//                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+//                    CachePot.getInstance().push(pending_works_list.get(position));
+//                    startActivity(intent);
+
+                    start_activity_with_object_push_and_origin(getActivity(),View_Work_Sales_Person.class,pending_works_list.get(position),"Pen");
                 }
 
                 @Override
@@ -328,7 +326,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             @Override
             protected void onCancelled() {
                 load_pending_works_task = null;
-//                showProgress(false);
+                showProgress(false);
             }
         }
 
@@ -375,8 +373,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         }
 
         public static Finished_Works_Fragment newInstance() {
-            Finished_Works_Fragment fragment = new Finished_Works_Fragment();
-            return fragment;
+            return new Finished_Works_Fragment();
         }
 
         @Override
@@ -399,15 +396,12 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Intent intent = new Intent(application_context, View_Finished_Work_Sales_Person.class);
-//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
-//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
-//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
-//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
-//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
                     Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
-                    CachePot.getInstance().push(finished_works_list.get(position));
-                    startActivity(intent);
+
+//                    Intent intent = new Intent(application_context, View_Finished_Work_Sales_Person.class);
+//                    CachePot.getInstance().push(finished_works_list.get(position));
+//                    startActivity(intent);
+                    start_activity_with_object_push(getActivity(),View_Finished_Work_Sales_Person.class,finished_works_list.get(position));
                 }
 
                 @Override
@@ -563,12 +557,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         }
 
         public static Upcoming_Works_Fragment newInstance() {
-            Upcoming_Works_Fragment fragment = new Upcoming_Works_Fragment();
-            return fragment;
+            return new Upcoming_Works_Fragment();
         }
 
         @Override
-        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_upcoming_works, container, false);
 
@@ -588,15 +581,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
-//                    intent.putExtra("work_id", upcoming_works_list.get(position).getId());
-//                    intent.putExtra("work_name", upcoming_works_list.get(position).getWork_name());
-//                    intent.putExtra("work_address", upcoming_works_list.get(position).getWork_address());
-//                    intent.putExtra("work_date", upcoming_works_list.get(position).getWork_date());
-//                    intent.putExtra("sales_person_id", upcoming_works_list.get(position).getSales_person_id());
                     Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
-                    CachePot.getInstance().push(upcoming_works_list.get(position));
-                    startActivity(intent);
+//                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
+//                    CachePot.getInstance().push(upcoming_works_list.get(position));
+//                    startActivity(intent);
+                    start_activity_with_object_push_and_finish_and_origin(getActivity(),View_Work_Sales_Person.class,upcoming_works_list.get(position),"Up");
 
                 }
 
@@ -828,7 +817,6 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-//        Toast_Utils.longToast(application_context,"Pause");
         finish();
         super.onPause();
     }

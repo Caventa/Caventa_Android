@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +36,7 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_View_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_View_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -58,9 +57,6 @@ public class View_Work extends AppCompatActivity {
 
     private List<Work_Expense> work_expenses;
 
-    private RecyclerView work_expenses_recycler_view;
-    private RecyclerView work_advances_recycler_view;
-
     private TextView txt_name, txt_address, txt_total_advance, txt_total_expense, txt_profit;
     Work selected_work;
 
@@ -79,7 +75,7 @@ public class View_Work extends AppCompatActivity {
         work_advances = new ArrayList<>();
         work_advances_adapter = new Work_Advances_View_Adapter(this, work_advances);
 
-        work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
+        RecyclerView work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
 
         work_advances_recycler_view.setHasFixedSize(false);
 
@@ -92,7 +88,7 @@ public class View_Work extends AppCompatActivity {
         work_expenses = new ArrayList<>();
         work_expenses_adapter = new Work_Expense_View_Adapter(this, work_expenses);
 
-        work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
+        RecyclerView work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -115,7 +111,7 @@ public class View_Work extends AppCompatActivity {
         txt_date.setText(Date_Utils.normal_Date_Format_words.format(selected_work.getWork_date()));
 
         initView();
-Log.d(General_Data.TAG,selected_work.getWork_name());
+        Log.d(General_Data.TAG, selected_work.getWork_name());
         txt_name.setText(selected_work.getWork_name());
         txt_address.setText(selected_work.getWork_address());
     }
@@ -132,10 +128,10 @@ Log.d(General_Data.TAG,selected_work.getWork_name());
 
     public class Load_Work_Profit_Task extends AsyncTask<Void, Void, String[]> {
         private ArrayList<NameValuePair> name_pair_value;
-        private double total_advance = 0;
-        private boolean work_advances_flag = true;
 
+        private double total_advance = 0;
         private double total_expense = 0;
+        private boolean work_advances_flag = true;
 
         Load_Work_Profit_Task() {
         }
@@ -240,8 +236,6 @@ Log.d(General_Data.TAG,selected_work.getWork_name());
                     } else {
                         Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                         Log.d(General_Data.TAG, e.getLocalizedMessage());
-//                        Log.d(General_Data.TAG, e.getCause().toString());
-//                        Log.d(General_Data.TAG, e.getClass().toString());
                         e.printStackTrace();
                     }
                 }
@@ -289,26 +283,13 @@ Log.d(General_Data.TAG,selected_work.getWork_name());
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.view_work, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_item_cancel) {
-            this.finish();
-            return true;
+    public void onBackPressed() {
+        switch (getIntent().getExtras().getString("origin")) {
+            case "Up":
+                Activity_Utils.start_activity_with_finish(this, Dashboard_Page.class);
+            default:
+                super.onBackPressed();
         }
 
-        return super.onOptionsItemSelected(item);
     }
-
 }

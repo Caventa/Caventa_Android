@@ -80,7 +80,8 @@ public class Edit_Work extends AppCompatActivity {
 
     TextView txt_total_advance, txt_total_expense, txt_total_profit;
 
-    double total_advance = View_Work_Sales_Person.total_advance, total_expense = View_Work_Sales_Person.total_expense;
+    //    double total_advance = View_Work_Sales_Person.total_advance, total_expense = View_Work_Sales_Person.total_expense;
+    double total_advance = 0, total_expense = 0;
 
     private Calendar calendar;
     private SimpleDateFormat sdf;
@@ -336,9 +337,6 @@ public class Edit_Work extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        View_Work_Sales_Person.total_advance=0;
-        View_Work_Sales_Person.total_expense=0;
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_item_cancel) {
