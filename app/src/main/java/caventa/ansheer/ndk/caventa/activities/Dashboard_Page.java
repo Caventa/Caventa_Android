@@ -381,7 +381,7 @@ public class Dashboard_Page extends AppCompatActivity {
                 }
 
                 showProgress(true);
-                load_finished_works_task = new Load_Finished_Works_Task();
+                load_finished_works_task = new Load_Finished_Works_Task(getActivity());
                 load_finished_works_task.execute((Void) null);
             }
 
@@ -398,8 +398,9 @@ public class Dashboard_Page extends AppCompatActivity {
         static Work_Adapter finished_works_adaptor;
 
         public static class Load_Finished_Works_Task extends AsyncTask<Void, Void, String[]> {
-
-            Load_Finished_Works_Task() {
+FragmentActivity current_activity;
+            Load_Finished_Works_Task(FragmentActivity current_Activity) {
+            this.current_activity=current_Activity;
             }
 
             DefaultHttpClient http_client;
@@ -443,7 +444,8 @@ public class Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "No Finished Works...", Toast.LENGTH_LONG).show();
+                            Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Finished Works...", fab);
+
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                             for (int i = 1; i < json_array.length(); i++) {
@@ -562,7 +564,7 @@ public class Dashboard_Page extends AppCompatActivity {
                 }
 
                 showProgress(true);
-                load_upcoming_works_task = new Load_Upcoming_Works_Task();
+                load_upcoming_works_task = new Load_Upcoming_Works_Task(getActivity());
                 load_upcoming_works_task.execute((Void) null);
             }
 
@@ -578,8 +580,9 @@ public class Dashboard_Page extends AppCompatActivity {
         static Work_Adapter upcoming_works_adaptor;
 
         public static class Load_Upcoming_Works_Task extends AsyncTask<Void, Void, String[]> {
-
-            Load_Upcoming_Works_Task() {
+FragmentActivity current_activity;
+            Load_Upcoming_Works_Task(FragmentActivity current_activity) {
+                this.current_activity=current_activity;
             }
 
             DefaultHttpClient http_client;
@@ -623,7 +626,8 @@ public class Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "No Upcoming Works...", Toast.LENGTH_LONG).show();
+                            Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Upcoming Works...", fab);
+
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
                             for (int i = 1; i < json_array.length(); i++) {

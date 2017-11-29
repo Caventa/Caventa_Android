@@ -36,6 +36,7 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_View_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_View_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -102,10 +103,11 @@ public class View_Finished_Work extends AppCompatActivity {
         work_expenses_recycler_view.setAdapter(work_expenses_adapter);
 
         if (load_work_profit_task != null) {
-            finish();
+            load_work_profit_task.cancel(true);
+            load_work_profit_task = null;
         }
         showProgress(true);
-        load_work_profit_task = new Load_Work_Profit_Task();
+        load_work_profit_task = new Load_Work_Profit_Task(this);
         load_work_profit_task.execute((Void) null);
 
         TextView txt_date = findViewById(R.id.work_date);
@@ -137,8 +139,9 @@ public class View_Finished_Work extends AppCompatActivity {
         private double total_expense = 0;
         private boolean work_advances_flag = true;
 
-
-        Load_Work_Profit_Task() {
+        AppCompatActivity current_activity;
+        Load_Work_Profit_Task(AppCompatActivity current_activity) {
+            this.current_activity = current_activity;
         }
 
         DefaultHttpClient http_client;
@@ -193,7 +196,7 @@ public class View_Finished_Work extends AppCompatActivity {
 
                     for (i = 0; i < json_array.length(); i++) {
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "No Advances...", Toast.LENGTH_LONG).show();
+                            Snackbar_Utils.display_Short_no_FAB_warning_bottom_SnackBar(current_activity, "No Advances...");
                             work_advances_flag = false;
                         } else {
                             if (i != 0 && work_advances_flag) {
@@ -215,7 +218,7 @@ public class View_Finished_Work extends AppCompatActivity {
                         try {
                             for (int j = i; j < json_array.length(); j++) {
                                 if (json_array.getJSONObject(i).getString("status").equals("1")) {
-                                    Toast.makeText(application_context, "No Expenses...", Toast.LENGTH_LONG).show();
+                                    Snackbar_Utils.display_Short_no_FAB_warning_bottom_SnackBar(current_activity, "No Expenses...");
                                     break;
                                 } else {
                                     if (j != i) {

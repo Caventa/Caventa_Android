@@ -1,5 +1,8 @@
 package caventa.ansheer.ndk.caventa.commons;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
@@ -12,5 +15,11 @@ public class Network_Utils {
                 .setAction("Retry", network_function);
         snackbar.getView().setBackgroundColor(RED);
         snackbar.show();
+    }
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -49,6 +50,7 @@ import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
 import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
+import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
@@ -61,25 +63,10 @@ import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_
 
 public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-//    private static ArrayList<Work> work_List;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
     private static Context application_context;
     private static SharedPreferences settings;
     private static int shortAnimTime;
-
+    static FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +77,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,10 +94,21 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = findViewById(R.id.container);
+        /*
+      The {@link ViewPager} that will host the section contents.
+     */
+        ViewPager mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
@@ -135,26 +133,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.menu_item_bank) {
-//            Intent i = new Intent(Sales_Person_Dashboard_Page.this, Sales_Person_Accounts.class);
-//            startActivity(i);
-//            return true;
-//        }
-//
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     static int fin_data_flag = 0, pen_data_flag = 0, up_data_flag = 0;
-
 
     /**
      * A placeholder fragment containing a simple view.
@@ -197,11 +176,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
                     Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
 
-//                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
-//                    CachePot.getInstance().push(pending_works_list.get(position));
-//                    startActivity(intent);
-
-                    start_activity_with_object_push_and_origin(getActivity(),View_Work_Sales_Person.class,pending_works_list.get(position),"Pen");
+                    start_activity_with_object_push_and_origin(getActivity(), View_Work_Sales_Person.class, pending_works_list.get(position), "Pen");
                 }
 
                 @Override
@@ -218,11 +193,9 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     load_pending_works_task = null;
                 }
                 showProgress(true);
-                load_pending_works_task = new Load_Pending_Works_Task();
+                load_pending_works_task = new Load_Pending_Works_Task(getActivity());
                 load_pending_works_task.execute((Void) null);
-
             }
-
             return rootView;
         }
 
@@ -230,14 +203,15 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         static View mLoginFormView;
         static View mProgressView;
 
-
         private RecyclerView recyclerView;
 
 
         public static class Load_Pending_Works_Task extends AsyncTask<Void, Void, String[]> {
 
+            FragmentActivity current_activity;
 
-            Load_Pending_Works_Task() {
+            Load_Pending_Works_Task(FragmentActivity current_activity) {
+                this.current_activity = current_activity;
             }
 
             DefaultHttpClient http_client;
@@ -288,7 +262,8 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
-                            Toast.makeText(application_context, "No Pending Works...", Toast.LENGTH_LONG).show();
+                            Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Pending Works...", fab);
+
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
 
@@ -401,7 +376,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 //                    Intent intent = new Intent(application_context, View_Finished_Work_Sales_Person.class);
 //                    CachePot.getInstance().push(finished_works_list.get(position));
 //                    startActivity(intent);
-                    start_activity_with_object_push(getActivity(),View_Finished_Work_Sales_Person.class,finished_works_list.get(position));
+                    start_activity_with_object_push(getActivity(), View_Finished_Work_Sales_Person.class, finished_works_list.get(position));
                 }
 
                 @Override
@@ -585,7 +560,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 //                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
 //                    CachePot.getInstance().push(upcoming_works_list.get(position));
 //                    startActivity(intent);
-                    start_activity_with_object_push_and_finish_and_origin(getActivity(),View_Work_Sales_Person.class,upcoming_works_list.get(position),"Up");
+                    start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work_Sales_Person.class, upcoming_works_list.get(position), "Up");
 
                 }
 
