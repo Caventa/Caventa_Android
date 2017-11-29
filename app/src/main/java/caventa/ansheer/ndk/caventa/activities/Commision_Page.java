@@ -4,12 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -163,14 +165,39 @@ public class Commision_Page extends AppCompatActivity {
         button_payout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (payout_task != null) {
-                    finish();
-                }
-                showProgress(true);
-                payout_task = new Payout_Task();
-                payout_task.execute((Void) null);
+                show_uncancelled_yes_no_confirmation_dialogue_for_payout();
             }
         });
+    }
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_payout() {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage("Want to payout? ");
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                execute_payout_task();
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle("Warning!");
+        alert.show();
+    }
+
+    private void execute_payout_task() {
+        if (payout_task != null) {
+            payout_task.cancel(true);
+            payout_task = null;
+        }
+        showProgress(true);
+        payout_task = new Payout_Task();
+        payout_task.execute((Void) null);
     }
 
     private void load_commision_page() {

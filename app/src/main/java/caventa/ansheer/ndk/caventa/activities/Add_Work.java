@@ -5,7 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,7 +48,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -100,6 +100,9 @@ public class Add_Work extends AppCompatActivity {
         txt_total_expense = findViewById(R.id.total_expense);
         txt_total_profit = findViewById(R.id.total_profit);
 
+        Class[] parameterTypes = new Class[1];
+        parameterTypes[0] = String.class;
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
@@ -111,7 +114,7 @@ public class Add_Work extends AppCompatActivity {
         work_advances_recycler_view.setHasFixedSize(false);
 
         // use a linear layout manager
-        LinearLayoutManager work_advances_recycler_view_layout_manager = new LinearLayoutManager(this);
+        final LinearLayoutManager work_advances_recycler_view_layout_manager = new LinearLayoutManager(this);
         work_advances_recycler_view.setLayoutManager(work_advances_recycler_view_layout_manager);
 
         work_advances_recycler_view.setAdapter(work_advances_adapter);
@@ -240,24 +243,8 @@ public class Add_Work extends AppCompatActivity {
         work_advances_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), work_advances_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Log.d(General_Data.TAG, String.valueOf(position));
-                Log.d(General_Data.TAG, String.valueOf(work_advances.size()));
-                Log.d(General_Data.TAG, Arrays.toString(work_advances.toArray()));
 
-                if (Work_Advances_Adapter.delete_status) {
-
-
-                    work_advances.remove(position);
-
-                    String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
-                    total_advance = total_advance - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
-                    txt_total_advance.setText("Advances : " + total_advance);
-
-                    calculate_total_profit();
-
-                    Work_Advances_Adapter.delete_status = false;
-                    work_advances_adapter.notifyDataSetChanged();
-                }
+                show_uncancelled_yes_no_confirmation_dialogue_for_advance("Do You Want to Delete Advance - " + work_advances.get(position).getDescription() + " : " + work_advances.get(position).getAmount(), "Warning!", position);
             }
 
             @Override
@@ -269,20 +256,7 @@ public class Add_Work extends AppCompatActivity {
         work_expenses_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), work_advances_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (Work_Expense_Adapter.delete_status) {
-
-                    work_expenses.remove(position);
-
-                    String description_amount = ((TextView) view.findViewById(R.id.description_amount)).getText().toString();
-
-                    total_expense = total_expense - Double.parseDouble(description_amount.substring(description_amount.indexOf("-") + 1));
-
-                    txt_total_expense.setText("Expenses : " + total_expense);
-                    calculate_total_profit();
-                    Work_Expense_Adapter.delete_status = false;
-
-                    work_expenses_adapter.notifyDataSetChanged();
-                }
+                show_uncancelled_yes_no_confirmation_dialogue_for_expense("Do You Want to Delete Expense - " + work_expenses.get(position).getDescription() + " : " + work_expenses.get(position).getAmount(), "Warning!", position);
             }
 
             @Override
@@ -291,6 +265,63 @@ public class Add_Work extends AppCompatActivity {
             }
         }));
         initView();
+    }
+
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_expense(String message, String title, final int position) {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage(message);
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                total_expense = total_expense - work_expenses.get(position).getAmount();
+                recalculate_total_expense();
+                work_expenses.remove(position);
+                work_expenses_adapter.notifyDataSetChanged();
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle(title);
+        alert.show();
+    }
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_advance(String message, String title, final int position) {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage(message);
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                total_advance = total_advance - work_advances.get(position).getAmount();
+                recalculate_total_advance();
+                work_advances.remove(position);
+                work_advances_adapter.notifyDataSetChanged();
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle(title);
+        alert.show();
+    }
+
+    void recalculate_total_expense() {
+        txt_total_expense.setText("Expenses : " + total_expense);
+        calculate_total_profit();
+    }
+
+    void recalculate_total_advance() {
+        txt_total_advance.setText("Advances : " + total_advance);
+        calculate_total_profit();
     }
 
     private void calculate_total_profit() {
@@ -313,29 +344,96 @@ public class Add_Work extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_item_cancel) {
-            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-            startActivity(i);
-            finish();
-            return true;
-        }
-
         if (id == R.id.menu_item_save) {
             attempt_work_save();
             return true;
         }
-
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-        startActivity(i);
-        finish();
+        if(formcheck())
+        {
+            show_uncancelled_yes_no_confirmation_dialogue_for_unsaved_data();
+        }
+        else {
+            super.onBackPressed();
+        }
     }
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_unsaved_data() {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage("Unsaved data will be lost! Continue? ");
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                Add_Work.this.finish();
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle("Warning!");
+        alert.show();
+    }
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_no_advances() {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage("There is no advances! Continue? ");
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+execute_work_save_task();
+
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle("Warning!");
+        alert.show();
+    }
+
+    void show_uncancelled_yes_no_confirmation_dialogue_for_unprofitable() {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
+        delete_confirmation_dialog.setMessage("Greater expense! Continue? ");
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                execute_work_save_task();
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle("Warning!");
+        alert.show();
+    }
+    private void execute_work_save_task() {
+        // Show a progress spinner, and kick off a background task to perform the user login attempt.
+        if (isOnline()) {
+            showProgress(true);
+            mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0));
+            mAuthTask.execute((Void) null);
+        } else {
+            Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+        }
+    }
+
 
     /* Keep track of the login task to ensure we can cancel it if requested. */
     private Work_Save_Task mAuthTask = null;
@@ -461,14 +559,16 @@ public class Add_Work extends AppCompatActivity {
             empty_check_result.second.requestFocus();
         } else {
 
-            // Show a progress spinner, and kick off a background task to perform the user login attempt.
-            if (isOnline()) {
-                showProgress(true);
-                mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0));
-                mAuthTask.execute((Void) null);
-            } else {
-                Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+            if(zero_check(new Double[]{total_advance}))
+            {
+                show_uncancelled_yes_no_confirmation_dialogue_for_no_advances();
             }
+            else if(total_expense>total_advance)
+            {
+                show_uncancelled_yes_no_confirmation_dialogue_for_unprofitable();
+            }
+
+
         }
     }
 
@@ -547,6 +647,11 @@ public class Add_Work extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    public boolean formcheck()
+    {
+        return non_empty_check(new EditText[]{txt_name,txt_address})&&zero_check(new Double[]{total_advance,total_expense});
+    }
+
     private Pair<Boolean, EditText> empty_check(Pair[] editText_Error_Pairs) {
         for (Pair<EditText, String> editText_Error_Pair : editText_Error_Pairs) {
             if (TextUtils.isEmpty(editText_Error_Pair.first.getText().toString())) {
@@ -555,6 +660,24 @@ public class Add_Work extends AppCompatActivity {
             }
         }
         return new Pair<>(false, null);
+    }
+
+    private boolean zero_check(Double[] doubles) {
+        for (Double a_Double : doubles) {
+            if (a_Double!=0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean non_empty_check(EditText[] editTexts) {
+        for (EditText editText : editTexts) {
+            if (!TextUtils.isEmpty(editText.getText().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void reset_errors(EditText[] edit_texts) {
