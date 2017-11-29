@@ -135,7 +135,7 @@ public class Dashboard_Page extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_item_bank) {
-            start_activity_with_finish(application_context,Accounts.class);
+            start_activity_with_finish(this,Accounts.class);
             return true;
         }
 
