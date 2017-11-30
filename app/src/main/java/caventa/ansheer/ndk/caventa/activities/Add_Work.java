@@ -354,11 +354,9 @@ public class Add_Work extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(formcheck())
-        {
+        if (formcheck()) {
             show_uncancelled_yes_no_confirmation_dialogue_for_unsaved_data();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -390,7 +388,7 @@ public class Add_Work extends AppCompatActivity {
         delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
-execute_work_save_task();
+                execute_work_save_task();
 
             }
         });
@@ -423,6 +421,7 @@ execute_work_save_task();
         alert.setTitle("Warning!");
         alert.show();
     }
+
     private void execute_work_save_task() {
         // Show a progress spinner, and kick off a background task to perform the user login attempt.
         if (isOnline()) {
@@ -546,7 +545,8 @@ execute_work_save_task();
 
     private void attempt_work_save() {
         if (mAuthTask != null) {
-            return;
+            mAuthTask.cancel(true);
+            mAuthTask = null;
         }
 
         reset_errors(new EditText[]{txt_name, txt_address});
@@ -559,13 +559,13 @@ execute_work_save_task();
             empty_check_result.second.requestFocus();
         } else {
 
-            if(zero_check(new Double[]{total_advance}))
-            {
+            if (zero_check(new Double[]{total_advance})) {
                 show_uncancelled_yes_no_confirmation_dialogue_for_no_advances();
-            }
-            else if(total_expense>total_advance)
-            {
+            } else if (total_expense > total_advance) {
                 show_uncancelled_yes_no_confirmation_dialogue_for_unprofitable();
+            }
+            else {
+                execute_work_save_task();
             }
 
 
@@ -647,9 +647,8 @@ execute_work_save_task();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    public boolean formcheck()
-    {
-        return non_empty_check(new EditText[]{txt_name,txt_address})&&zero_check(new Double[]{total_advance,total_expense});
+    public boolean formcheck() {
+        return non_empty_check(new EditText[]{txt_name, txt_address}) && zero_check(new Double[]{total_advance, total_expense});
     }
 
     private Pair<Boolean, EditText> empty_check(Pair[] editText_Error_Pairs) {
@@ -664,7 +663,7 @@ execute_work_save_task();
 
     private boolean zero_check(Double[] doubles) {
         for (Double a_Double : doubles) {
-            if (a_Double!=0) {
+            if (a_Double == 0) {
                 return true;
             }
         }
