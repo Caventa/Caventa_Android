@@ -1,16 +1,10 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
@@ -18,7 +12,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,20 +25,10 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,7 +38,6 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_Adapter;
-import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -64,18 +46,23 @@ import ndk.prism.common_utils.Date_Picker_Utils;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
+import static caventa.ansheer.ndk.caventa.commons.Alert_Dialog_Utils.show_uncancelled_yes_no_confirmation_for_unsaved_data_and_finish_on_yes;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.handle_json_insertion_response_and_switch_with_finish;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.perform_http_client_network_task;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress;
+import static caventa.ansheer.ndk.caventa.commons.Validation_Utils.empty_check;
+import static caventa.ansheer.ndk.caventa.commons.Validation_Utils.non_empty_check;
+import static caventa.ansheer.ndk.caventa.commons.Validation_Utils.reset_errors;
+import static caventa.ansheer.ndk.caventa.commons.Validation_Utils.zero_check;
+
 public class Add_Work extends AppCompatActivity {
 
     private Work_Advances_Adapter work_advances_adapter;
-
     private Work_Expense_Adapter work_expenses_adapter;
 
     private List<Work_Advance> work_advances;
-
     private List<Work_Expense> work_expenses;
-
-    private RecyclerView work_expenses_recycler_view;
-    private RecyclerView work_advances_recycler_view;
 
     TextView txt_total_advance, txt_total_expense, txt_total_profit;
 
@@ -95,14 +82,10 @@ public class Add_Work extends AppCompatActivity {
         setContentView(R.layout.add_work);
         setTitle("New Work");
         application_context = getApplicationContext();
-        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
-                Context.MODE_PRIVATE);
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,Context.MODE_PRIVATE);
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_total_profit = findViewById(R.id.total_profit);
-
-        Class[] parameterTypes = new Class[1];
-        parameterTypes[0] = String.class;
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -110,7 +93,7 @@ public class Add_Work extends AppCompatActivity {
         work_advances = new ArrayList<>();
         work_advances_adapter = new Work_Advances_Adapter(this, work_advances);
 
-        work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
+        RecyclerView work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
 
         work_advances_recycler_view.setHasFixedSize(false);
 
@@ -123,7 +106,7 @@ public class Add_Work extends AppCompatActivity {
         work_expenses = new ArrayList<>();
         work_expenses_adapter = new Work_Expense_Adapter(this, work_expenses);
 
-        work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
+        RecyclerView work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -191,7 +174,7 @@ public class Add_Work extends AppCompatActivity {
                                     total_advance = total_advance + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
                                     txt_total_advance.setText("Advances : " + total_advance);
 
-                                    calculate_total_profit();
+                                    recalculate_total_profit();
 
                                     work_advances_adapter.notifyDataSetChanged();
                                 }
@@ -228,7 +211,7 @@ public class Add_Work extends AppCompatActivity {
                                     total_expense = total_expense + Double.parseDouble(((EditText) dialog.findViewById(R.id.name)).getText().toString());
                                     txt_total_expense.setText("Expenses : " + total_expense);
 
-                                    calculate_total_profit();
+                                    recalculate_total_profit();
 
                                     work_expenses_adapter.notifyDataSetChanged();
                                 }
@@ -277,7 +260,7 @@ public class Add_Work extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
                 total_expense = total_expense - work_expenses.get(position).getAmount();
-                recalculate_total_expense();
+                redraw_total_expense();
                 work_expenses.remove(position);
                 work_expenses_adapter.notifyDataSetChanged();
             }
@@ -300,7 +283,7 @@ public class Add_Work extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
                 total_advance = total_advance - work_advances.get(position).getAmount();
-                recalculate_total_advance();
+                redraw_total_advance();
                 work_advances.remove(position);
                 work_advances_adapter.notifyDataSetChanged();
             }
@@ -315,17 +298,17 @@ public class Add_Work extends AppCompatActivity {
         alert.show();
     }
 
-    void recalculate_total_expense() {
+    void redraw_total_expense() {
         txt_total_expense.setText("Expenses : " + total_expense);
-        calculate_total_profit();
+        recalculate_total_profit();
     }
 
-    void recalculate_total_advance() {
+    void redraw_total_advance() {
         txt_total_advance.setText("Advances : " + total_advance);
-        calculate_total_profit();
+        recalculate_total_profit();
     }
 
-    private void calculate_total_profit() {
+    void recalculate_total_profit() {
         total_profit = total_advance - total_expense;
         txt_total_profit.setText("Profit : " + total_profit);
     }
@@ -355,32 +338,13 @@ public class Add_Work extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (formcheck()) {
-            show_uncancelled_yes_no_confirmation_dialogue_for_unsaved_data();
+        if (form_check()) {
+            show_uncancelled_yes_no_confirmation_for_unsaved_data_and_finish_on_yes(this);
         } else {
             super.onBackPressed();
         }
     }
 
-    void show_uncancelled_yes_no_confirmation_dialogue_for_unsaved_data() {
-        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
-        delete_confirmation_dialog.setMessage("Unsaved data will be lost! Continue? ");
-        delete_confirmation_dialog.setCancelable(false);
-        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-                Add_Work.this.finish();
-            }
-        });
-        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        AlertDialog alert = delete_confirmation_dialog.create();
-        alert.setTitle("Warning!");
-        alert.show();
-    }
 
     void show_uncancelled_yes_no_confirmation_dialogue_for_no_advances() {
         AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(this);
@@ -425,9 +389,9 @@ public class Add_Work extends AppCompatActivity {
 
     private void execute_work_save_task() {
         // Show a progress spinner, and kick off a background task to perform the user login attempt.
-        if (isOnline()) {
-            showProgress(true);
-            mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0),this);
+        if (isOnline(application_context)) {
+            showProgress(true,application_context,mProgressView,mLoginFormView);
+            mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0), this);
             mAuthTask.execute((Void) null);
         } else {
             Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -451,10 +415,7 @@ public class Add_Work extends AppCompatActivity {
         int task_sales_person_id;
         AppCompatActivity current_activity;
 
-        Work_Save_Task(String work_name, String work_address, String advances_json, String expenses_json,
-                       Date work_date,
-                       int sales_person_id, AppCompatActivity current_activity
-        ) {
+        Work_Save_Task(String work_name, String work_address, String advances_json, String expenses_json, Date work_date, int sales_person_id, AppCompatActivity current_activity) {
             task_work_name = work_name;
             task_work_address = work_address;
             task_advances_json = advances_json;
@@ -464,36 +425,12 @@ public class Add_Work extends AppCompatActivity {
             this.current_activity = current_activity;
         }
 
-        DefaultHttpClient http_client;
-        HttpPost http_post;
-        ArrayList<NameValuePair> name_pair_value;
-        String network_action_response;
 
         @Override
         protected String[] doInBackground(Void... params) {
-            try {
-                http_client = new DefaultHttpClient();
-                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/add_work.php");
-                name_pair_value = new ArrayList<NameValuePair>(6);
-                name_pair_value.add(new BasicNameValuePair("work_name", task_work_name));
-                name_pair_value.add(new BasicNameValuePair("work_address", task_work_address));
-                name_pair_value.add(new BasicNameValuePair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)));
-                name_pair_value.add(new BasicNameValuePair("sales_person_id", String.valueOf(task_sales_person_id)));
-                name_pair_value.add(new BasicNameValuePair("advances_json", task_advances_json));
-                name_pair_value.add(new BasicNameValuePair("expenses_json", task_expenses_json));
-
-                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
-                ResponseHandler<String> response_handler = new BasicResponseHandler();
-                network_action_response = http_client.execute(http_post, response_handler);
-                return new String[]{"0", network_action_response};
-
-            } catch (UnsupportedEncodingException e) {
-                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
-            } catch (ClientProtocolException e) {
-                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
-            } catch (IOException e) {
-                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
-            }
+            return perform_http_client_network_task(General_Data.SERVER_IP_ADDRESS + "/android/add_work.php", new Pair[]{new Pair("work_name", task_work_name),
+                    new Pair("work_address", task_work_address), new Pair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)), new Pair("sales_person_id", String.valueOf(task_sales_person_id)),
+                    new Pair("advances_json", task_advances_json), new Pair("expenses_json", task_expenses_json)});
         }
 
 
@@ -501,39 +438,9 @@ public class Add_Work extends AppCompatActivity {
         protected void onPostExecute(final String[] network_action_response_array) {
             mAuthTask = null;
 
-            showProgress(false);
+            showProgress(false,application_context,mProgressView,mLoginFormView);
 
-            Log.d(General_Data.TAG, network_action_response_array[0]);
-            Log.d(General_Data.TAG, network_action_response_array[1]);
-
-            if (network_action_response_array[0].equals("1")) {
-                Toast.makeText(Add_Work.this, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
-                Log.d(General_Data.TAG, network_action_response_array[1]);
-            } else {
-
-                try {
-                    JSONObject json = new JSONObject(network_action_response_array[1]);
-                    String count = json.getString("status");
-                    switch (count) {
-                        case "0":
-                            Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
-                            Activity_Utils.start_activity_with_finish(current_activity, Sales_Person_Dashboard_Page.class);
-                            break;
-                        case "1":
-                            Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
-                            txt_name.requestFocus();
-                            break;
-                        default:
-                            Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                    Log.d(General_Data.TAG, e.getLocalizedMessage());
-                }
-
-
-            }
+            handle_json_insertion_response_and_switch_with_finish(network_action_response_array, current_activity, Sales_Person_Dashboard_Page.class, application_context, txt_name);
 
 
         }
@@ -541,7 +448,7 @@ public class Add_Work extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
+            showProgress(false,application_context,mProgressView,mLoginFormView);
         }
     }
 
@@ -569,13 +476,10 @@ public class Add_Work extends AppCompatActivity {
             } else {
                 execute_work_save_task();
             }
-
-
         }
     }
 
     private String generate_expenses_json() {
-
         JSONArray mJSONArray = new JSONArray();
         for (int i = 0; i < work_expenses.size(); i++) {
             JSONObject json_obj = new JSONObject();
@@ -593,8 +497,6 @@ public class Add_Work extends AppCompatActivity {
     }
 
     private String generate_advances_json() {
-
-
         JSONArray mJSONArray = new JSONArray();
         for (int i = 0; i < work_advances.size(); i++) {
             JSONObject json_obj = new JSONObject();
@@ -612,79 +514,8 @@ public class Add_Work extends AppCompatActivity {
 
     Context application_context;
 
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
-
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    public boolean formcheck() {
+    public boolean form_check() {
         return non_empty_check(new EditText[]{txt_name, txt_address}) && zero_check(new Double[]{total_advance, total_expense});
-    }
-
-    private Pair<Boolean, EditText> empty_check(Pair[] editText_Error_Pairs) {
-        for (Pair<EditText, String> editText_Error_Pair : editText_Error_Pairs) {
-            if (TextUtils.isEmpty(editText_Error_Pair.first.getText().toString())) {
-                editText_Error_Pair.first.setError(editText_Error_Pair.second);
-                return new Pair<>(true, editText_Error_Pair.first);
-            }
-        }
-        return new Pair<>(false, null);
-    }
-
-    private boolean zero_check(Double[] doubles) {
-        for (Double a_Double : doubles) {
-            if (a_Double == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean non_empty_check(EditText[] editTexts) {
-        for (EditText editText : editTexts) {
-            if (!TextUtils.isEmpty(editText.getText().toString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void reset_errors(EditText[] edit_texts) {
-        for (EditText edit_text : edit_texts) {
-            edit_text.setError(null);
-        }
     }
 
 }
