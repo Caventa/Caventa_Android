@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.adapters.extra;
+package caventa.ansheer.ndk.caventa.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.models.extra.Commision;
+import caventa.ansheer.ndk.caventa.models.Commision;
 
 
 public class Commision_Adapter extends RecyclerView.Adapter<Commision_Adapter.ViewHolder> {

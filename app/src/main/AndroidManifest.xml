@@ -59,9 +59,7 @@
         <activity android:name=".activities.View_Work" />
         <activity android:name=".activities.View_Work_Sales_Person" />
         <activity android:name=".activities.Edit_Work" />
-        <activity android:name=".activities.extra.Sales_Person_Accounts" />
         <activity android:name=".activities.View_Finished_Work_Sales_Person" />
-        <activity android:name=".activities.extra.Sales_Person_Commision_Page" />
 
         <activity
             android:name=".activities.Commision_Page"

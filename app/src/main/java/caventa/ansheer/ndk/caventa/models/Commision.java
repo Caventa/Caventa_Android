@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.models.extra;
+package caventa.ansheer.ndk.caventa.models;
 
 
 import java.io.Serializable;

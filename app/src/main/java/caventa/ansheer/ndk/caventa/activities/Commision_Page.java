@@ -45,10 +45,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.adapters.extra.Commision_Adapter;
+import caventa.ansheer.ndk.caventa.adapters.Commision_Adapter;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
-import caventa.ansheer.ndk.caventa.models.extra.Commision;
+import caventa.ansheer.ndk.caventa.models.Commision;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 

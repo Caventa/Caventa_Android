@@ -338,15 +338,6 @@ public class Edit_Work extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_item_cancel) {
-
-            Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-            startActivity(i);
-            finish();
-            return true;
-        }
-
         if (id == R.id.menu_item_save) {
             attempt_work_save();
             Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
