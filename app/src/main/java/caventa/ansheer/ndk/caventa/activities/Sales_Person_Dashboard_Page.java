@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,6 +47,7 @@ import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
@@ -81,8 +81,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(application_context, Add_Work.class);
-                startActivity(i);
+                Activity_Utils.start_activity_with_finish(Sales_Person_Dashboard_Page.this,Add_Work.class);
             }
         });
         shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);

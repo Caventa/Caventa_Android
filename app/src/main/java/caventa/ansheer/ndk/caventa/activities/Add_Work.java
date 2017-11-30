@@ -55,6 +55,7 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -426,7 +427,7 @@ public class Add_Work extends AppCompatActivity {
         // Show a progress spinner, and kick off a background task to perform the user login attempt.
         if (isOnline()) {
             showProgress(true);
-            mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0));
+            mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0),this);
             mAuthTask.execute((Void) null);
         } else {
             Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -448,10 +449,11 @@ public class Add_Work extends AppCompatActivity {
         String task_work_name, task_work_address, task_advances_json, task_expenses_json;
         Date task_work_date;
         int task_sales_person_id;
+        AppCompatActivity current_activity;
 
         Work_Save_Task(String work_name, String work_address, String advances_json, String expenses_json,
                        Date work_date,
-                       int sales_person_id
+                       int sales_person_id, AppCompatActivity current_activity
         ) {
             task_work_name = work_name;
             task_work_address = work_address;
@@ -459,6 +461,7 @@ public class Add_Work extends AppCompatActivity {
             task_expenses_json = expenses_json;
             task_work_date = work_date;
             task_sales_person_id = sales_person_id;
+            this.current_activity = current_activity;
         }
 
         DefaultHttpClient http_client;
@@ -514,7 +517,7 @@ public class Add_Work extends AppCompatActivity {
                     switch (count) {
                         case "0":
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
-                            finish();
+                            Activity_Utils.start_activity_with_finish(current_activity, Sales_Person_Dashboard_Page.class);
                             break;
                         case "1":
                             Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
@@ -563,8 +566,7 @@ public class Add_Work extends AppCompatActivity {
                 show_uncancelled_yes_no_confirmation_dialogue_for_no_advances();
             } else if (total_expense > total_advance) {
                 show_uncancelled_yes_no_confirmation_dialogue_for_unprofitable();
-            }
-            else {
+            } else {
                 execute_work_save_task();
             }
 

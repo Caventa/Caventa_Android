@@ -275,7 +275,7 @@ public class Commision_Page extends AppCompatActivity {
 
                     } else {
 
-                        commisions.add(new Commision(Date_Utils.normal_Date_Format.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(1).getString("clear_date"))), json_array.getJSONObject(1).getString("clear_time")));
+                        commisions.add(new Commision(Date_Utils.normal_Date_Format.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(1).getString("clear_date_time"))), ""));
 
                         for (i = 1; i < json_array.length(); i++) {
 

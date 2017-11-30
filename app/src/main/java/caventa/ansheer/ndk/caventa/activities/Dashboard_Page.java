@@ -52,7 +52,7 @@ import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_finish;
+import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity;
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push;
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_finish_and_origin;
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_origin;
@@ -135,7 +135,7 @@ public class Dashboard_Page extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_item_bank) {
-            start_activity_with_finish(this,Accounts.class);
+            start_activity(this,Accounts.class);
             return true;
         }
 
