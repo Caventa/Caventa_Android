@@ -4,13 +4,18 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +32,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -43,6 +49,12 @@ import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
 import caventa.ansheer.ndk.caventa.models.Work_Expense;
 import ndk.prism.common_utils.Date_Utils;
+import ndk.prism.common_utils.Toast_Utils;
+
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline;
+import static caventa.ansheer.ndk.caventa.commons.Visibility_Utils.set_visible;
+
+//TODO:Cancel work
 
 public class View_Work extends AppCompatActivity {
 
@@ -54,12 +66,14 @@ public class View_Work extends AppCompatActivity {
 
     private Work_Expense_View_Adapter work_expenses_adapter;
 
-    private List<Work_Advance> work_advances;
+    static List<Work_Advance> work_advances;
 
-    private List<Work_Expense> work_expenses;
+    static List<Work_Expense> work_expenses;
 
     private TextView txt_name, txt_address, txt_total_advance, txt_total_expense, txt_profit;
     Work selected_work;
+    private TextView txt_commission;
+    private TextView txt_net_profit;
 
 
     @Override
@@ -113,9 +127,14 @@ public class View_Work extends AppCompatActivity {
         txt_date.setText(Date_Utils.normal_Date_Format_words.format(selected_work.getWork_date()));
 
         initView();
-        Log.d(General_Data.TAG, selected_work.getWork_name());
+
         txt_name.setText(selected_work.getWork_name());
         txt_address.setText(selected_work.getWork_address());
+
+        if (((getIntent().getExtras().getString("origin").equals("Sales_Person_Fin")) || (getIntent().getExtras().getString("origin").equals("Common_Fin"))) && (selected_work.getSales_person_id() != 1)) {
+            set_visible(new View[]{txt_commission, txt_net_profit});
+//            remove_from_parent_layout(new View[]{txt_commission,txt_net_profit});
+        }
     }
 
     private void initView() {
@@ -124,6 +143,8 @@ public class View_Work extends AppCompatActivity {
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
         txt_profit = findViewById(R.id.total_profit);
+        txt_commission = findViewById(R.id.commision);
+        txt_net_profit = findViewById(R.id.net_profit);
     }
 
     private Load_Work_Profit_Task load_work_profit_task = null;
@@ -232,6 +253,11 @@ public class View_Work extends AppCompatActivity {
 
                             txt_profit.setText("Profit : " + (total_advance - total_expense));
 
+                            txt_commission.setText("Commission : " + ((total_advance - total_expense) * 0.6));
+
+                            txt_net_profit.setText("Net Profit : " + ((total_advance - total_expense) * 0.4));
+
+
                         } catch (JSONException ex) {
                             Toast.makeText(application_context, "Error : " + ex.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                             Log.d(General_Data.TAG, ex.getLocalizedMessage());
@@ -287,13 +313,195 @@ public class View_Work extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (getIntent().getExtras().getString("origin").equals("Sales_Person_Pen")) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.view_work_pen, menu);
+        } else if (getIntent().getExtras().getString("origin").equals("Sales_Person_Up")) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.view_work_up, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.menu_item_finish) {
+
+            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
+            after_time_dialog.setMessage("Work is Finished, Is it?").setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            dialog.cancel();
+                            if (finish_work_task != null) {
+                                return;
+                            }
+
+                            // Show a progress spinner, and kick off a background task to perform the user login attempt.
+                            if (isOnline(application_context)) {
+                                showProgress(true);
+                                finish_work_task = new Finish_Work_Task(selected_work.getId());
+                                finish_work_task.execute((Void) null);
+                            } else {
+                                Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
+                            }
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    dialog.cancel();
+                }
+            });
+            AlertDialog alert = after_time_dialog.create();
+            alert.setTitle("Warning!");
+            alert.show();
+
+            return true;
+        }
+
+        if (id == R.id.menu_item_work_cancel) {
+
+            AlertDialog.Builder after_time_dialog = new AlertDialog.Builder(this);
+            after_time_dialog.setMessage("Work will be cancelled, OK?").setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            dialog.cancel();
+
+
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    dialog.cancel();
+                }
+            });
+            AlertDialog alert = after_time_dialog.create();
+            alert.setTitle("Warning!");
+            alert.show();
+
+            return true;
+        }
+
+        if (id == R.id.menu_item_edit) {
+
+            Intent i = new Intent(application_context, Edit_Work.class);
+            CachePot.getInstance().push(selected_work);
+            startActivity(i);
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {
+
         switch (getIntent().getExtras().getString("origin")) {
-            case "Up":
+            case "Sales_Person_Up":
+                Activity_Utils.start_activity_with_finish(this, Sales_Person_Dashboard_Page.class);
+            case "Common_Up":
                 Activity_Utils.start_activity_with_finish(this, Dashboard_Page.class);
             default:
                 super.onBackPressed();
         }
-
     }
+
+    /* Keep track of the login task to ensure we can cancel it if requested. */
+    private Finish_Work_Task finish_work_task = null;
+
+    public class Finish_Work_Task extends AsyncTask<Void, Void, String[]> {
+
+        String task_work_id;
+
+        Finish_Work_Task(String work_id) {
+            task_work_id = work_id;
+
+        }
+
+        DefaultHttpClient http_client;
+        HttpPost http_post;
+        ArrayList<NameValuePair> name_pair_value;
+        String network_action_response;
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                http_client = new DefaultHttpClient();
+                http_post = new HttpPost(General_Data.SERVER_IP_ADDRESS + "/android/finish_work.php");
+                name_pair_value = new ArrayList<NameValuePair>(1);
+                name_pair_value.add(new BasicNameValuePair("work_id", task_work_id));
+
+                http_post.setEntity(new UrlEncodedFormEntity(name_pair_value));
+                ResponseHandler<String> response_handler = new BasicResponseHandler();
+                network_action_response = http_client.execute(http_post, response_handler);
+                return new String[]{"0", network_action_response};
+
+            } catch (UnsupportedEncodingException e) {
+                return new String[]{"1", "UnsupportedEncodingException : " + e.getLocalizedMessage()};
+            } catch (ClientProtocolException e) {
+                return new String[]{"1", "ClientProtocolException : " + e.getLocalizedMessage()};
+            } catch (IOException e) {
+                return new String[]{"1", "IOException : " + e.getLocalizedMessage()};
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final String[] network_action_response_array) {
+            finish_work_task = null;
+
+            showProgress(false);
+
+            Log.d(General_Data.TAG, network_action_response_array[0]);
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+
+            if (network_action_response_array[0].equals("1")) {
+                Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, network_action_response_array[1]);
+            } else {
+
+                try {
+                    JSONObject json = new JSONObject(network_action_response_array[1]);
+                    String count = json.getString("status");
+                    switch (count) {
+                        case "0":
+                            Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
+
+                            Activity_Utils.start_activity_with_finish(View_Work.this, List_Sales_Persons.class);
+
+                            break;
+                        case "1":
+                            Toast.makeText(application_context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
+                            txt_name.requestFocus();
+                            break;
+                        default:
+                            Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(General_Data.TAG, e.getLocalizedMessage());
+                }
+
+
+            }
+
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            finish_work_task = null;
+            showProgress(false);
+        }
+    }
+
 }

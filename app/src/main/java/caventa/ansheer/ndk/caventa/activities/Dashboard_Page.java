@@ -53,7 +53,6 @@ import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity;
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push;
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_finish_and_origin;
 import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_origin;
 
@@ -181,7 +180,7 @@ public class Dashboard_Page extends AppCompatActivity {
                 public void onClick(View view, int position) {
                     Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_origin(getActivity(),View_Work.class,pending_works_list.get(position),"Pen");
+                    start_activity_with_object_push_and_origin(getActivity(),View_Work.class,pending_works_list.get(position),"Common_Pen");
                 }
 
                 @Override
@@ -365,7 +364,7 @@ public class Dashboard_Page extends AppCompatActivity {
 
                     Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
 
-                    start_activity_with_object_push(getActivity(),View_Finished_Work.class,finished_works_list.get(position));
+                    start_activity_with_object_push_and_origin(getActivity(),View_Work.class,finished_works_list.get(position),"Common_Fin");
                 }
 
                 @Override
@@ -546,7 +545,7 @@ FragmentActivity current_activity;
 
                     Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_finish_and_origin(getActivity(),View_Work.class,upcoming_works_list.get(position),"Up");
+                    start_activity_with_object_push_and_finish_and_origin(getActivity(),View_Work.class,upcoming_works_list.get(position),"Common_Up");
                 }
 
                 @Override

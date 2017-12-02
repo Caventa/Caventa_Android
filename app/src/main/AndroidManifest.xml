@@ -57,15 +57,12 @@
 
         <activity android:name=".activities.Add_Work" />
         <activity android:name=".activities.View_Work" />
-        <activity android:name=".activities.View_Work_Sales_Person" />
         <activity android:name=".activities.Edit_Work" />
-        <activity android:name=".activities.View_Finished_Work_Sales_Person" />
 
         <activity
             android:name=".activities.Commision_Page"
             android:label="@string/title_activity_commision__page"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.View_Finished_Work" />
 
         <activity
             android:name=".activities.Account_Ledger"

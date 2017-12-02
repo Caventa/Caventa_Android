@@ -116,7 +116,7 @@ public class Edit_Work extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        work_advances = View_Work_Sales_Person.work_advances;
+        work_advances = View_Work.work_advances;
         work_advances_adapter = new Work_Advances_Adapter(this, work_advances);
 
         work_advances_recycler_view = findViewById(R.id.recycler_view_advance);
@@ -129,7 +129,7 @@ public class Edit_Work extends AppCompatActivity {
 
         work_advances_recycler_view.setAdapter(work_advances_adapter);
 
-        work_expenses = View_Work_Sales_Person.work_expenses;
+        work_expenses = View_Work.work_expenses;
         work_expenses_adapter = new Work_Expense_Adapter(this, work_expenses);
 
         work_expenses_recycler_view = findViewById(R.id.recycler_view_expense);
