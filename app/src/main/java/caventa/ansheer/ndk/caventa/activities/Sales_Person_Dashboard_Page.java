@@ -1,12 +1,8 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -49,14 +45,13 @@ import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
 import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
+import caventa.ansheer.ndk.caventa.commons.Network_Utils;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
+import caventa.ansheer.ndk.caventa.commons.Tab_Layout_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
-
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_finish_and_origin;
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_origin;
 
 //TODO:Work search
 
@@ -64,14 +59,17 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     private static Context application_context;
     private static SharedPreferences settings;
-    private static int shortAnimTime;
+
     static FloatingActionButton fab;
+    private Context activity_context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         application_context = getApplicationContext();
+        activity_context = this;
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,13 +78,20 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Activity_Utils.start_activity_with_finish(Sales_Person_Dashboard_Page.this,Add_Work.class);
+
+                fin_data_flag = 0;
+                pen_data_flag = 0;
+                up_data_flag = 0;
+
+                finished_works_list = new ArrayList<>();
+                pending_works_list = new ArrayList<>();
+                upcoming_works_list = new ArrayList<>();
+
+                Activity_Utils.start_activity_with_finish(activity_context, Add_Work.class);
             }
         });
-        shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
-                Context.MODE_PRIVATE);
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE, Context.MODE_PRIVATE);
 
         setTitle(settings.getString("sales_person", "Unknown"));
 
@@ -112,6 +117,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        Tab_Layout_Utils.select_Tab(tabLayout, getIntent().getIntExtra("tab_index", 0));
     }
 
 
@@ -174,7 +180,9 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
                     Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_origin(getActivity(), View_Work.class, pending_works_list.get(position), "Sales_Person_Pen");
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(1, position), "Sales_Person_Pen");
+
+//                    start_activity_with_object_push_and_origin(getActivity(), View_Work.class, pending_works_list.get(position), "Sales_Person_Pen");
                 }
 
                 @Override
@@ -185,12 +193,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
             if (pen_data_flag == 0) {
 
-
                 if (load_pending_works_task != null) {
                     load_pending_works_task.cancel(true);
                     load_pending_works_task = null;
                 }
-                showProgress(true);
+                Network_Utils.showProgress(true, application_context, mProgressView, mLoginFormView);
                 load_pending_works_task = new Load_Pending_Works_Task(getActivity());
                 load_pending_works_task.execute((Void) null);
             }
@@ -245,7 +252,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_pending_works_task = null;
 
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -254,27 +261,20 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Pending Works...", fab);
 
                         } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-
                             for (int i = 1; i < json_array.length(); i++) {
-
 
                                 pending_works_list.add(new Work(json_array.getJSONObject(i).getString("name"),
                                         json_array.getJSONObject(i).getString("address"),
                                         json_array.getJSONObject(i).getString("id"),
                                         Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date")),
                                         Integer.parseInt(json_array.getJSONObject(i).getString("sales_person_id"))));
-
-
                             }
                             pending_works_adaptor.notifyDataSetChanged();
                             pen_data_flag = 1;
@@ -299,41 +299,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             @Override
             protected void onCancelled() {
                 load_pending_works_task = null;
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
             }
         }
 
         private static Load_Pending_Works_Task load_pending_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-
     }
 
 
@@ -371,10 +341,9 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                 public void onClick(View view, int position) {
                     Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
 
-//                    Intent intent = new Intent(application_context, View_Finished_Work_Sales_Person.class);
-//                    CachePot.getInstance().push(finished_works_list.get(position));
-//                    startActivity(intent);
-                    start_activity_with_object_push_and_origin(getActivity(), View_Work.class, finished_works_list.get(position),"Sales_Person_Fin");
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(2, position), "Sales_Person_Fin");
+
+//                    start_activity_with_object_push_and_origin(getActivity(), View_Work.class, finished_works_list.get(position),"Sales_Person_Fin");
                 }
 
                 @Override
@@ -389,7 +358,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     load_finished_works_task = null;
                 }
 
-                showProgress(true);
+                Network_Utils.showProgress(true, application_context, mProgressView, mLoginFormView);
                 load_finished_works_task = new Load_Finished_Works_Task();
                 load_finished_works_task.execute((Void) null);
             }
@@ -398,7 +367,6 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         }
 
         private RecyclerView recyclerView;
-
 
         static View mLoginFormView;
         static View mProgressView;
@@ -442,7 +410,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_finished_works_task = null;
 
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -451,9 +419,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Toast.makeText(application_context, "No Finished Works...", Toast.LENGTH_LONG).show();
@@ -485,40 +451,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             @Override
             protected void onCancelled() {
                 load_finished_works_task = null;
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
             }
         }
 
         private static Load_Finished_Works_Task load_finished_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
     }
 
     /**
@@ -555,10 +492,11 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                 @Override
                 public void onClick(View view, int position) {
                     Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
-//                    Intent intent = new Intent(application_context, View_Work_Sales_Person.class);
-//                    CachePot.getInstance().push(upcoming_works_list.get(position));
-//                    startActivity(intent);
-                    start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, upcoming_works_list.get(position), "Sales_Person_Up");
+
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(0, position), "Sales_Person_Up");
+
+//                    start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, upcoming_works_list.get(position), "Sales_Person_Up");
+
 
                 }
 
@@ -576,7 +514,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     load_upcoming_works_task = null;
                 }
 
-                showProgress(true);
+                Network_Utils.showProgress(true, application_context, mProgressView, mLoginFormView);
                 load_upcoming_works_task = new Load_Upcoming_Works_Task();
                 load_upcoming_works_task.execute((Void) null);
             }
@@ -588,7 +526,6 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
         static View mLoginFormView;
         static View mProgressView;
-
 
         public static class Load_Upcoming_Works_Task extends AsyncTask<Void, Void, String[]> {
 
@@ -627,7 +564,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_upcoming_works_task = null;
 
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -636,9 +573,7 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Toast.makeText(application_context, "No Upcoming Works...", Toast.LENGTH_LONG).show();
@@ -670,51 +605,20 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
             @Override
             protected void onCancelled() {
                 load_upcoming_works_task = null;
-                showProgress(false);
+                Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
             }
         }
 
         private static Load_Upcoming_Works_Task load_upcoming_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-
-
     }
 
-    private static List<Work> finished_works_list = new ArrayList<>();
+    static List<Work> finished_works_list = new ArrayList<>();
     static Work_Adapter finished_works_adaptor;
 
-    private static List<Work> pending_works_list = new ArrayList<>();
+    static List<Work> pending_works_list = new ArrayList<>();
     static Work_Adapter pending_works_adaptor;
 
-    private static List<Work> upcoming_works_list = new ArrayList<>();
+    static List<Work> upcoming_works_list = new ArrayList<>();
     static Work_Adapter upcoming_works_adaptor;
 
     /**
@@ -769,6 +673,34 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
 
     }
 
+    static Work clear_static_variables_and_return_current_work(int tab_index, int position) {
+        up_data_flag = 0;
+        fin_data_flag = 0;
+        pen_data_flag = 0;
+
+        Work current_work;
+
+        switch (tab_index) {
+            case 0:
+                current_work = upcoming_works_list.get(position);
+                break;
+
+            case 1:
+                current_work = pending_works_list.get(position);
+                break;
+
+            default:
+                current_work = finished_works_list.get(position);
+
+        }
+
+        upcoming_works_list = new ArrayList<>();
+        pending_works_list = new ArrayList<>();
+        finished_works_list = new ArrayList<>();
+
+        return current_work;
+    }
+
     @Override
     public void onBackPressed() {
         fin_data_flag = 0;
@@ -776,21 +708,10 @@ public class Sales_Person_Dashboard_Page extends AppCompatActivity {
         up_data_flag = 0;
 
         finished_works_list = new ArrayList<>();
-        finished_works_adaptor = new Work_Adapter(finished_works_list);
-
         pending_works_list = new ArrayList<>();
-        pending_works_adaptor = new Work_Adapter(pending_works_list);
-
         upcoming_works_list = new ArrayList<>();
-        upcoming_works_adaptor = new Work_Adapter(upcoming_works_list);
 
-        super.onBackPressed();
-//        finish();
+        Activity_Utils.start_activity_with_finish(activity_context, List_Sales_Persons.class);
     }
 
-    @Override
-    protected void onPause() {
-        finish();
-        super.onPause();
-    }
 }

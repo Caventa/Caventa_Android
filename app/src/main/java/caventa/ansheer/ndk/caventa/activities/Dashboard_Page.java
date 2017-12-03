@@ -1,12 +1,7 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -45,16 +40,16 @@ import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.DividerItemDecoration;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
+import caventa.ansheer.ndk.caventa.commons.Tab_Layout_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import ndk.prism.common_utils.Date_Utils;
 
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity;
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_finish_and_origin;
-import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_with_object_push_and_origin;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress;
 
 //TODO:Redesign work list card
 //TODO:work search
@@ -62,9 +57,56 @@ import static caventa.ansheer.ndk.caventa.commons.Activity_Utils.start_activity_
 
 public class Dashboard_Page extends AppCompatActivity {
 
-    private static Context application_context;
-    private static int shortAnimTime;
+    static Context application_context;
     static FloatingActionButton fab;
+    static List<Work> pending_works_list = new ArrayList<>(), finished_works_list = new ArrayList<>(), upcoming_works_list = new ArrayList<>();
+    static Context activity_context;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_home, menu);
+
+        // Associate searchable configuration with the SearchView
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
+    static Work clear_static_variables_and_return_current_work(int tab_index, int position) {
+        up_data_flag = 0;
+        fin_data_flag = 0;
+        pen_data_flag = 0;
+
+        Work current_work;
+
+        switch (tab_index) {
+            case 0:
+                current_work = upcoming_works_list.get(position);
+                break;
+
+            case 1:
+                current_work = pending_works_list.get(position);
+                break;
+
+            default:
+                current_work = finished_works_list.get(position);
+
+        }
+
+        upcoming_works_list = new ArrayList<>();
+        pending_works_list = new ArrayList<>();
+        finished_works_list = new ArrayList<>();
+
+        return current_work;
+    }
+
+    static int fin_data_flag = 0, pen_data_flag = 0, up_data_flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +114,7 @@ public class Dashboard_Page extends AppCompatActivity {
         setContentView(R.layout.dashboard_page);
 
         application_context = getApplicationContext();
+        activity_context=this;
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,11 +123,19 @@ public class Dashboard_Page extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(application_context, List_Sales_Persons.class);
-                startActivity(i);
+
+//                Activity_Utils.start_activity(application_context,List_Sales_Persons.class);
+                fin_data_flag = 0;
+                pen_data_flag = 0;
+                up_data_flag = 0;
+
+                finished_works_list = new ArrayList<>();
+                pending_works_list = new ArrayList<>();
+                upcoming_works_list = new ArrayList<>();
+
+                Activity_Utils.start_activity_with_finish(activity_context, List_Sales_Persons.class);
             }
         });
-        shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -108,22 +159,7 @@ public class Dashboard_Page extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-
-        // Associate searchable configuration with the SearchView
-//        SearchManager searchManager =
-//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView =
-//                (SearchView) menu.findItem(R.id.search).getActionView();
-//        searchView.setSearchableInfo(
-//                searchManager.getSearchableInfo(getComponentName()));
-
-        return true;
+        Tab_Layout_Utils.select_Tab(tabLayout, getIntent().getIntExtra("tab_index", 0));
     }
 
     @Override
@@ -134,15 +170,23 @@ public class Dashboard_Page extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_item_bank) {
-            start_activity(this,Accounts.class);
+//            Activity_Utils.start_activity(this, Accounts.class);
+
+            fin_data_flag = 0;
+            pen_data_flag = 0;
+            up_data_flag = 0;
+
+            finished_works_list = new ArrayList<>();
+            pending_works_list = new ArrayList<>();
+            upcoming_works_list = new ArrayList<>();
+
+            Activity_Utils.start_activity_with_finish_and_tab_index(this, Accounts.class, 0);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    static int fin_data_flag = 0, pen_data_flag = 0, up_data_flag = 0;
-
 
     /**
      * A placeholder fragment containing a simple view.
@@ -180,7 +224,15 @@ public class Dashboard_Page extends AppCompatActivity {
                 public void onClick(View view, int position) {
                     Log.d(General_Data.TAG, "Work ID : " + pending_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_origin(getActivity(),View_Work.class,pending_works_list.get(position),"Common_Pen");
+//                    pen_data_flag = 0;
+//                    clear_static_variables();
+
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(1,position) , "Common_Pen");
+
+//                    start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class,pending_works_list.get(position) , "Common_Pen");
+
+//                    Activity_Utils.start_activity_with_object_push_and_origin(getActivity(), View_Work.class, pending_works_list.get(position), "Common_Pen");
+
                 }
 
                 @Override
@@ -196,22 +248,17 @@ public class Dashboard_Page extends AppCompatActivity {
                     load_pending_works_task = null;
                 }
 
-                showProgress(true);
+                showProgress(true, application_context, mProgressView, mProgressView);
                 load_pending_works_task = new Load_Pending_Works_Task(getActivity());
                 load_pending_works_task.execute((Void) null);
-
             }
-
             return rootView;
         }
-
-
 
         private RecyclerView recyclerView;
         static View mLoginFormView;
         static View mProgressView;
 
-        private static List<Work> pending_works_list = new ArrayList<>();
         static Work_Adapter pending_works_adaptor;
 
         public static class Load_Pending_Works_Task extends AsyncTask<Void, Void, String[]> {
@@ -243,12 +290,11 @@ public class Dashboard_Page extends AppCompatActivity {
                 }
             }
 
-
             @Override
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_pending_works_task = null;
 
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -257,9 +303,7 @@ public class Dashboard_Page extends AppCompatActivity {
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Pending Works...", fab);
@@ -291,43 +335,12 @@ public class Dashboard_Page extends AppCompatActivity {
             @Override
             protected void onCancelled() {
                 load_pending_works_task = null;
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
             }
         }
 
         private static Load_Pending_Works_Task load_pending_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-
     }
-
 
     /**
      * A placeholder fragment containing a simple view.
@@ -364,7 +377,16 @@ public class Dashboard_Page extends AppCompatActivity {
 
                     Log.d(General_Data.TAG, "Work ID : " + finished_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_origin(getActivity(),View_Work.class,finished_works_list.get(position),"Common_Fin");
+
+//                    fin_data_flag = 0;
+//                    clear_static_variables();
+
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(2,position) , "Common_Fin");
+
+//                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, finished_works_list.get(position), "Common_Fin");
+
+//                    Activity_Utils.start_activity_with_object_push_and_origin(getActivity(), View_Work.class, finished_works_list.get(position), "Common_Fin");
+
                 }
 
                 @Override
@@ -374,12 +396,13 @@ public class Dashboard_Page extends AppCompatActivity {
             }));
 
             if (fin_data_flag == 0) {
+
                 if (load_finished_works_task != null) {
                     load_finished_works_task.cancel(true);
                     load_finished_works_task = null;
                 }
 
-                showProgress(true);
+                showProgress(true, application_context, mProgressView, mProgressView);
                 load_finished_works_task = new Load_Finished_Works_Task(getActivity());
                 load_finished_works_task.execute((Void) null);
             }
@@ -393,13 +416,13 @@ public class Dashboard_Page extends AppCompatActivity {
         static View mLoginFormView;
         static View mProgressView;
 
-        private static List<Work> finished_works_list = new ArrayList<>();
         static Work_Adapter finished_works_adaptor;
 
         public static class Load_Finished_Works_Task extends AsyncTask<Void, Void, String[]> {
-FragmentActivity current_activity;
+            FragmentActivity current_activity;
+
             Load_Finished_Works_Task(FragmentActivity current_Activity) {
-            this.current_activity=current_Activity;
+                this.current_activity = current_Activity;
             }
 
             DefaultHttpClient http_client;
@@ -429,7 +452,7 @@ FragmentActivity current_activity;
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_finished_works_task = null;
 
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -438,9 +461,7 @@ FragmentActivity current_activity;
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Finished Works...", fab);
@@ -473,40 +494,11 @@ FragmentActivity current_activity;
             @Override
             protected void onCancelled() {
                 load_finished_works_task = null;
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
             }
         }
 
         private static Load_Finished_Works_Task load_finished_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
     }
 
     /**
@@ -522,8 +514,7 @@ FragmentActivity current_activity;
         }
 
         @Override
-        public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_upcoming_works, container, false);
 
             recyclerView = rootView.findViewById(R.id.recycler_view);
@@ -545,7 +536,14 @@ FragmentActivity current_activity;
 
                     Log.d(General_Data.TAG, "Work ID : " + upcoming_works_list.get(position).getId());
 
-                    start_activity_with_object_push_and_finish_and_origin(getActivity(),View_Work.class,upcoming_works_list.get(position),"Common_Up");
+//                    up_data_flag = 0;
+//                    clear_static_variables();
+
+                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, clear_static_variables_and_return_current_work(0,position) , "Common_Up");
+
+//                    Activity_Utils.start_activity_with_object_push_and_finish_and_origin(getActivity(), View_Work.class, upcoming_works_list.get(position), "Common_Up");
+
+//                    Activity_Utils.start_activity_with_object_push_and_origin(getActivity(), View_Work.class, upcoming_works_list.get(position), "Common_Up");
                 }
 
                 @Override
@@ -562,7 +560,7 @@ FragmentActivity current_activity;
                     load_upcoming_works_task = null;
                 }
 
-                showProgress(true);
+                showProgress(true, application_context, mProgressView, mProgressView);
                 load_upcoming_works_task = new Load_Upcoming_Works_Task(getActivity());
                 load_upcoming_works_task.execute((Void) null);
             }
@@ -575,13 +573,13 @@ FragmentActivity current_activity;
         static View mLoginFormView;
         static View mProgressView;
 
-        private static List<Work> upcoming_works_list = new ArrayList<>();
         static Work_Adapter upcoming_works_adaptor;
 
         public static class Load_Upcoming_Works_Task extends AsyncTask<Void, Void, String[]> {
-FragmentActivity current_activity;
+            FragmentActivity current_activity;
+
             Load_Upcoming_Works_Task(FragmentActivity current_activity) {
-                this.current_activity=current_activity;
+                this.current_activity = current_activity;
             }
 
             DefaultHttpClient http_client;
@@ -611,7 +609,7 @@ FragmentActivity current_activity;
             protected void onPostExecute(final String[] network_action_response_array) {
                 load_upcoming_works_task = null;
 
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
 
                 Log.d(General_Data.TAG, network_action_response_array[0]);
                 Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -620,9 +618,7 @@ FragmentActivity current_activity;
                     Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, network_action_response_array[1]);
                 } else {
-
                     try {
-
                         JSONArray json_array = new JSONArray(network_action_response_array[1]);
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Snackbar_Utils.display_Short_FAB_success_bottom_SnackBar(current_activity, "No Upcoming Works...", fab);
@@ -654,42 +650,11 @@ FragmentActivity current_activity;
             @Override
             protected void onCancelled() {
                 load_upcoming_works_task = null;
-                showProgress(false);
+                showProgress(false, application_context, mProgressView, mProgressView);
             }
         }
 
         private static Load_Upcoming_Works_Task load_upcoming_works_task = null;
-
-        /**
-         * Shows the progress UI and hides the login form.
-         */
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-        private static void showProgress(final boolean show) {
-            // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-            // for very easy animations. If available, use these APIs to fade-in
-            // the progress spinner.
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-
-
     }
 
     /**
@@ -698,7 +663,7 @@ FragmentActivity current_activity;
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -709,16 +674,12 @@ FragmentActivity current_activity;
             switch (position) {
                 case 0:
                     return Upcoming_Works_Fragment.newInstance();
-//                    return Pending_Works_Fragment.newInstance();
-
 
                 case 1:
                     return Pending_Works_Fragment.newInstance();
 
-
                 default:
                     return Finished_Works_Fragment.newInstance();
-
 
             }
         }

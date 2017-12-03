@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.commons.TODO_Utils;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_installments_ledger_table_view.Loan_Installments_Ledger_Entry;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.loan_installments_ledger_table_view.Loan_Installments_Ledger_TableView;
@@ -67,13 +67,12 @@ public class Loan_Installments_Ledger extends AppCompatActivity {
         setTitle(selected_loan_ledger_entry.getParticulars());
         application_context = getApplicationContext();
         if (load_account_ledger_task != null) {
-            finish();
+            load_account_ledger_task.cancel(true);
+            load_account_ledger_task = null;
         }
         showProgress(true);
         load_account_ledger_task = new Load_Account_Ledger_Task();
         load_account_ledger_task.execute((Void) null);
-
-
     }
 
 
@@ -239,8 +238,8 @@ public class Loan_Installments_Ledger extends AppCompatActivity {
 //        }
 
         if (id == R.id.menu_item_add) {
-//            start_activity(Add_Other_Expense.class);
-            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
+            Activity_Utils.start_activity_with_object_push_and_finish(this,Add_Loan_Installment.class,selected_loan_ledger_entry);
+//            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
             return true;
         }
 

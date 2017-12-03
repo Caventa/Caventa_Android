@@ -79,10 +79,10 @@
             android:label="Sales Reports"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.Add_Other_Expense"
+            android:name=".activities.Add_Other_Expense_Sale"
             android:label="Add Other Expense" />
         <activity
-            android:name=".activities.Other_Expense_Ledger"
+            android:name=".activities.Other_Expense_Sale_Ledger"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.Investment_Ledger"
@@ -103,6 +103,14 @@
         </activity>
         <activity
             android:name=".activities.Loan_Installments_Ledger"
+            android:screenOrientation="landscape" />
+        <activity android:name=".activities.Add_Investment" />
+        <activity android:name=".activities.Add_Loan" />
+        <activity android:name=".activities.Add_Loan_Installment" />
+        <activity
+            android:name=".activities.Sales_Ledger"
+            android:label="Sales Ledger"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="landscape" />
 
     </application>

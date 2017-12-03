@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -37,6 +36,7 @@
                     android:id="@+id/show_calendar"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     app:srcCompat="@android:drawable/ic_menu_my_calendar" />
@@ -46,13 +46,15 @@
                     android:layout_width="8dp"
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
-                    android:layout_toEndOf="@+id/show_calendar" />
+                    android:layout_toEndOf="@+id/show_calendar"
+                    android:layout_toRightOf="@+id/show_calendar" />
 
                 <TextView
                     android:id="@+id/work_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/space"
+                    android:layout_toRightOf="@+id/space"
                     android:text="22-10-2015"
                     android:textAlignment="center"
                     android:textSize="20sp"
@@ -63,24 +65,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="16dp" />
 
-            <Spinner
-                android:id="@+id/spinner_category"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <android.support.v4.widget.Space
-                android:layout_width="match_parent"
-                android:layout_height="16dp" />
-
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/description"
+                    android:id="@+id/receipt_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Description"
+                    android:hint="Receipt Number"
                     android:imeOptions="actionNext"
                     android:inputType="text" />
 
@@ -90,13 +83,72 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+
                 <EditText
-                    android:id="@+id/amount"
+                    android:id="@+id/payed_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Amount"
-                    android:imeOptions="actionDone"
+                    android:gravity="top|left"
+                    android:hint="Payed Amount"
+                    android:imeOptions="actionNext"
                     android:inputType="numberDecimal"
+                    android:scrollbars="vertical" />
+
+            </android.support.design.widget.TextInputLayout>
+			
+			<android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:id="@+id/principle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|left"
+                    android:hint="Principle Amount"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
+                    android:scrollbars="vertical" />
+
+            </android.support.design.widget.TextInputLayout>
+			
+			  
+			
+			<android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:id="@+id/interest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|left"
+                    android:hint="Interest"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
+                    android:lines="5"
+                    android:maxLines="5"
+                    android:minLines="1"
+                    android:scrollbars="vertical" />
+
+            </android.support.design.widget.TextInputLayout>
+			
+			
+			<android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:id="@+id/remarks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|left"
+                    android:hint="Remarks"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:scrollbars="vertical" />
 
             </android.support.design.widget.TextInputLayout>
@@ -104,9 +156,7 @@
             <android.support.v4.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="16dp" />
-
             <Button
-                android:id="@+id/button_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Submit" />

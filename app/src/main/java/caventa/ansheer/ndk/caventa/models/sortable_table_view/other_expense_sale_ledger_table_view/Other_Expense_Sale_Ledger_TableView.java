@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view;
+package caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -13,21 +13,21 @@ import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 
 
 /**
- * An extension of the {@link SortableTableView} that handles {@link Other_Expense_Ledger_Entry}s.
+ * An extension of the {@link SortableTableView} that handles {@link Other_Expense_Sale_Ledger_Entry}s.
  *
  * @author ISchwarz
  */
-public class Other_Expense_Ledger_TableView extends SortableTableView<Other_Expense_Ledger_Entry> {
+public class Other_Expense_Sale_Ledger_TableView extends SortableTableView<Other_Expense_Sale_Ledger_Entry> {
 
-    public Other_Expense_Ledger_TableView(final Context context) {
+    public Other_Expense_Sale_Ledger_TableView(final Context context) {
         this(context, null);
     }
 
-    public Other_Expense_Ledger_TableView(final Context context, final AttributeSet attributes) {
+    public Other_Expense_Sale_Ledger_TableView(final Context context, final AttributeSet attributes) {
         this(context, attributes, android.R.attr.listViewStyle);
     }
 
-    public Other_Expense_Ledger_TableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
+    public Other_Expense_Sale_Ledger_TableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
         super(context, attributes, styleAttributes);
 
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(context, "#", "Par.", "Am.");
@@ -45,9 +45,9 @@ public class Other_Expense_Ledger_TableView extends SortableTableView<Other_Expe
         tableColumnWeightModel.setColumnWeight(2, 2);
         setColumnModel(tableColumnWeightModel);
 
-        setColumnComparator(0, Other_Expense_Ledger_Table_Comparators.get_Insertion_Date_Comparator());
-        setColumnComparator(1, Other_Expense_Ledger_Table_Comparators.get_Particulars_Comparator());
-        setColumnComparator(2, Other_Expense_Ledger_Table_Comparators.get_Amount_Comparator());
+        setColumnComparator(0, Other_Expense_Sale_Ledger_Table_Comparators.get_Insertion_Date_Comparator());
+        setColumnComparator(1, Other_Expense_Sale_Ledger_Table_Comparators.get_Particulars_Comparator());
+        setColumnComparator(2, Other_Expense_Sale_Ledger_Table_Comparators.get_Amount_Comparator());
     }
 
 }

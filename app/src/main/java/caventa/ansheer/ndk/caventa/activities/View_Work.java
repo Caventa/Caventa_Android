@@ -1,13 +1,9 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +40,7 @@ import caventa.ansheer.ndk.caventa.adapters.Work_Advances_View_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_View_Adapter;
 import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.Snackbar_Utils;
+import caventa.ansheer.ndk.caventa.commons.TODO_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -52,6 +49,7 @@ import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
 import static caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline;
+import static caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress;
 import static caventa.ansheer.ndk.caventa.commons.Visibility_Utils.set_visible;
 
 //TODO:Cancel work
@@ -74,6 +72,7 @@ public class View_Work extends AppCompatActivity {
     Work selected_work;
     private TextView txt_commission;
     private TextView txt_net_profit;
+    private Context activity_context;
 
 
     @Override
@@ -83,6 +82,7 @@ public class View_Work extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         application_context = getApplicationContext();
+        activity_context=this;
 
         selected_work = CachePot.getInstance().pop(Work.class);
         setTitle(selected_work.getWork_name());
@@ -119,7 +119,7 @@ public class View_Work extends AppCompatActivity {
             load_work_profit_task.cancel(true);
             load_work_profit_task = null;
         }
-        showProgress(true);
+        showProgress(true, application_context, mProgressView, mLoginFormView);
         load_work_profit_task = new Load_Work_Profit_Task(this);
         load_work_profit_task.execute((Void) null);
 
@@ -194,7 +194,7 @@ public class View_Work extends AppCompatActivity {
         protected void onPostExecute(final String[] network_action_response_array) {
             load_work_profit_task = null;
 
-            showProgress(false);
+            showProgress(false, application_context, mProgressView, mLoginFormView);
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -207,10 +207,7 @@ public class View_Work extends AppCompatActivity {
                 JSONArray json_array = new JSONArray();
                 int i = 0;
                 try {
-
                     json_array = new JSONArray(network_action_response_array[1]);
-
-
                     for (i = 0; i < json_array.length(); i++) {
                         if (json_array.getJSONObject(0).getString("status").equals("1")) {
                             Snackbar_Utils.display_Short_no_FAB_warning_bottom_SnackBar(current_activity, "No Advances...");
@@ -269,47 +266,14 @@ public class View_Work extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
-
             }
-
-
         }
 
         @Override
         protected void onCancelled() {
             load_work_profit_task = null;
-            showProgress(false);
+            showProgress(false, application_context, mProgressView, mLoginFormView);
         }
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
     }
 
     @Override
@@ -345,7 +309,7 @@ public class View_Work extends AppCompatActivity {
 
                             // Show a progress spinner, and kick off a background task to perform the user login attempt.
                             if (isOnline(application_context)) {
-                                showProgress(true);
+                                showProgress(true, application_context, mProgressView, mLoginFormView);
                                 finish_work_task = new Finish_Work_Task(selected_work.getId());
                                 finish_work_task.execute((Void) null);
                             } else {
@@ -373,6 +337,7 @@ public class View_Work extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int id) {
 
                             dialog.cancel();
+                            TODO_Utils.display_TODO_no_FAB_SnackBar(activity_context);
 
 
                         }
@@ -395,6 +360,7 @@ public class View_Work extends AppCompatActivity {
             CachePot.getInstance().push(selected_work);
             startActivity(i);
             finish();
+//            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
             return true;
         }
 
@@ -406,9 +372,26 @@ public class View_Work extends AppCompatActivity {
 
         switch (getIntent().getExtras().getString("origin")) {
             case "Sales_Person_Up":
-                Activity_Utils.start_activity_with_finish(this, Sales_Person_Dashboard_Page.class);
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Sales_Person_Dashboard_Page.class, 0);
+                break;
+            case "Sales_Person_Pen":
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Sales_Person_Dashboard_Page.class, 1);
+                break;
+            case "Sales_Person_Fin":
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Sales_Person_Dashboard_Page.class, 2);
+                break;
             case "Common_Up":
-                Activity_Utils.start_activity_with_finish(this, Dashboard_Page.class);
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Dashboard_Page.class, 0);
+//                super.onBackPressed();
+                break;
+            case "Common_Pen":
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Dashboard_Page.class, 1);
+//                super.onBackPressed();
+                break;
+            case "Common_Fin":
+                Activity_Utils.start_activity_with_finish_and_tab_index(this, Dashboard_Page.class, 2);
+//                super.onBackPressed();
+                break;
             default:
                 super.onBackPressed();
         }
@@ -458,7 +441,7 @@ public class View_Work extends AppCompatActivity {
         protected void onPostExecute(final String[] network_action_response_array) {
             finish_work_task = null;
 
-            showProgress(false);
+            showProgress(false, application_context, mProgressView, mLoginFormView);
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -467,7 +450,6 @@ public class View_Work extends AppCompatActivity {
                 Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
-
                 try {
                     JSONObject json = new JSONObject(network_action_response_array[1]);
                     String count = json.getString("status");
@@ -475,7 +457,9 @@ public class View_Work extends AppCompatActivity {
                         case "0":
                             Toast.makeText(application_context, "OK", Toast.LENGTH_LONG).show();
 
-                            Activity_Utils.start_activity_with_finish(View_Work.this, List_Sales_Persons.class);
+//                            Activity_Utils.start_activity_with_finish_and_tab_index(activity_context,Sales_Person_Dashboard_Page.class,0);
+
+                            Activity_Utils.start_activity_with_finish_and_tab_index(activity_context, Sales_Person_Dashboard_Page.class, 2);
 
                             break;
                         case "1":
@@ -485,22 +469,17 @@ public class View_Work extends AppCompatActivity {
                         default:
                             Toast.makeText(application_context, "Error : Check json", Toast.LENGTH_LONG).show();
                     }
-
                 } catch (JSONException e) {
                     Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
                 }
-
-
             }
-
-
         }
 
         @Override
         protected void onCancelled() {
             finish_work_task = null;
-            showProgress(false);
+            showProgress(false, application_context, mProgressView, mLoginFormView);
         }
     }
 

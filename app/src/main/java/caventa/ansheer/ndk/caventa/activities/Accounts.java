@@ -1,15 +1,9 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,8 +11,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import com.github.kimkevin.cachepot.CachePot;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -34,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
+import caventa.ansheer.ndk.caventa.commons.Network_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import ndk.prism.common_utils.Toast_Utils;
@@ -44,16 +38,17 @@ import ndk.prism.common_utils.Toast_Utils;
 
 public class Accounts extends AppCompatActivity {
 
-    private Button button_Commisions;
-    private Context application_context;
+    private Button button_Commissions;
+    private static Context application_context;
     static List<Sales_Person> sales_persons;
-    private LinearLayout mLoginFormView;
-    private ProgressBar mProgressView;
+    private static LinearLayout mLoginFormView;
+    private static ProgressBar mProgressView;
     private Button button_Other_Expenses;
     private Button button_sales;
     private Button button_loans;
     private Button button_investments;
     private Button button_Ledger;
+    static Context activity_context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,17 +56,18 @@ public class Accounts extends AppCompatActivity {
         setContentView(R.layout.accounts);
         initView();
         application_context = getApplicationContext();
-        button_Commisions.setOnClickListener(new View.OnClickListener() {
+        activity_context = this;
+        button_Commissions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isOnline()) {
-                    if (load_sales_persons_commision_task != null) {
-                        load_sales_persons_commision_task.cancel(true);
-                        load_sales_persons_commision_task = null;
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    if (load_sales_persons_commission_task != null) {
+                        load_sales_persons_commission_task.cancel(true);
+                        load_sales_persons_commission_task = null;
                     }
-                    showProgress(true);
-                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task("Commisions");
-                    load_sales_persons_commision_task.execute((Void) null);
+                    caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress(true, application_context, mProgressView, mLoginFormView);
+                    load_sales_persons_commission_task = new Load_Sales_Persons_Commission_Task("Commisions", activity_context);
+                    load_sales_persons_commission_task.execute((Void) null);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -81,8 +77,8 @@ public class Accounts extends AppCompatActivity {
         button_Other_Expenses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline()) {
-                    load_other_expenses_ledger_page();
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    Activity_Utils.start_activity_with_integer_extras(activity_context, Other_Expense_Sale_Ledger.class, new Pair[]{new Pair("position", 0)});
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -92,14 +88,14 @@ public class Accounts extends AppCompatActivity {
         button_sales.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline()) {
-                    if (load_sales_persons_commision_task != null) {
-                        load_sales_persons_commision_task.cancel(true);
-                        load_sales_persons_commision_task = null;
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    if (load_sales_persons_commission_task != null) {
+                        load_sales_persons_commission_task.cancel(true);
+                        load_sales_persons_commission_task = null;
                     }
-                    showProgress(true);
-                    load_sales_persons_commision_task = new Load_Sales_Persons_Commision_Task("Sales Reports");
-                    load_sales_persons_commision_task.execute((Void) null);
+                    caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress(true, application_context, mProgressView, mLoginFormView);
+                    load_sales_persons_commission_task = new Load_Sales_Persons_Commission_Task("Sales Reports", activity_context);
+                    load_sales_persons_commission_task.execute((Void) null);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -109,8 +105,8 @@ public class Accounts extends AppCompatActivity {
         button_loans.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Loan_Ledger.class);
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    Activity_Utils.start_activity(activity_context, Loan_Ledger.class);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -121,8 +117,8 @@ public class Accounts extends AppCompatActivity {
         button_investments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Investment_Ledger.class);
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    Activity_Utils.start_activity(activity_context, Investment_Ledger.class);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -133,8 +129,8 @@ public class Accounts extends AppCompatActivity {
         button_Ledger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline()) {
-                    start_activity(Account_Ledger.class);
+                if (caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline(application_context)) {
+                    Activity_Utils.start_activity(activity_context, Account_Ledger.class);
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
                 }
@@ -143,42 +139,26 @@ public class Accounts extends AppCompatActivity {
         });
     }
 
-    void start_activity(Class activity) {
-        Intent intent = new Intent(getApplicationContext(), activity);
-        startActivity(intent);
-    }
-
-
-    private void load_other_expenses_ledger_page() {
-        Intent i = new Intent(application_context, Other_Expense_Ledger.class);
-        i.putExtra("position", 0);
-        startActivity(i);
-    }
-
     private void initView() {
-        button_Commisions = findViewById(R.id.button_commisions);
+        button_Commissions = findViewById(R.id.button_commisions);
         mLoginFormView = findViewById(R.id.email_login_form);
         mProgressView = findViewById(R.id.login_progress);
         button_Other_Expenses = findViewById(R.id.button_other_expenses);
         button_sales = findViewById(R.id.button_sales);
         button_loans = findViewById(R.id.button_loans);
         button_investments = findViewById(R.id.button_investments);
-        button_Ledger = (Button) findViewById(R.id.button_ledger);
+        button_Ledger = findViewById(R.id.button_ledger);
     }
 
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
+    private static Load_Sales_Persons_Commission_Task load_sales_persons_commission_task = null;
 
-    private Load_Sales_Persons_Commision_Task load_sales_persons_commision_task = null;
-
-    public class Load_Sales_Persons_Commision_Task extends AsyncTask<Void, Void, String[]> {
+    public static class Load_Sales_Persons_Commission_Task extends AsyncTask<Void, Void, String[]> {
         String task_origin;
+        Context current_activity;
 
-        Load_Sales_Persons_Commision_Task(String origin) {
+        Load_Sales_Persons_Commission_Task(String origin, Context current_activity) {
             this.task_origin = origin;
+            this.current_activity = current_activity;
         }
 
         DefaultHttpClient http_client;
@@ -206,9 +186,9 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final String[] network_action_response_array) {
-            load_sales_persons_commision_task = null;
+            load_sales_persons_commission_task = null;
 
-            showProgress(false);
+            Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -217,10 +197,7 @@ public class Accounts extends AppCompatActivity {
                 Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
-
-
                 try {
-
                     JSONArray json_array = new JSONArray(network_action_response_array[1]);
                     if (json_array.getJSONObject(0).getString("status").equals("1")) {
                         Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
@@ -233,16 +210,13 @@ public class Accounts extends AppCompatActivity {
 
                         }
                         if (task_origin.equals("Commisions")) {
-                            Intent intent = new Intent(getApplicationContext(), Commision_Page.class);
-                            CachePot.getInstance().push(sales_persons.get(1));
-                            intent.putExtra("position", 0);
-                            startActivity(intent);
-                        }
-                        else if (task_origin.equals("Sales Reports")) {
-                            Intent intent = new Intent(getApplicationContext(), Sales_Reports.class);
-                            CachePot.getInstance().push(sales_persons.get(0));
-                            intent.putExtra("position", 0);
-                            startActivity(intent);
+
+                            Activity_Utils.start_activity_with_object_push_and_integer_extras(current_activity, Commision_Page.class, new Pair[]{new Pair("position", 0)}, sales_persons.get(1));
+
+                        } else if (task_origin.equals("Sales Reports")) {
+
+                            Activity_Utils.start_activity_with_object_push_and_integer_extras(current_activity, Sales_Ledger.class, new Pair[]{new Pair("position", 0)}, sales_persons.get(0));
+//                            Activity_Utils.start_activity(current_activity,Sales_Ledger.class);
                         }
                     }
 
@@ -260,37 +234,13 @@ public class Accounts extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            load_sales_persons_commision_task = null;
-            showProgress(false);
+            load_sales_persons_commission_task = null;
+            Network_Utils.showProgress(false, application_context, mProgressView, mLoginFormView);
         }
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
+    @Override
+    public void onBackPressed() {
+        Activity_Utils.start_activity_with_finish_and_tab_index(this, Dashboard_Page.class, 0);
     }
 }

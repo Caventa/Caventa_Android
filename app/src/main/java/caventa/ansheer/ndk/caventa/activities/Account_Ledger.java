@@ -57,7 +57,8 @@ public class Account_Ledger extends AppCompatActivity {
 
         application_context = getApplicationContext();
         if (load_account_ledger_task != null) {
-            finish();
+            load_account_ledger_task.cancel(true);
+            load_account_ledger_task = null;
         }
         showProgress(true);
         load_account_ledger_task = new Load_Account_Ledger_Task();
@@ -138,12 +139,12 @@ public class Account_Ledger extends AppCompatActivity {
                         double balance = 0;
                         for (int i = 1; i < json_array.length(); i++) {
 
-                            if (json_array.getJSONObject(i).getString("particulars").contains("Advance")) {
+                            if (json_array.getJSONObject(i).getString("particulars").contains("~Advance")||json_array.getJSONObject(i).getString("particulars").contains("~Investment")||json_array.getJSONObject(i).getString("particulars").contains("~Other Sale")||json_array.getJSONObject(i).getString("particulars").contains("~Loan")) {
                                 balance = balance + Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
                                 account_ledger_entries.add(new Account_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), 0, Double.parseDouble(json_array.getJSONObject(i).getString("amount")), balance));
                                 Log.d(General_Data.TAG, String.valueOf(balance));
                             }
-                            if (json_array.getJSONObject(i).getString("particulars").contains("Expense")||json_array.getJSONObject(i).getString("particulars").contains("Commision")) {
+                            if (json_array.getJSONObject(i).getString("particulars").contains("~Expense")||json_array.getJSONObject(i).getString("particulars").contains("~Commission")||json_array.getJSONObject(i).getString("particulars").contains("~Other Expense")||json_array.getJSONObject(i).getString("particulars").contains("~Installment")) {
                                 balance = balance - Double.parseDouble(json_array.getJSONObject(i).getString("amount"));
                                 account_ledger_entries.add(new Account_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("particulars"), Double.parseDouble(json_array.getJSONObject(i).getString("amount")), 0, balance));
                                 Log.d(General_Data.TAG, String.valueOf(balance));

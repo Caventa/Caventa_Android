@@ -1,4 +1,4 @@
-package caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view;
+package caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view;
 
 import android.content.Context;
 import android.view.View;
@@ -13,28 +13,28 @@ import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 
 import static android.graphics.Color.BLACK;
 
-public class Other_Expense_Ledger_Table_Data_Adapter extends LongPressAwareTableDataAdapter<Other_Expense_Ledger_Entry> {
+public class Other_Expense_Sale_Ledger_Table_Data_Adapter extends LongPressAwareTableDataAdapter<Other_Expense_Sale_Ledger_Entry> {
 
     private static final int TEXT_SIZE = 14;
 
-    public Other_Expense_Ledger_Table_Data_Adapter(final Context context, final List<Other_Expense_Ledger_Entry> data, final TableView<Other_Expense_Ledger_Entry> tableView) {
+    public Other_Expense_Sale_Ledger_Table_Data_Adapter(final Context context, final List<Other_Expense_Sale_Ledger_Entry> data, final TableView<Other_Expense_Sale_Ledger_Entry> tableView) {
         super(context, data, tableView);
     }
 
     @Override
     public View getDefaultCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        final Other_Expense_Ledger_Entry other_expense_ledger_entry = getRowData(rowIndex);
+        final Other_Expense_Sale_Ledger_Entry other_expense_Sale_ledger_entry = getRowData(rowIndex);
         View renderedView = null;
 
         switch (columnIndex) {
             case 0:
-                renderedView = renderString(Date_Utils.normal_date_short_year_format.format(other_expense_ledger_entry.getInsertion_date()));
+                renderedView = renderString(Date_Utils.normal_date_short_year_format.format(other_expense_Sale_ledger_entry.getInsertion_date()));
                 break;
             case 1:
-                renderedView = renderString(other_expense_ledger_entry.getParticulars());
+                renderedView = renderString(other_expense_Sale_ledger_entry.getParticulars());
                 break;
             case 2:
-                renderedView = renderString(String.valueOf(other_expense_ledger_entry.getAmount()));
+                renderedView = renderString(String.valueOf(other_expense_Sale_ledger_entry.getAmount()));
                 break;
 
         }

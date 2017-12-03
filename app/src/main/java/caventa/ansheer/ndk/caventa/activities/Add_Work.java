@@ -29,7 +29,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,6 +37,7 @@ import java.util.List;
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Work_Advances_Adapter;
 import caventa.ansheer.ndk.caventa.adapters.Work_Expense_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Work_Advance;
@@ -46,8 +46,6 @@ import ndk.prism.common_utils.Date_Picker_Utils;
 import ndk.prism.common_utils.Date_Utils;
 import ndk.prism.common_utils.Toast_Utils;
 
-import static caventa.ansheer.ndk.caventa.commons.Alert_Dialog_Utils.show_uncancelled_yes_no_confirmation_for_unsaved_data_and_finish_on_yes;
-import static caventa.ansheer.ndk.caventa.commons.Network_Utils.handle_json_insertion_response_and_switch_with_finish;
 import static caventa.ansheer.ndk.caventa.commons.Network_Utils.isOnline;
 import static caventa.ansheer.ndk.caventa.commons.Network_Utils.perform_http_client_network_task;
 import static caventa.ansheer.ndk.caventa.commons.Network_Utils.showProgress;
@@ -68,13 +66,13 @@ public class Add_Work extends AppCompatActivity {
 
     double total_advance = 0, total_expense = 0, total_profit = 0;
     private Calendar calendar;
-    private SimpleDateFormat sdf;
     private EditText txt_name;
     private EditText txt_address;
 
     private View mProgressView;
     private View mLoginFormView;
     private SharedPreferences settings;
+    static Context activity_context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +80,7 @@ public class Add_Work extends AppCompatActivity {
         setContentView(R.layout.add_work);
         setTitle("New Work");
         application_context = getApplicationContext();
+        activity_context = this;
         settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,Context.MODE_PRIVATE);
         txt_total_advance = findViewById(R.id.total_advance);
         txt_total_expense = findViewById(R.id.total_expense);
@@ -215,7 +214,6 @@ public class Add_Work extends AppCompatActivity {
 
                                     work_expenses_adapter.notifyDataSetChanged();
                                 }
-
                             }
 
                         })
@@ -245,7 +243,6 @@ public class Add_Work extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-
             }
         }));
         initView();
@@ -321,6 +318,8 @@ public class Add_Work extends AppCompatActivity {
         return true;
     }
 
+    static MenuItem save_menu_item;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -329,11 +328,31 @@ public class Add_Work extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_item_save) {
+            save_menu_item=item;
             attempt_work_save();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    public void show_uncancelled_yes_no_confirmation_for_unsaved_data_and_finish_on_yes(final Context context) {
+        AlertDialog.Builder delete_confirmation_dialog = new AlertDialog.Builder(context);
+        delete_confirmation_dialog.setMessage("Unsaved data will be lost! Continue? ");
+        delete_confirmation_dialog.setCancelable(false);
+        delete_confirmation_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                Activity_Utils.start_activity_with_finish_and_tab_index(activity_context,Sales_Person_Dashboard_Page.class,0);
+            }
+        });
+        delete_confirmation_dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = delete_confirmation_dialog.create();
+        alert.setTitle("Warning!");
+        alert.show();
     }
 
     @Override
@@ -341,7 +360,7 @@ public class Add_Work extends AppCompatActivity {
         if (form_check()) {
             show_uncancelled_yes_no_confirmation_for_unsaved_data_and_finish_on_yes(this);
         } else {
-            super.onBackPressed();
+            Activity_Utils.start_activity_with_finish_and_tab_index(activity_context,Sales_Person_Dashboard_Page.class,0);
         }
     }
 
@@ -392,6 +411,7 @@ public class Add_Work extends AppCompatActivity {
         if (isOnline(application_context)) {
             showProgress(true,application_context,mProgressView,mLoginFormView);
             mAuthTask = new Work_Save_Task(txt_name.getText().toString(), txt_address.getText().toString(), generate_advances_json(), generate_expenses_json(), calendar.getTime(), settings.getInt("sales_person_id", 0), this);
+            save_menu_item.setEnabled(false);
             mAuthTask.execute((Void) null);
         } else {
             Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -428,6 +448,7 @@ public class Add_Work extends AppCompatActivity {
 
         @Override
         protected String[] doInBackground(Void... params) {
+            Log.d(General_Data.TAG,task_work_name+","+task_work_address+","+ caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format.format(task_work_date)+","+task_sales_person_id+","+task_advances_json+","+task_expenses_json);
             return perform_http_client_network_task(General_Data.SERVER_IP_ADDRESS + "/android/add_work.php", new Pair[]{new Pair("work_name", task_work_name),
                     new Pair("work_address", task_work_address), new Pair("work_date", Date_Utils.mysql_Date_Format.format(task_work_date)), new Pair("sales_person_id", String.valueOf(task_sales_person_id)),
                     new Pair("advances_json", task_advances_json), new Pair("expenses_json", task_expenses_json)});
@@ -442,16 +463,48 @@ public class Add_Work extends AppCompatActivity {
 
             handle_json_insertion_response_and_switch_with_finish(network_action_response_array, current_activity, Sales_Person_Dashboard_Page.class, application_context, txt_name);
 
-
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false,application_context,mProgressView,mLoginFormView);
+            save_menu_item.setEnabled(true);
         }
     }
 
+    public void handle_json_insertion_response_and_switch_with_finish(String[] network_action_response_array, AppCompatActivity current_activity, Class to_switch_activity, Context context, View view_to_focus_on_error) {
+        Log.d(General_Data.TAG, network_action_response_array[0]);
+        Log.d(General_Data.TAG, network_action_response_array[1]);
+
+        if (network_action_response_array[0].equals("1")) {
+            Toast.makeText(context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
+            Log.d(General_Data.TAG, network_action_response_array[1]);
+        } else {
+
+            try {
+                JSONObject json = new JSONObject(network_action_response_array[1]);
+                String response_code = json.getString("status");
+                switch (response_code) {
+                    case "0":
+                        Toast.makeText(context, "OK", Toast.LENGTH_LONG).show();
+                        Activity_Utils.start_activity_with_finish_and_tab_index(current_activity,to_switch_activity,0);
+                        break;
+                    case "1":
+                        Toast.makeText(context, "Error : " + json.getString("error"), Toast.LENGTH_LONG).show();
+                        view_to_focus_on_error.requestFocus();
+                        break;
+                    default:
+                        Toast.makeText(context, "Error : Check json", Toast.LENGTH_LONG).show();
+                }
+
+            } catch (JSONException e) {
+                Toast.makeText(context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Log.d(General_Data.TAG, e.getLocalizedMessage());
+            }
+        }
+        save_menu_item.setEnabled(true);
+    }
 
     private void attempt_work_save() {
         if (mAuthTask != null) {

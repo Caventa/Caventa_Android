@@ -15,7 +15,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_spinner" />
+        layout="@layout/toolbar_spinner_start" />
 
     <ScrollView
         android:id="@+id/login_form"

@@ -37,24 +37,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
-import caventa.ansheer.ndk.caventa.commons.TODO_Utils;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_Entry;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_TableView;
-import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_ledger_table_view.Other_Expense_Ledger_Table_Data_Adapter;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_Entry;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_TableView;
+import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_Table_Data_Adapter;
 import ndk.prism.common_utils.Toast_Utils;
 
 import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 
 //TODO:Loans
 
-public class Other_Expense_Ledger extends AppCompatActivity {
+public class Other_Expense_Sale_Ledger extends AppCompatActivity {
 
 
     private Context application_context;
-    static List<Other_Expense_Ledger_Entry> other_expense_ledger_entries;
+    static List<Other_Expense_Sale_Ledger_Entry> other_expense_ledger_entries;
     private ProgressBar mProgressView;
-    private Other_Expense_Ledger_TableView other_expense_ledger_tableView;
+    private Other_Expense_Sale_Ledger_TableView other_expense_Sale_ledger_tableView;
     Spinner spinner_Scheme;
     private Bundle extras;
     private ArrayList<String> spinner_list;
@@ -62,7 +62,7 @@ public class Other_Expense_Ledger extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.other_expense_ledger);
+        setContentView(R.layout.other_expense_sale_ledger);
         initView();
 
         application_context = getApplicationContext();
@@ -133,7 +133,7 @@ public class Other_Expense_Ledger extends AppCompatActivity {
     }
 
     private void load_other_expenses_ledger_page() {
-        Intent i = new Intent(application_context, Other_Expense_Ledger.class);
+        Intent i = new Intent(application_context, Other_Expense_Sale_Ledger.class);
         i.putExtra("position", spinner_Scheme.getSelectedItemPosition());
         startActivity(i);
         finish();
@@ -150,7 +150,7 @@ public class Other_Expense_Ledger extends AppCompatActivity {
 
     private void initView() {
         mProgressView = findViewById(R.id.login_progress);
-        other_expense_ledger_tableView = findViewById(R.id.tableView);
+        other_expense_Sale_ledger_tableView = findViewById(R.id.tableView);
 
     }
 
@@ -211,12 +211,12 @@ public class Other_Expense_Ledger extends AppCompatActivity {
 
                         for (int i = 1; i < json_array.length(); i++) {
 
-                            other_expense_ledger_entries.add(new Other_Expense_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("description"), Double.parseDouble(json_array.getJSONObject(i).getString("amount"))));
+                            other_expense_ledger_entries.add(new Other_Expense_Sale_Ledger_Entry(mysql_date_time_format.parse(json_array.getJSONObject(i).getString("insertion_date_time")), json_array.getJSONObject(i).getString("description"), Double.parseDouble(json_array.getJSONObject(i).getString("amount"))));
                         }
 
-                        if (other_expense_ledger_tableView != null) {
-                            final Other_Expense_Ledger_Table_Data_Adapter other_expense_ledger_table_data_adapter = new Other_Expense_Ledger_Table_Data_Adapter(getApplicationContext(), other_expense_ledger_entries, other_expense_ledger_tableView);
-                            other_expense_ledger_tableView.setDataAdapter(other_expense_ledger_table_data_adapter);
+                        if (other_expense_Sale_ledger_tableView != null) {
+                            final Other_Expense_Sale_Ledger_Table_Data_Adapter other_expense_Sale_ledger_table_data_adapter = new Other_Expense_Sale_Ledger_Table_Data_Adapter(getApplicationContext(), other_expense_ledger_entries, other_expense_Sale_ledger_tableView);
+                            other_expense_Sale_ledger_tableView.setDataAdapter(other_expense_Sale_ledger_table_data_adapter);
 
                         }
                     }
@@ -252,12 +252,12 @@ public class Other_Expense_Ledger extends AppCompatActivity {
         // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        other_expense_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
-        other_expense_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
+        other_expense_Sale_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+        other_expense_Sale_ledger_tableView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                other_expense_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
+                other_expense_Sale_ledger_tableView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 
@@ -292,8 +292,8 @@ public class Other_Expense_Ledger extends AppCompatActivity {
 //        }
 
         if (id == R.id.menu_item_add) {
-//            start_activity(Add_Other_Expense.class);
-            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
+            Activity_Utils.start_activity_with_finish(this,Add_Other_Expense_Sale.class);
+//            TODO_Utils.display_TODO_no_FAB_SnackBar(this);
             return true;
         }
 

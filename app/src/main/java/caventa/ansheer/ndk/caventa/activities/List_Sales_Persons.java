@@ -1,15 +1,10 @@
 package caventa.ansheer.ndk.caventa.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -37,6 +32,7 @@ import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.adapters.Sales_Person_Adapter;
+import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
 import caventa.ansheer.ndk.caventa.commons.Network_Utils;
 import caventa.ansheer.ndk.caventa.commons.RecyclerTouchListener;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
@@ -52,6 +48,7 @@ public class List_Sales_Persons extends AppCompatActivity {
     SharedPreferences settings;
     private View mProgressView;
     private View mLoginFormView;
+    private Context activity_context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +56,9 @@ public class List_Sales_Persons extends AppCompatActivity {
         setContentView(R.layout.sales_persons);
 
         application_context = getApplicationContext();
+        activity_context = this;
 
-        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,
-                Context.MODE_PRIVATE);
+        settings = getApplicationContext().getSharedPreferences(General_Data.SHARED_PREFERENCE,Context.MODE_PRIVATE);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -92,8 +89,9 @@ public class List_Sales_Persons extends AppCompatActivity {
                     editor.putString("sales_person", sales_person.getName());
                     editor.apply();
 
-                    Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
-                    startActivity(i);
+//                    Intent i = new Intent(application_context, Sales_Person_Dashboard_Page.class);
+//                    startActivity(i);
+                    Activity_Utils.start_activity_with_finish_and_tab_index(activity_context,Sales_Person_Dashboard_Page.class,0);
 
                 } else {
                     Toast_Utils.longToast(getApplicationContext(), "Internet is unavailable");
@@ -126,7 +124,7 @@ public class List_Sales_Persons extends AppCompatActivity {
             load_sales_persons_task.cancel(true);
             load_sales_persons_task = null;
         }
-        showProgress(true);
+        Network_Utils.showProgress(true,application_context,mProgressView,mLoginFormView);
         load_sales_persons_task = new Load_Sales_Persons_Task();
         load_sales_persons_task.execute((Void) null);
     }
@@ -167,7 +165,7 @@ public class List_Sales_Persons extends AppCompatActivity {
         protected void onPostExecute(final String[] network_action_response_array) {
             load_sales_persons_task = null;
 
-            showProgress(false);
+            Network_Utils.showProgress(false,application_context,mProgressView,mLoginFormView);
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -176,73 +174,29 @@ public class List_Sales_Persons extends AppCompatActivity {
                 Toast.makeText(application_context, "Error : " + network_action_response_array[1], Toast.LENGTH_LONG).show();
                 Log.d(General_Data.TAG, network_action_response_array[1]);
             } else {
-
-
                 try {
-
                     JSONArray json_array = new JSONArray(network_action_response_array[1]);
                     if (json_array.getJSONObject(0).getString("status").equals("1")) {
                         Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-
                         for (int i = 1; i < json_array.length(); i++) {
                             sales_persons.add(new Sales_Person(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("id")));
-
-
                         }
-
                         sales_person_adapter.notifyDataSetChanged();
-
-
                     }
-
-
                 } catch (JSONException e) {
                     Toast.makeText(application_context, "Error : " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     Log.d(General_Data.TAG, e.getLocalizedMessage());
                 }
-
-
             }
-
-
         }
 
         @Override
         protected void onCancelled() {
             load_sales_persons_task = null;
-            showProgress(false);
+            Network_Utils.showProgress(false,application_context,mProgressView,mLoginFormView);
         }
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
     }
 
     /**
@@ -289,5 +243,10 @@ public class List_Sales_Persons extends AppCompatActivity {
     private int dpToPx(int dp) {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    @Override
+    public void onBackPressed() {
+        Activity_Utils.start_activity_with_finish_and_tab_index(this,Dashboard_Page.class,0);
     }
 }

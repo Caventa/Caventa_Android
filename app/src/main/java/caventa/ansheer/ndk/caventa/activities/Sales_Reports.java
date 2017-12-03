@@ -116,7 +116,6 @@ public class Sales_Reports extends AppCompatActivity {
 
         work_overviews = new ArrayList<>();
 
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
