@@ -80,7 +80,7 @@ public class Splash_Screen extends AppCompatActivity {
                             } else {
                                 Toast.makeText(application_context, "Latest Version...", Toast.LENGTH_SHORT).show();
                                 // After completing http call will close this activity and launch main activity
-                                Activity_Utils.start_activity_with_finish_and_tab_index(current_activity,Dashboard_Page.class,0);
+                                Activity_Utils.start_activity_with_finish_and_tab_index(current_activity,Login.class,0);
 //                                Activity_Utils.start_activity_with_finish(current_activity,Dashboard_Page.class);
                             }
                         }

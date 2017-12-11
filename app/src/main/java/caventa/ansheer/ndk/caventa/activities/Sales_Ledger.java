@@ -4,15 +4,22 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +28,18 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.github.kimkevin.cachepot.CachePot;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -33,14 +52,21 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.commons.Activity_Utils;
+import caventa.ansheer.ndk.caventa.commons.Date_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.account_ledger_table_view.Account_Ledger_Entry;
@@ -61,7 +87,6 @@ public class Sales_Ledger extends AppCompatActivity {
     private Account_Ledger_TableView account_ledger_tableView;
     private Sales_Person selected_sales_person;
     private Spinner spinner_Scheme;
-    private ArrayList<String> spinner_list;
 
 
     @Override
@@ -104,7 +129,7 @@ public class Sales_Ledger extends AppCompatActivity {
             }
         });
 
-        spinner_list = new ArrayList<>();
+        ArrayList<String> spinner_list = new ArrayList<>();
 
         for (int i = 0; i < Accounts.sales_persons.size(); i++) {
             spinner_list.add(Accounts.sales_persons.get(i).getName());
@@ -122,6 +147,197 @@ public class Sales_Ledger extends AppCompatActivity {
         showProgress(true);
         load_account_ledger_task = new Load_Account_Ledger_Task();
         load_account_ledger_task.execute((Void) null);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.add_work, menu);
+
+        // Associate searchable configuration with the SearchView
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.menu_item_save) {
+//            Activity_Utils.start_activity(this, Accounts.class);
+            if (create_Account_Ledger_Pdf())
+                promptForNextAction();
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    File myFile;
+
+    boolean create_Account_Ledger_Pdf() {
+
+        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+        boolean is_documents_Present = true;
+        if (!docsFolder.exists()) {
+            is_documents_Present = docsFolder.mkdir();
+        }
+        if (is_documents_Present) {
+            File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS), "Caventa Manager");
+            boolean is_caventa_manager_Present = true;
+            if (!pdfFolder.exists()) {
+                is_caventa_manager_Present = pdfFolder.mkdir();
+
+            }
+            if (is_caventa_manager_Present) {
+
+                Log.i(General_Data.TAG, "Pdf Directory created");
+
+                //Create time stamp
+                Date date = new Date();
+                String timeStamp = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss").format(date);
+                myFile = new File(pdfFolder + "/Sales_" +selected_sales_person.getName()+"_"+ timeStamp + ".pdf");
+
+                try {
+                    OutputStream output = new FileOutputStream(myFile);
+
+                    //Step 1
+                    Document document = new Document(PageSize.A4);
+
+                    //Step 2
+                    PdfWriter.getInstance(document, output);
+
+                    //Step 3
+                    document.open();
+
+                    //Step 4 Add content
+
+                    Paragraph title = new Paragraph("Caventa Manager, Sales Ledger, "+selected_sales_person.getName(), FontFactory.getFont(FontFactory.TIMES_ROMAN, 16, Font.BOLD, BaseColor.BLACK));
+
+                    addEmptyLine(title, 1);
+                    title.setAlignment(Element.ALIGN_CENTER);
+                    document.add(title);
+
+                    PdfPTable table = new PdfPTable(5);
+
+                    PdfPCell c1 = new PdfPCell(new Phrase("Date"));
+                    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(c1);
+
+                    PdfPCell c2 = new PdfPCell(new Phrase("Particulars"));
+                    c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(c2);
+
+                    PdfPCell c3 = new PdfPCell(new Phrase("Debit"));
+                    c3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(c3);
+
+                    PdfPCell c4 = new PdfPCell(new Phrase("Credit"));
+                    c4.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(c4);
+
+                    PdfPCell c5 = new PdfPCell(new Phrase("Balance"));
+                    c5.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(c5);
+
+//                    table.setHeaderRows(1);
+
+//                    table.addCell("1.1");
+//                    table.addCell("1.2");
+//                    table.addCell("1.3");
+
+                    if (!account_ledger_entries.isEmpty()) {
+                        for (Account_Ledger_Entry account_ledger_entry : account_ledger_entries) {
+                            table.addCell(Date_Utils.normal_date_time_short_year_format.format(account_ledger_entry.getInsertion_date()));
+                            table.addCell(account_ledger_entry.getParticulars());
+                            table.addCell(String.valueOf(account_ledger_entry.getDebit_amount()));
+                            table.addCell(String.valueOf(account_ledger_entry.getCredit_amount()));
+                            table.addCell(String.valueOf(account_ledger_entry.getBalance()));
+                        }
+                    }
+
+                    document.add(table);
+
+                    //Step 5: Close the document
+                    document.close();
+                    return true;
+
+                } catch (DocumentException | FileNotFoundException e) {
+                    e.printStackTrace();
+                    Log.i(General_Data.TAG, "Pdf Creation failure " + e.getLocalizedMessage());
+                    Toast_Utils.longToast(application_context, "Pdf fail");
+                }
+
+            } else {
+                Log.i(General_Data.TAG, "Folder Creation failure ");
+                Toast_Utils.longToast(application_context, "Folder fail");
+            }
+
+        } else {
+            Log.i(General_Data.TAG, "Folder Creation failure ");
+            Toast_Utils.longToast(application_context, "Folder fail");
+        }
+        return false;
+    }
+
+    private static void addEmptyLine(Paragraph paragraph, int number) {
+        for (int i = 0; i < number; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+    }
+
+    private void promptForNextAction() {
+        final String[] options = {
+                "Preview It",
+                "Cancel"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ledger Saved, What Next?");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (options[which].equals("Email It")) {
+                    emailNote();
+                } else if (options[which].equals("Preview It")) {
+                    viewPdf();
+                } else if (options[which].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        builder.show();
+
+    }
+
+
+    private void emailNote() {
+        Intent email = new Intent(Intent.ACTION_SEND);
+        email.putExtra(Intent.EXTRA_SUBJECT, "mSubjectEditText.getText().toString()");
+        email.putExtra(Intent.EXTRA_TEXT, "mBodyEditText.getText().toString()");
+        Uri uri = Uri.parse(myFile.getAbsolutePath());
+        email.putExtra(Intent.EXTRA_STREAM, uri);
+        email.setType("message/rfc822");
+        startActivity(email);
+    }
+
+    private void viewPdf() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(myFile), "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
     }
 
     private void load_sales_reports_page() {
@@ -185,6 +401,7 @@ public class Sales_Ledger extends AppCompatActivity {
             load_account_ledger_task = null;
 
             showProgress(false);
+            account_ledger_entries = new ArrayList<>();
 
             Log.d(General_Data.TAG, network_action_response_array[0]);
             Log.d(General_Data.TAG, network_action_response_array[1]);
@@ -202,7 +419,7 @@ public class Sales_Ledger extends AppCompatActivity {
                         Toast.makeText(application_context, "Error...", Toast.LENGTH_LONG).show();
                     } else if (json_array.getJSONObject(0).getString("status").equals("0")) {
 
-                        account_ledger_entries = new ArrayList<>();
+
 
                         double balance = 0;
                         for (int i = 1; i < json_array.length(); i++) {

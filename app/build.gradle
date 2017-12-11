@@ -42,4 +42,5 @@ dependencies {
     implementation 'com.github.kimkevin:cachepot:1.2.0'
     implementation group: 'com.koushikdutta.ion', name: 'ion', version: '2.2.1'
     implementation 'de.codecrafters.tableview:tableview:2.8.0'
+    implementation 'com.itextpdf:itext-pdfa:5.5.5'
 }

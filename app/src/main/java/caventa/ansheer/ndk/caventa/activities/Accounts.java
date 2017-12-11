@@ -85,6 +85,8 @@ public class Accounts extends AppCompatActivity {
             }
         });
 
+        button_Other_Expenses.setVisibility(View.INVISIBLE);
+
         button_sales.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,6 +116,8 @@ public class Accounts extends AppCompatActivity {
             }
         });
 
+        button_loans.setVisibility(View.INVISIBLE);
+
         button_investments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,6 +129,8 @@ public class Accounts extends AppCompatActivity {
 
             }
         });
+
+        button_investments.setVisibility(View.INVISIBLE);
 
         button_Ledger.setOnClickListener(new View.OnClickListener() {
             @Override
