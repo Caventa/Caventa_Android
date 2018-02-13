@@ -19,10 +19,12 @@ import caventa.ansheer.ndk.caventa.commons.Application_VCS_Utils;
 import caventa.ansheer.ndk.caventa.commons.Network_Utils;
 import caventa.ansheer.ndk.caventa.commons.Server_Utils;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import ndk.prism.common_utils.Update_Utils;
+import ndk.utils.Update_Utils;
+
 
 import static caventa.ansheer.ndk.caventa.commons.Network_Utils.display_Long_no_FAB_no_network_bottom_SnackBar;
-import static ndk.prism.common_utils.Network_Utils.display_Friendly_Exception_Message;
+import static ndk.utils.Network_Utils.display_Friendly_Exception_Message;
+
 
 //TODO:Full screen splash
 

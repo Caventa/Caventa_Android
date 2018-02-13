@@ -43,9 +43,9 @@ import java.util.ArrayList;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
-import ndk.prism.common_utils.Network_Utils;
-import ndk.prism.common_utils.Toast_Utils;
-import ndk.prism.common_utils.Update_Utils;
+import ndk.utils.Network_Utils;
+import ndk.utils.Toast_Utils;
+import ndk.utils.Update_Utils;
 
 
 public class Login extends AppCompatActivity {

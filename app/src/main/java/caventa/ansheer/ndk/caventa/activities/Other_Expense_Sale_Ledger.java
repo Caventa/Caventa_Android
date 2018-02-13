@@ -42,7 +42,8 @@ import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_Entry;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_TableView;
 import caventa.ansheer.ndk.caventa.models.sortable_table_view.other_expense_sale_ledger_table_view.Other_Expense_Sale_Ledger_Table_Data_Adapter;
-import ndk.prism.common_utils.Toast_Utils;
+import ndk.utils.Toast_Utils;
+
 
 import static caventa.ansheer.ndk.caventa.commons.Date_Utils.mysql_date_time_format;
 

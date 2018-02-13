@@ -45,8 +45,9 @@ import caventa.ansheer.ndk.caventa.adapters.Work_Overview_Adapter;
 import caventa.ansheer.ndk.caventa.constants.General_Data;
 import caventa.ansheer.ndk.caventa.models.Sales_Person;
 import caventa.ansheer.ndk.caventa.models.Work_Overview;
-import ndk.prism.common_utils.Date_Utils;
-import ndk.prism.common_utils.Toast_Utils;
+import ndk.utils.Date_Utils;
+import ndk.utils.Toast_Utils;
+
 
 //TODO:Sales reports
 
@@ -230,7 +231,7 @@ public class Sales_Reports extends AppCompatActivity {
 
                         for (i = 1; i < json_array.length(); i++) {
 
-                            work_overviews.add(new Work_Overview(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("address"),Date_Utils.normal_Date_Format_words.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date"))),json_array.getJSONObject(i).getString("total_advance").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_advance")),json_array.getJSONObject(i).getString("total_expense").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_expense")) ));
+                            work_overviews.add(new Work_Overview(json_array.getJSONObject(i).getString("name"), json_array.getJSONObject(i).getString("address"), Date_Utils.normal_Date_Format_words.format(Date_Utils.mysql_Date_Format.parse(json_array.getJSONObject(i).getString("work_date"))),json_array.getJSONObject(i).getString("total_advance").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_advance")),json_array.getJSONObject(i).getString("total_expense").equals("null")? 0 : Double.parseDouble(json_array.getJSONObject(i).getString("total_expense")) ));
 
                         }
 

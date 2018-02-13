@@ -10,7 +10,8 @@ import java.util.List;
 
 import caventa.ansheer.ndk.caventa.R;
 import caventa.ansheer.ndk.caventa.models.Work;
-import ndk.prism.common_utils.Date_Utils;
+import ndk.utils.Date_Utils;
+
 
 public class Work_Adapter extends RecyclerView.Adapter<Work_Adapter.MyViewHolder> {
 
