@@ -6,7 +6,8 @@ env:
   global:
     # - "FTP_USER=coordinator@edcccet.in"
     # - "FTP_USER=root@filebooker.com"        
-    - "FTP_USER=ndk@vfmob.com.md-in-64.webhostbox.net"
+    # - "FTP_USER=ndk@vfmob.com.md-in-64.webhostbox.net"
+    - "FTP_USER=root@alaneesgroup.com"
     - "FTP_PASSWORD=9895204814"
     
 notifications:
@@ -20,6 +21,9 @@ android:
     - build-tools-27.0.1
     - android-27
     - extra-android-m2repository
+    
+licenses:
+    - 'android-sdk-license-.+'
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -42,4 +46,4 @@ before_install:
 script: ./gradlew build
 
 after_success:
-    - curl --ftp-create-dirs -T "{${TRAVIS_BUILD_DIR}/${DIR}/app/build/outputs/apk/debug/app-debug.apk}" -u $FTP_USER:$FTP_PASSWORD ftp://vfmob.com.md-in-64.webhostbox.net/baneeishaque/caventa_production/builds/travis/
+    - curl --ftp-create-dirs -T "{${TRAVIS_BUILD_DIR}/${DIR}/app/build/outputs/apk/debug/app-debug.apk}" -u $FTP_USER:$FTP_PASSWORD ftp://192.254.233.216/travis_build_outs/caventa_production/
